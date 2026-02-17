@@ -1,0 +1,164 @@
+EXIOBASE_Code,EXIOBASE_Name,SUT_Product_ID,SUT_Product_Name,Water_2022
+IN,Paddy rice,1,Paddy,20457.570987712428
+IN.1,Wheat,2,Wheat,13216.62901016343
+IN.2,Cereal grains nec,3,Coarse cereals,1545.8058496358788
+IN.3,"Vegetables, fruit, nuts",18,Fruits,6026.65829090909
+IN.4,Oil seeds,7,Groundnut,4350.89696969697
+IN.5,"Sugar cane, sugar beet",12,Sugarcane,6118.780765819394
+IN.6,Plant-based fibers,11,"jute, hemp and mesta",39.37253212121213
+IN.7,Crops nec,20,Other food crops,5033.604269380365
+IN.8,Cattle,21,Milk,377.9769696969697
+IN.9,Pigs,24,Other livestock products,4.872339393939394
+IN.10,Poultry,23,Egg and poultry,6.61589793939394
+IN.11,Meat animals nec,24,Other livestock products,48.6560806060606
+IN.12,Animal products nec,24,Other livestock products,0.0
+IN.13,Raw milk,21,Milk,0.0
+IN.14,"Wool, silk-worm cocoons",22,Wool,0.0
+IN.15,"Forestry, logging",25,Industry Wood,0.0
+IN.16,"Fishing, aquaculture",28,Inland Fish,0.0
+IN.17,Anthracite,30,Coal and Lignite,0.0
+IN.18,Coking Coal,30,Coal and Lignite,0.0
+IN.19,Other Bituminous Coal,30,Coal and Lignite,0.0
+IN.20,Sub-Bituminous Coal,30,Coal and Lignite,0.0
+IN.21,Patent Fuel,30,Coal and Lignite,0.0
+IN.22,Lignite/Brown Coal,30,Coal and Lignite,0.0
+IN.23,BKB/Peat Briquettes,30,Coal and Lignite,0.0
+IN.24,Peat,30,Coal and Lignite,0.0
+IN.25,Crude petroleum,32,Crude petroleum,0.0
+IN.26,Natural gas,31,Natural Gas,0.0
+IN.27,Natural gas liquids,31,Natural Gas,0.0
+IN.28,Other hydrocarbons,31,Natural Gas,0.0
+IN.29,Uranium and thorium ores,33,Iron ore,0.0
+IN.30,Iron ores,33,Iron ore,0.0
+IN.31,Copper ores,36,Copper ore,0.0
+IN.32,Nickel ores,37,Other Metallic minerals,0.0
+IN.33,Aluminium ores,35,Bauxite,0.0
+IN.34,Meat cattle products,42,Processed other meat & meat products,1.4799901967013576
+IN.35,Meat pigs products,42,Processed other meat & meat products,0.3214170703031696
+IN.36,Meat poultry products,41,Processed poultry meat & poultry meat products,19.03876439059825
+IN.37,Meat products nec,42,Processed other meat & meat products,1.666728847811782
+IN.38,Vegetable oils and fats,46,Edible Oils and Fats,9.328199884105926
+IN.39,Dairy products,45,Dairy products,72.80979546750102
+IN.40,Processed rice,47,"Grain Mill products, starch and starch products",37.03036075090691
+IN.41,Sugar,48,Sugar,2.122706374136752
+IN.42,Food products nec,50,Miscellaneous food products,108.32497293170654
+IN.43,Beverages,51,Alcoholic beverages,3.457042010199273
+IN.44,Fish products,43,Processed fish & fish products,144.86021166442916
+IN.45,Tobacco products,55,Tobacco Products,0.413801622049697
+IN.46,Textiles,56,Cotton Yarn and Cotton Textiles,55.19801343665176
+IN.47,Wearing apparel; furs,61,Ready made garments,29.52000705727273
+IN.48,Leather products,64,Leather and leather products except footwear,4.3368178710964855
+IN.49,Wood products,65,Wood and wood products except furniture,40.63128782670304
+IN.50,Pulp,66,"Paper, Paper products and newsprint",0.0
+IN.51,Re-processing of paper,66,"Paper, Paper products and newsprint",206.26379651847304
+IN.52,Paper products,66,"Paper, Paper products and newsprint",0.0
+IN.53,Printed matter,67,"Publishing, printing and allied activities",76.5043638600422
+IN.54,Coke Oven Coke,71,Petroleum products,63.43237533363812
+IN.55,Gas Coke,71,Petroleum products,6.457740777231999
+IN.56,Coal Tar,72,Coal tar products,6.385600251870436
+IN.57,Gas Works Gas,71,Petroleum products,0.0
+IN.58,Coke oven gas,71,Petroleum products,156.89330947878787
+IN.59,Blast Furnace Gas,71,Petroleum products,0.0
+IN.60,Other recovered gases,71,Petroleum products,188.68508091772625
+IN.61,Petroleum Refinery,71,Petroleum products,308.5074985113164
+IN.62,Ethane,71,Petroleum products,36.68460961731091
+IN.63,LPG,71,Petroleum products,6.412302862379394
+IN.64,Motor Gasoline,71,Petroleum products,17.814021218061093
+IN.65,Aviation Gasoline,71,Petroleum products,0.0
+IN.66,Gasoline Type Jet Fuel,71,Petroleum products,3.234033424511067
+IN.67,Kerosene Type Jet Fuel,71,Petroleum products,18.91076012398028
+IN.68,Kerosene,71,Petroleum products,22.82057733152943
+IN.69,Gas/Diesel Oil,71,Petroleum products,0.0
+IN.70,Heavy Fuel Oil,71,Petroleum products,1.6911020214218184
+IN.71,Refinery Gas,71,Petroleum products,174.8008419417067
+IN.72,Liquefied Refinery Gases,72,Coal tar products,279.5450536778133
+IN.73,Refinery Feedstocks,71,Petroleum products,0.0258919151390424
+IN.74,Additives/Blending,71,Petroleum products,0.0
+IN.75,Other Hydrocarbons,71,Petroleum products,24.929520860254655
+IN.76,White Spirit & SBP,71,Petroleum products,0.0
+IN.77,Lubricants,71,Petroleum products,1.6425618639567274
+IN.78,Bitumen,71,Petroleum products,0.0
+IN.79,Paraffin Waxes,71,Petroleum products,2.5117402754831515
+IN.80,Petroleum Coke,71,Petroleum products,0.0
+IN.81,Non-specified Petroleum,71,Petroleum products,31.951975519297445
+IN.82,Industrial Biofuels,71,Petroleum products,0.0
+IN.83,Municipal wastes (renew),71,Petroleum products,0.0616768515776242
+IN.84,Primary solid biofuels,71,Petroleum products,131.1659918937885
+IN.85,Other liquid biofuels,71,Petroleum products,0.0053583490544663
+IN.86,Municipal Wastes (non-renew),71,Petroleum products,0.7901000557575757
+IN.87,Primary solid biofuels,71,Petroleum products,5.531760534073509
+IN.88,Other liquid biofuels,71,Petroleum products,0.4087144903530557
+IN.89,N-fertiliser,75,Fertilizers,0.613066394179297
+IN.90,P-fertiliser,75,Fertilizers,0.1006702072497575
+IN.91,Chemicals nec,81,Other chemicals and chemical products,0.3098791057302181
+IN.92,Electricity - coal,114,Electricity,17.85865624499187
+IN.93,Electricity - gas,114,Electricity,9.565961212121214e-10
+IN.94,Electricity - nuclear,114,Electricity,0.0
+IN.95,Electricity - hydro,114,Electricity,194.62509090909091
+IN.96,Electricity - wind,114,Electricity,2.5771757575757577
+IN.97,Electricity - petroleum,114,Electricity,8.980824242424244
+IN.98,Electricity - biomass/waste,114,Electricity,0.0
+IN.99,Electricity - solar PV,114,Electricity,0.0
+IN.100,Electricity - solar thermal,114,Electricity,0.0079314909090909
+IN.101,Electricity - tide/wave/ocean,114,Electricity,0.0841321212121212
+IN.102,Electricity - geothermal,114,Electricity,0.0
+IN.103,Electricity - nec,114,Electricity,0.0
+IN.104,Electricity transmission,114,Electricity,0.0
+IN.105,Electricity distribution,114,Electricity,0.0
+IN.106,Gas distribution,115,Gas,0.0
+IN.107,Steam/hot water supply,115,Gas,0.0
+IN.108,Water supply,116,Water Supply,0.0
+IN.109,Construction,113,Construction and construction services,0.0
+IN.133,Sewage/refuse disposal,116,Water Supply,0.0
+IN.110,Motor vehicle sales/repair,118,Repair & Maintenance of Motor Vehicle,0.0
+IN.111,Wholesale trade,117,Trade,0.0
+IN.112,Retail trade,117,Trade,0.0
+IN.113,Hotels and restaurants,119,Hotels & Restaurant,0.0
+IN.114,Railway transport,120,Railway Transport,0.0
+IN.115,Road transport,121,Land transport,0.0
+IN.116,Pipeline transport,121,Land transport,0.0
+IN.117,Sea/coastal transport,123,Water Transport,0.0
+IN.118,Inland water transport,123,Water Transport,0.0
+IN.119,Air transport,122,Air transport,0.0
+IN.120,Transport support; travel agencies,124,Supportive and Auxiliary transport activities,0.0
+IN.121,Post and telecom,126,Communication services,0.0
+IN.122,Financial services,127,Financial services,0.0
+IN.123,Insurance/pension,128,Insurance services,0.0
+IN.124,Financial auxiliaries,127,Financial services,0.0
+IN.125,Real estate,130,Real estate services,0.0
+IN.126,Machinery rental,131,Renting of machinery & equipment,0.0
+IN.127,Computer services,135,Computer related services,0.0
+IN.128,R&D services,132,Research & Development Services,0.0
+IN.129,Business services,134,Other Business services,0.0
+IN.130,Public administration,136,Public administration and defence,0.0
+IN.131,Education,137,Education services,0.0
+IN.132,Health and social work,138,Human health and social care services,0.0
+IN.134,Membership organizations,139,"Community, social and personal services",0.0
+IN.135,Recreational/cultural services,140,"Recreation, entertainment and radio & TV broadcasting and other services",0.0
+IN.136,Other services,139,"Community, social and personal services",0.0
+IN.137,Private households,139,"Community, social and personal services",0.0
+IN.138,Other sector 138,112,Miscellaneous manufacturing,0.0
+IN.139,Other sector 139,112,Miscellaneous manufacturing,0.0
+IN.140,Other sector 140,112,Miscellaneous manufacturing,0.0
+IN.141,Other sector 141,112,Miscellaneous manufacturing,0.0
+IN.142,Other sector 142,112,Miscellaneous manufacturing,0.0
+IN.143,Other sector 143,112,Miscellaneous manufacturing,0.0
+IN.144,Other sector 144,112,Miscellaneous manufacturing,0.0
+IN.145,Other sector 145,112,Miscellaneous manufacturing,0.0
+IN.146,Other sector 146,112,Miscellaneous manufacturing,0.0
+IN.147,Other sector 147,112,Miscellaneous manufacturing,0.0
+IN.148,Other sector 148,112,Miscellaneous manufacturing,0.0
+IN.149,Other sector 149,112,Miscellaneous manufacturing,0.0
+IN.150,Other sector 150,112,Miscellaneous manufacturing,0.0
+IN.151,Other sector 151,112,Miscellaneous manufacturing,0.0
+IN.152,Other sector 152,112,Miscellaneous manufacturing,0.0
+IN.153,Other sector 153,112,Miscellaneous manufacturing,0.0
+IN.154,Other sector 154,112,Miscellaneous manufacturing,0.0
+IN.155,Other sector 155,112,Miscellaneous manufacturing,0.0
+IN.156,Other sector 156,112,Miscellaneous manufacturing,0.0
+IN.157,Other sector 157,112,Miscellaneous manufacturing,0.0
+IN.158,Other sector 158,112,Miscellaneous manufacturing,0.0
+IN.159,Other sector 159,112,Miscellaneous manufacturing,0.0
+IN.160,Other sector 160,112,Miscellaneous manufacturing,0.0
+IN.161,Other sector 161,112,Miscellaneous manufacturing,2.7814181818181817e-06
+IN.162,Other sector 162,112,Miscellaneous manufacturing,0.0
