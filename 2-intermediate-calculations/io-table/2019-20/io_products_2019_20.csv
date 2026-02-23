@@ -1,0 +1,141 @@
+Product_ID,Product_Name
+1,Paddy
+2,Wheat
+3,Coarse cereals
+4,Gram
+5,Arhar
+6,Other pulses
+7,Groundnut
+8,Rapeseed and mustard
+9,Other oil seeds
+10,kapas
+11,"jute, hemp and mesta"
+12,Sugarcane
+13,Coconut
+14,Tobacco
+15,Tea
+16,Coffee
+17,Rubber
+18,Fruits
+19,Vegetables
+20,Other food crops
+21,Milk
+22,Wool
+23,Egg and poultry
+24,Other livestock products
+25,Industry Wood
+26,Firewood
+27,Other forestry products
+28,Inland Fish
+29,Marine Fish
+30,Coal and Lignite
+31,Natural Gas
+32,Crude petroleum
+33,Iron ore
+34,Manganese ore
+35,Bauxite
+36,Copper ore
+37,Other Metallic minerals
+38,Limestone
+39,Mica
+40,Other non metallic minerals
+41,Processed poultry meat & poultry meat products
+42,Processed other meat & meat products
+43,Processed fish & fish products
+44,Processed fruits & Processed Vegetables
+45,Dairy products
+46,Edible Oils and Fats
+47,"Grain Mill products, starch and starch products"
+48,Sugar
+49,Bread & Bakery products
+50,Miscellaneous food products
+51,Alcoholic beverages
+52,Non alcoholic beverages
+53,Tea processed
+54,Coffee processed
+55,Tobacco Products
+56,Cotton Yarn and Cotton Textiles
+57,Synthetic yarn and synthetic textiles
+58,Wool yarn and woolen textiles
+59,Silk yarn and silk textiles
+60,Carpet weaving
+61,Ready made garments
+62,Misc. textile products
+63,Leather footwear
+64,Leather and leather products except footwear
+65,Wood and wood products except furniture
+66,"Paper, Paper products and newsprint"
+67,"Publishing, printing and allied activities"
+68,Furniture & Fixtures
+69,Rubber products
+70,Plastic products
+71,Petroleum products
+72,Coal tar products
+73,Inorganic chemicals
+74,Organic chemicals
+75,Fertilizers
+76,Pesticides
+77,"Paints, varnishes and lacquers"
+78,Drugs and medicine
+79,"Soaps, cosmetics and glycerin"
+80,"Synthetic fibres, resin"
+81,Other chemicals and chemical products
+82,Cement
+83,Non metallic mineral products
+84,Iron and steel Ferro alloys
+85,Iron and steel casting and forging
+86,Iron and steel foundries
+87,Non ferrous basic metals (including alloys)
+88,"Hand tools, hardware"
+89,Miscellaneous metal products
+90,Tractors and other agricultural implements
+91,Industrial machinery for food and textile industry
+92,Industrial machinery (except food and textile)
+93,Machine tools
+94,Other non electrical machinery
+95,Electrical industrial machinery
+96,"Electrical cables, wires"
+97,Batteries
+98,Electrical appliances
+99,Communication equipment
+100,Other electrical machinery
+101,Electronic equipment including T.V
+102,"Medical precision, optical instrument"
+103,Watches and clocks
+104,Ships and boats
+105,Rail equipment
+106,Motor vehicles
+107,Motor cycles and scooters
+108,"Bicycles, cycle-rickshaw"
+109,Aircrafts & Spacecrafts
+110,Other transport equipment
+111,Gems & jewellery
+112,Miscellaneous manufacturing
+113,Construction and construction services
+114,Electricity
+115,Gas
+116,Water Supply
+117,Trade
+118,Repair & Maintenance of Motor Vehicle
+119,Hotels & Restaurant
+120,Railway Transport
+121,Land transport
+122,Air transport
+123,Water Transport
+124,Supportive and Auxiliary transport activities
+125,Storage and warehousing
+126,Communication services
+127,Financial services
+128,Insurance services
+129,Ownership of dwellings
+130,Real estate services
+131,Renting of machinery & equipment
+132,Research & Development Services
+133,Legal services
+134,Other Business services
+135,Computer related services
+136,Public administration and defence
+137,Education services
+138,Human health and social care services
+139,"Community, social and personal services"
+140,"Recreation, entertainment and radio & TV broadcasting and other services"

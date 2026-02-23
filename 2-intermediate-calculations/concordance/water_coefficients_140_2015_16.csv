@@ -1,0 +1,141 @@
+Product_ID,Product_Name,Water_2015_m3_per_crore
+1,Paddy,147227.50346617747
+2,Wheat,149408.95507042253
+3,Coarse cereals,2988.930299014084
+4,Gram,2988.930299014084
+5,Arhar,2988.930299014084
+6,Other pulses,2988.930299014084
+7,Groundnut,14102.253521126759
+8,Rapeseed and mustard,14102.253521126759
+9,Other oil seeds,14102.253521126759
+10,kapas,234.16521830985914
+11,"jute, hemp and mesta",234.16521830985914
+12,Sugarcane,93507.15221664788
+13,Coconut,17803.394366197183
+14,Tobacco,14757.534754929578
+15,Tea,14757.534754929578
+16,Coffee,14757.534754929578
+17,Rubber,14757.534754929578
+18,Fruits,17803.394366197183
+19,Vegetables,17803.394366197183
+20,Other food crops,14757.534754929578
+21,Milk,0.0
+22,Wool,0.0
+23,Egg and poultry,91.9207690140845
+24,Other livestock products,7659.622366197183
+25,Industry Wood,0.0
+26,Firewood,0.0
+27,Other forestry products,0.0
+28,Inland Fish,0.0
+29,Marine Fish,0.0
+30,Coal and Lignite,0.0
+31,Natural Gas,0.0
+32,Crude petroleum,0.0
+33,Iron ore,0.0
+34,Manganese ore,0.0
+35,Bauxite,0.0
+36,Copper ore,0.0
+37,Other Metallic minerals,0.0
+38,Limestone,0.0
+39,Mica,0.0
+40,Other non metallic minerals,0.0
+41,Processed poultry meat & poultry meat products,16.81666285859873
+42,Processed other meat & meat products,7.21217758245938
+43,Processed fish & fish products,414.3076167372686
+44,Processed fruits & Processed Vegetables,159.86232616689406
+45,Dairy products,25.369950143946337
+46,Edible Oils and Fats,72.18213314208114
+47,"Grain Mill products, starch and starch products",4.401410247877535
+48,Sugar,21.28448266915493
+49,Bread & Bakery products,4.401410247877535
+50,Miscellaneous food products,0.0
+51,Alcoholic beverages,9.745801707239435
+52,Non alcoholic beverages,9.745801707239435
+53,Tea processed,0.0
+54,Coffee processed,0.0
+55,Tobacco Products,1.1167666957661972
+56,Cotton Yarn and Cotton Textiles,65.70710243897042
+57,Synthetic yarn and synthetic  textiles,65.70710243897042
+58,Wool yarn and woolen textiles,65.70710243897042
+59,Silk yarn and silk textiles,65.70710243897042
+60,Carpet weaving,65.70710243897042
+61,Ready made garments,160.86486193802813
+62,Misc. textile products,65.70710243897042
+63,Leather footwear,32.19026549859592
+64,Leather and leather products except footwear,0.0
+65,Wood and wood products except furniture,23.70359305066549
+66,"Paper, Paper products and newsprint",1135.7986620713161
+67,"Publishing, printing and allied activities",565.4379703520859
+68,Furniture & Fixtures,23.70359305066549
+69,Rubber products,1946.3019644126844
+70,Plastic products,1946.3019644126844
+71,Petroleum products,2580.1537404470914
+72,Coal tar products,2580.1537404470914
+73,Inorganic chemicals,0.07593345070422534
+74,Organic chemicals,0.07593345070422534
+75,Fertilizers,5.381158168450704
+76,Pesticides,0.07593345070422534
+77,"Paints, varnishes and lacquers",0.07593345070422534
+78,Drugs and medicine,0.07593345070422534
+79,"Soaps, cosmetics and glycerin",0.07593345070422534
+80,"Synthetic fibres, resin",0.07593345070422534
+81,Other chemicals and chemical products,0.07593345070422534
+82,Cement,0.0
+83,Non metallic mineral products,0.0
+84,Iron and steel Ferro alloys,0.0
+85,Iron and steel casting and forging,0.0
+86,Iron and steel foundries,0.0
+87,Non ferrous basic metals (including alloys),0.0
+88,"Hand tools, hardware",0.0
+89,Miscellaneous metal products,0.0
+90,Tractors and  other agricultural implements,0.0
+91,Industrial machinery for food and textile industry,0.0
+92,Industrial machinery (except food and textile),0.0
+93,Machine tools,0.0
+94,Other non electrical machinery,0.0
+95,Electrical industrial machinery,0.0
+96,"Electrical cables, wires",0.0
+97,Batteries,0.0
+98,Electrical appliances,0.0
+99,Communication equipment,0.0
+100,Other electrical machinery,0.0
+101,Electronic equipment including T.V,0.0
+102,"Medical precision, optical instrument",0.0
+103,Watches and clocks,0.0
+104,Ships and boats,0.0
+105,Rail equipment,0.0
+106,Motor vehicles,0.0
+107,Motor cycles and scooters,0.0
+108,"Bicycles, cycle-rickshaw",0.0
+109,Aircrafts & Spacecrafts,0.0
+110,Other transport equipment,0.0
+111,Gems & jewellery,0.0
+112,Miscellaneous manufacturing,0.0
+113,Construction and construction services,0.0
+114,Electricity,3755.2656967224407
+115,Gas,0.0
+116,Water Supply,0.0
+117,Trade,0.0
+118,Repair & Maintenance of Motor Vehicle,0.0
+119,Hotels & Restaurant,0.0
+120,Railway Transport,0.0
+121,Land transport,0.0
+122,Air transport,0.0
+123,Water Transport,0.0
+124,Supportive and Auxiliary transport activities,0.0
+125,Storage and warehousing,0.0
+126,Communication services,0.0
+127,Financial services,0.0
+128,Insurance services,0.0
+129,Ownership of dwellings,0.0
+130,Real estate services,0.0
+131,Renting of machinery & equipment,0.0
+132,Research & Development Services,0.0
+133,Legal services,0.0
+134,Other Business services,0.0
+135,Computer related services,0.0
+136,Public administration and defence,0.0
+137,Education services,0.0
+138,Human health and social care services,0.0
+139,"Community, social and personal services",0.0
+140,"Recreation, entertainment and radio & TV broadcasting  and other services",0.0

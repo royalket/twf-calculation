@@ -1,0 +1,25 @@
+ID,Category,Category_Type,Inbound_2015,Domestic_2015,Total_2015,NAS_Sector,Real_G15,Nominal_G15
+1,Accommodation services/hotels,Characteristic,41373.0,5610.0,46983.0,Hotels,1.0,1.0
+2,Food and beverage serving services/restaurants,Characteristic,73470.0,88588.0,162058.0,Trade,1.0,1.0
+3,Railway passenger transport services,Characteristic,2032.0,19096.0,21128.0,Railway,1.0,1.0
+4,Road passenger transport services,Characteristic,18699.0,183807.0,202506.0,Road,1.0,1.0
+5,Water passenger transport services,Characteristic,614.0,924.0,1538.0,Water_Trans,1.0,1.0
+6,Air passenger transport services,Characteristic,14172.0,57962.0,72134.0,Air,1.0,1.0
+7,Transport equipment rental services,Characteristic,330.0,634.0,964.0,Transport_Svcs,1.0,1.0
+8,Travel agencies and other reservation services,Characteristic,4073.0,5345.0,9418.0,Transport_Svcs,1.0,1.0
+9,Cultural and religious services,Characteristic,974.0,52.0,1026.0,Real_Estate,1.0,1.0
+10,Sports and other recreational services,Characteristic,6690.0,209.0,6899.0,Real_Estate,1.0,1.0
+11,Health and medical related services,Characteristic,11514.0,79130.0,90644.0,Real_Estate,1.0,1.0
+12,Readymade garments,Connected,20364.0,51003.0,71367.0,Textiles,1.0,1.0
+13,Processed Food,Connected,2851.0,11597.0,14448.0,Food_Mfg,1.0,1.0
+14,Alcohol and tobacco products,Connected,4254.0,3489.0,7743.0,Food_Mfg,1.0,1.0
+15,Travel related consumer goods,Connected,14918.0,26646.0,41564.0,Other_Mfg,1.0,1.0
+16,Footwear,Connected,2809.0,7908.0,10717.0,Textiles,1.0,1.0
+17,"Soaps, cosmetics and glycerine",Connected,638.0,935.0,1573.0,Other_Mfg,1.0,1.0
+18,Gems and jewellery,Connected,13985.0,8807.0,22792.0,Other_Mfg,1.0,1.0
+19,"Books, journals, magazines, stationery",Connected,1571.0,1452.0,3023.0,Other_Mfg,1.0,1.0
+20,Vacation homes,Imputed,0.0,4248.0,4248.0,Real_Estate,1.0,1.0
+21,Social transfers in kind,Imputed,0.0,4177.0,4177.0,Real_Estate,1.0,1.0
+22,FISIM,Imputed,0.0,42924.0,42924.0,Finance,1.0,1.0
+23,Producers guest houses,Imputed,0.0,64716.0,64716.0,Real_Estate,1.0,1.0
+24,Imputed expenditures on food,Imputed,0.0,25215.0,25215.0,Food_Mfg,1.0,1.0

@@ -1,0 +1,77 @@
+Category_ID,Category_Name,Category_Type,N_EXIOBASE_Sectors,EXIOBASE_Sectors,SUT_Product_IDs,Water_2019_m3_per_crore
+AGR_001,Paddy,Agriculture,1,IN,1,180219.7883916962
+AGR_002,Wheat,Agriculture,1,IN.1,2,137923.10382278482
+AGR_003,Sugarcane,Agriculture,1,IN.5,12,85956.16048748103
+AGR_004,Milk (Raw),Agriculture,1,IN.13,21,0.0
+AGR_005,Wool/Silk,Agriculture,1,IN.14,22,0.0
+AGR_006,Egg & Poultry (Live),Agriculture,1,IN.10,23,79.15357974683545
+AGR_M01,Cereals & Pulses,Agriculture,1,IN.2,"3,4,5,6",14673.293831822786
+AGR_M02,Oil Seeds,Agriculture,1,IN.4,"7,8,9",42146.58227848102
+AGR_M03,Cotton & Jute,Agriculture,1,IN.6,"10,11",247.14177215189875
+AGR_M04,Fruits & Vegetables,Agriculture,1,IN.3,"13,18,19",48268.427848101266
+AGR_M05,Other Crops,Agriculture,1,IN.7,"14,15,16,17,20",65188.76621518987
+AGR_M06,Other Livestock,Agriculture,4,"IN.8,IN.9,IN.11,IN.12",24,6890.521037974683
+AGR_M07,Forestry,Agriculture,1,IN.15,"25,26,27",0.0
+AGR_M08,Fishing,Agriculture,1,IN.16,"28,29",0.0
+MIN_001,Crude Petroleum,Mining,1,IN.25,32,0.0
+MIN_002,Natural Gas,Mining,1,IN.26,31,0.0
+MIN_003,Iron Ore,Mining,1,IN.30,33,0.0
+MIN_004,Copper Ore,Mining,1,IN.31,36,0.0
+MIN_M01,Coal & Lignite,Mining,8,"IN.17,IN.18,IN.19,IN.20,IN.21,IN.22,IN.23,IN.24",30,0.0
+MIN_M02,Other Metallic Minerals,Mining,2,"IN.32,IN.33","34,35,37",0.0
+MIN_M03,Non-Metallic Minerals,Mining,3,"IN.27,IN.28,IN.29","38,39,40",0.0
+FOOD_001,Processed Poultry,Food Mfg,1,IN.36,41,3.5053187708732034
+FOOD_002,Processed Fish,Food Mfg,1,IN.44,43,503.95675065066644
+FOOD_003,Dairy Products,Food Mfg,1,IN.39,45,29.065562473596586
+FOOD_004,Sugar,Food Mfg,1,IN.41,48,18.03905872839241
+FOOD_005,Tobacco Products,Food Mfg,1,IN.45,55,0.9133043481139241
+FOOD_M01,Processed Meat,Food Mfg,3,"IN.34,IN.35,IN.37",42,12.956616625350229
+FOOD_M02,Processed Fruit/Veg,Food Mfg,1,IN.42,44,181.8700749460727
+FOOD_M03,Edible Oils,Food Mfg,1,IN.38,46,32.107964070478104
+FOOD_M04,Grain Mill & Bakery,Food Mfg,1,IN.40,"47,49",8.762908536754303
+FOOD_M05,Misc Food Products,Food Mfg,0,,50,0.0
+FOOD_M06,Beverages,Food Mfg,1,IN.43,"51,52",13.286118430670887
+FOOD_M07,Processed Tea/Coffee,Food Mfg,0,,"53,54",0.0
+TEXT_001,Ready Made Garments,Textiles,1,IN.47,61,246.96443324227855
+TEXT_002,Leather Footwear,Textiles,1,IN.48,63,36.50930418804127
+TEXT_M01,Textiles,Textiles,1,IN.46,"56,57,58,59,60,62",345.85918360106297
+TEXT_M02,Leather (excl. Ftwr),Textiles,0,,64,0.0
+WOOD_M01,Wood & Furniture,Manufacturing,1,IN.49,"65,68",85.94785276538356
+WOOD_M02,Paper Products,Manufacturing,3,"IN.50,IN.51,IN.52",66,1822.6095024829233
+WOOD_M03,Printing/Publishing,Manufacturing,1,IN.53,67,640.745395443689
+CHEM_M01,Rubber & Plastics,Manufacturing,9,"IN.71,IN.72,IN.75,IN.76,IN.77,IN.78,IN.79,IN.80,IN.81","69,70",4660.848487199047
+CHEM_M02,Petroleum Products,Manufacturing,19,"IN.54,IN.55,IN.56,IN.57,IN.58,IN.59,IN.60,IN.61,IN.62,IN.63,IN.64,IN.65,IN.66,IN.67,IN.68,IN.69,IN.70,IN.73,IN.74","71,72",5612.121201728324
+CHEM_M03,Fertilizers,Manufacturing,2,"IN.89,IN.90",75,6.37559433022405
+CHEM_M04,Other Chemicals,Manufacturing,1,IN.91,"73,74,76,77,78,79,80,81",0.7321987341772153
+METAL_M01,Cement & Non-Metallic,Manufacturing,0,,"82,83",0.0
+METAL_M02,Iron & Steel,Manufacturing,0,,"84,85,86",0.0
+METAL_M03,Non-Ferrous Metals,Manufacturing,0,,"87,88,89",0.0
+MACH_M01,Machinery,Manufacturing,0,,"90,91,92,93,94",0.0
+MACH_M02,Electrical Machinery,Manufacturing,0,,"95,96,97,98,100",0.0
+MACH_M03,Electronics,Manufacturing,0,,"99,101,102,103",0.0
+MACH_M04,Transport Equipment,Manufacturing,0,,"104,105,106,107,108,109,110",0.0
+MISC_M01,Gems & Jewellery,Manufacturing,0,,111,0.0
+MISC_M02,Misc Manufacturing,Manufacturing,0,,112,0.0
+UTIL_M01,"Electricity, Heat & Energy",Utilities,22,"IN.82,IN.83,IN.84,IN.85,IN.86,IN.87,IN.88,IN.92,IN.93,IN.94,IN.95,IN.96,IN.97,IN.98,IN.99,IN.100,IN.101,IN.102,IN.103,IN.104,IN.105,IN.107",114,5017.996459513858
+SERV_001,Hotels & Restaurants,Services,1,IN.113,119,0.0
+SERV_002,Railway Transport,Services,1,IN.114,120,0.0
+SERV_003,Road Transport,Services,1,IN.115,121,0.0
+SERV_004,Air Transport,Services,1,IN.119,122,0.0
+SERV_005,Construction,Services,1,IN.109,113,0.0
+SERV_006,Gas Distribution,Services,1,IN.106,115,0.0
+SERV_007,Water Supply,Services,1,IN.108,116,0.0
+SERV_008,Retail Trade,Services,1,IN.112,118,0.0
+SERV_009,Financial Services,Services,3,"IN.122,IN.123,IN.124",125,0.0
+SERV_010,Real Estate,Services,1,IN.125,126,0.0
+SERV_011,IT & R&D,Services,2,"IN.127,IN.128","127,128",0.0
+SERV_012,Business Services,Services,1,IN.129,129,0.0
+SERV_013,Public Administration,Services,1,IN.130,130,0.0
+SERV_014,Education,Services,1,IN.131,131,0.0
+SERV_015,Health & Social Work,Services,1,IN.132,132,0.0
+SERV_016,Waste Management,Services,1,IN.133,133,0.0
+SERV_017,Cultural & Rec Services,Services,1,IN.135,135,0.0
+SERV_018,Other Services,Services,2,"IN.136,IN.137","136,137",0.0
+SERV_019,Post & Telecom,Services,1,IN.121,134,0.0
+SERV_M01,Wholesale Trade,Services,1,IN.111,117,0.0
+SERV_M02,Pipeline/Water Transport,Services,3,"IN.116,IN.117,IN.118",123,0.0
+SERV_M03,Support & Travel Agencies,Services,1,IN.120,124,0.0
