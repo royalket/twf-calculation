@@ -1,0 +1,26 @@
+SUPPLY-CHAIN PATH ANALYSIS — 2019
+=======================================================
+
+Top 10 dominant pathways:
+  #1: Wheat → Wheat                                                           30168.24M m³  (39.29%)
+  #2: Paddy → Paddy                                                           24303.99M m³  (31.65%)
+  #3: Groundnut → Groundnut                                                    1823.35M m³  (2.37%)
+  #4: Paddy → Coarse cereals                                                   1239.91M m³  (1.61%)
+  #5: Coarse cereals → Coarse cereals                                          1107.84M m³  (1.44%)
+  #6: Wheat → Coarse cereals                                                    912.34M m³  (1.19%)
+  #7: Coconut → Coconut                                                         904.33M m³  (1.18%)
+  #8: Paddy → Wheat                                                             812.44M m³  (1.06%)
+  #9: Paddy → Other pulses                                                      628.20M m³  (0.82%)
+  #10: Paddy → Groundnut                                                         568.37M m³  (0.74%)
+
+Top 10 tourism-dependent sectors (HEM):
+  #1: Crude petroleum                                dep=33.867%
+  #2: Financial services                             dep=5.780%
+  #3: Organic chemicals                              dep=4.259%
+  #4: Coarse cereals                                 dep=3.802%
+  #5: Fertilizers                                    dep=3.724%
+  #6: Petroleum products                             dep=3.310%
+  #7: Wheat                                          dep=2.978%
+  #8: Recreation, entertainment and radio & TV broa  dep=2.193%
+  #9: Electricity                                    dep=2.091%
+  #10: Paddy                                          dep=1.995%

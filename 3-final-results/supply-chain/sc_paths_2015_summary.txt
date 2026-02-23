@@ -1,0 +1,26 @@
+SUPPLY-CHAIN PATH ANALYSIS — 2015
+=======================================================
+
+Top 10 dominant pathways:
+  #1: Wheat → Wheat                                                           19532.11M m³  (40.82%)
+  #2: Paddy → Paddy                                                           12637.43M m³  (26.41%)
+  #3: Rapeseed and mustard → Rapeseed and mustard                              1019.73M m³  (2.13%)
+  #4: Paddy → Coarse cereals                                                    816.78M m³  (1.71%)
+  #5: Wheat → Coarse cereals                                                    705.39M m³  (1.47%)
+  #6: Coconut → Coconut                                                         651.95M m³  (1.36%)
+  #7: Groundnut → Groundnut                                                     610.95M m³  (1.28%)
+  #8: Coarse cereals → Coarse cereals                                           607.89M m³  (1.27%)
+  #9: Paddy → Wheat                                                             470.07M m³  (0.98%)
+  #10: Other food crops → Coarse cereals                                         432.26M m³  (0.90%)
+
+Top 10 tourism-dependent sectors (HEM):
+  #1: Crude petroleum                                dep=14.020%
+  #2: Fertilizers                                    dep=6.934%
+  #3: Organic chemicals                              dep=6.337%
+  #4: Financial services                             dep=5.453%
+  #5: Coarse cereals                                 dep=4.848%
+  #6: Petroleum products                             dep=3.674%
+  #7: Wheat                                          dep=3.490%
+  #8: Other food crops                               dep=3.316%
+  #9: Recreation, entertainment and radio & TV broa  dep=2.920%
+  #10: Electricity                                    dep=2.880%

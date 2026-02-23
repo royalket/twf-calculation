@@ -1,0 +1,37 @@
+INDIRECT TWF — 2022
+============================================================
+
+Total:        5,151,494,685 m³  (5.1515 billion m³)
+Demand (INR): ₹1,497,873 crore
+Demand (USD): $188,412 million  (@ ₹79.50/USD)
+Intensity:    3439.2 m³/₹ crore  |  27341.7 m³/USD million
+
+Top 20 categories (destination view):
+   1. Processed Fruit/Veg                       2,236,637,723 m³
+   2. Hotels & Restaurants                        488,306,182 m³
+   3. Beverages                                   439,005,122 m³
+   4. Road Transport                              413,904,419 m³
+   5. Grain Mill & Bakery                         242,294,351 m³
+   6. Ready Made Garments                         230,235,101 m³
+   7. Other Services                              221,515,893 m³
+   8. Other Chemicals                             189,736,851 m³
+   9. Air Transport                               154,187,602 m³
+  10. Health & Social Work                        135,348,034 m³
+  11. Financial Services                           82,619,394 m³
+  12. Leather Footwear                             60,142,923 m³
+  13. Real Estate                                  53,432,023 m³
+  14. Textiles                                     48,414,439 m³
+  15. Railway Transport                            42,702,091 m³
+  16. Support & Travel Agencies                    31,856,673 m³
+  17. Printing/Publishing                          26,203,508 m³
+  18. Electricity, Heat & Energy                   19,130,387 m³
+  19. Paper Products                               19,094,896 m³
+  20. Tobacco Products                              9,136,119 m³
+
+Water origin by source sector (upstream extraction):
+  Agriculture              3,941,348,343 m³  (76.5%)
+  Petroleum                  626,714,847 m³  (12.2%)
+  Manufacturing              366,143,683 m³  (7.1%)
+  Electricity                217,287,812 m³  (4.2%)
+  Mining                               0 m³  (0.0%)
+  Services                             0 m³  (0.0%)

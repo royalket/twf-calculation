@@ -1,0 +1,10 @@
+Component,Scenario,Total_TWF_m3,Delta_pct
+Agriculture,LOW,5496292714,-15.92
+Agriculture,BASE,6537352753,0.0
+Agriculture,HIGH,7578412793,15.92
+Electricity,LOW,6431500570,-1.62
+Electricity,BASE,6537352753,0.0
+Electricity,HIGH,6643204937,1.62
+Petroleum,LOW,6438034043,-1.52
+Petroleum,BASE,6537352753,0.0
+Petroleum,HIGH,6636671464,1.52

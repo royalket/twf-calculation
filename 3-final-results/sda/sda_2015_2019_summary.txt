@@ -1,0 +1,12 @@
+SDA — 2015 → 2019
+=======================================================
+
+TWF 2015:        47,854,674,721 m³
+TWF 2019:        76,786,447,883 m³
+Change:         +28,931,773,162 m³
+
+Two-polar decomposition:
+  W effect (water technology):   +2,162,695,048 m³  (+7.5%)
+  L effect (supply structure):   -1,285,777,513 m³  (-4.4%)
+  Y effect (tourism demand):    +28,031,827,694 m³  (+96.9%)
+  Residual:                         +23,027,933 m³  (+0.080%)

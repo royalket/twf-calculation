@@ -1,0 +1,51 @@
+Rank,Source_ID,Source_Name,Source_Group,Dest_ID,Dest_Name,Dest_Group,Water_m3,Share_pct,Path
+1,2,Wheat,Agriculture,2,Wheat,Agriculture,30168241051,39.2885,Wheat → Wheat
+2,1,Paddy,Agriculture,1,Paddy,Agriculture,24303991826,31.6514,Paddy → Paddy
+3,7,Groundnut,Agriculture,7,Groundnut,Agriculture,1823354706,2.3746,Groundnut → Groundnut
+4,1,Paddy,Agriculture,3,Coarse cereals,Agriculture,1239914207,1.6148,Paddy → Coarse cereals
+5,3,Coarse cereals,Agriculture,3,Coarse cereals,Agriculture,1107843196,1.4428,Coarse cereals → Coarse cereals
+6,2,Wheat,Agriculture,3,Coarse cereals,Agriculture,912342068,1.1882,Wheat → Coarse cereals
+7,13,Coconut,Agriculture,13,Coconut,Agriculture,904327302,1.1777,Coconut → Coconut
+8,1,Paddy,Agriculture,2,Wheat,Agriculture,812443416,1.0581,Paddy → Wheat
+9,1,Paddy,Agriculture,6,Other pulses,Agriculture,628202943,0.8181,Paddy → Other pulses
+10,1,Paddy,Agriculture,7,Groundnut,Agriculture,568372012,0.7402,Paddy → Groundnut
+11,6,Other pulses,Agriculture,6,Other pulses,Agriculture,511265958,0.6658,Other pulses → Other pulses
+12,2,Wheat,Agriculture,6,Other pulses,Agriculture,462238410,0.602,Wheat → Other pulses
+13,1,Paddy,Agriculture,5,Arhar,Agriculture,446223606,0.5811,Paddy → Arhar
+14,8,Rapeseed and mustard,Agriculture,8,Rapeseed and mustard,Agriculture,435788460,0.5675,Rapeseed and mustard → Rapeseed and mustard
+15,2,Wheat,Agriculture,7,Groundnut,Agriculture,418214175,0.5446,Wheat → Groundnut
+16,20,Other food crops,Agriculture,3,Coarse cereals,Agriculture,393600523,0.5126,Other food crops → Coarse cereals
+17,9,Other oil seeds,Agriculture,9,Other oil seeds,Agriculture,351355185,0.4576,Other oil seeds → Other oil seeds
+18,5,Arhar,Agriculture,5,Arhar,Agriculture,345565590,0.45,Arhar → Arhar
+19,2,Wheat,Agriculture,1,Paddy,Agriculture,330635946,0.4306,Wheat → Paddy
+20,2,Wheat,Agriculture,5,Arhar,Agriculture,328336078,0.4276,Wheat → Arhar
+21,15,Tea,Agriculture,15,Tea,Agriculture,325089018,0.4234,Tea → Tea
+22,14,Tobacco,Agriculture,14,Tobacco,Agriculture,311628411,0.4058,Tobacco → Tobacco
+23,1,Paddy,Agriculture,10,kapas,Agriculture,287557944,0.3745,Paddy → kapas
+24,12,Sugarcane,Agriculture,12,Sugarcane,Agriculture,262306572,0.3416,Sugarcane → Sugarcane
+25,1,Paddy,Agriculture,13,Coconut,Agriculture,260661056,0.3395,Paddy → Coconut
+26,20,Other food crops,Agriculture,2,Wheat,Agriculture,257903452,0.3359,Other food crops → Wheat
+27,12,Sugarcane,Agriculture,3,Coarse cereals,Agriculture,236289045,0.3077,Sugarcane → Coarse cereals
+28,2,Wheat,Agriculture,10,kapas,Agriculture,211588196,0.2756,Wheat → kapas
+29,20,Other food crops,Agriculture,6,Other pulses,Agriculture,199417835,0.2597,Other food crops → Other pulses
+30,2,Wheat,Agriculture,13,Coconut,Agriculture,191797179,0.2498,Wheat → Coconut
+31,114,Electricity,Electricity,3,Coarse cereals,Agriculture,183112422,0.2385,Electricity → Coarse cereals
+32,20,Other food crops,Agriculture,7,Groundnut,Agriculture,180425000,0.235,Other food crops → Groundnut
+33,19,Vegetables,Agriculture,3,Coarse cereals,Agriculture,163805886,0.2133,Vegetables → Coarse cereals
+34,71,Petroleum products,Manufacturing,3,Coarse cereals,Agriculture,162714744,0.2119,Petroleum products → Coarse cereals
+35,17,Rubber,Agriculture,17,Rubber,Agriculture,162295079,0.2114,Rubber → Rubber
+36,12,Sugarcane,Agriculture,2,Wheat,Agriculture,154826421,0.2016,Sugarcane → Wheat
+37,1,Paddy,Agriculture,8,Rapeseed and mustard,Agriculture,149521675,0.1947,Paddy → Rapeseed and mustard
+38,1,Paddy,Agriculture,4,Gram,Agriculture,145980892,0.1901,Paddy → Gram
+39,20,Other food crops,Agriculture,1,Paddy,Agriculture,142642202,0.1858,Other food crops → Paddy
+40,20,Other food crops,Agriculture,5,Arhar,Agriculture,141649998,0.1845,Other food crops → Arhar
+41,1,Paddy,Agriculture,15,Tea,Agriculture,121643052,0.1584,Paddy → Tea
+42,114,Electricity,Electricity,2,Wheat,Agriculture,119982883,0.1563,Electricity → Wheat
+43,12,Sugarcane,Agriculture,6,Other pulses,Agriculture,119715923,0.1559,Sugarcane → Other pulses
+44,1,Paddy,Agriculture,9,Other oil seeds,Agriculture,117147703,0.1526,Paddy → Other oil seeds
+45,4,Gram,Agriculture,4,Gram,Agriculture,114471738,0.1491,Gram → Gram
+46,19,Vegetables,Agriculture,19,Vegetables,Agriculture,113934088,0.1484,Vegetables → Vegetables
+47,1,Paddy,Agriculture,14,Tobacco,Agriculture,113868211,0.1483,Paddy → Tobacco
+48,18,Fruits,Agriculture,18,Fruits,Agriculture,112207672,0.1461,Fruits → Fruits
+49,2,Wheat,Agriculture,8,Rapeseed and mustard,Agriculture,110019640,0.1433,Wheat → Rapeseed and mustard
+50,12,Sugarcane,Agriculture,7,Groundnut,Agriculture,108314010,0.1411,Sugarcane → Groundnut

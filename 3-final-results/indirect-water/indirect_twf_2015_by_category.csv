@@ -1,0 +1,77 @@
+Category_ID,Category_Name,Category_Type,Total_Water_m3,Demand_crore,Water_pct
+FOOD_M02,Processed Fruit/Veg,Food Mfg,2447845365.852228,83946.0,38.129789890908754
+SERV_001,Hotels & Restaurants,Services,1880597254.5936983,128012.0,29.29383497315506
+SERV_003,Road Transport,Services,378259291.5235241,202506.0,5.892099031776284
+FOOD_M06,Beverages,Food Mfg,314970161.8057964,37057.4,4.906251946752079
+TEXT_001,Ready Made Garments,Textiles,217490140.91451088,71367.0,3.3878175035485723
+FOOD_M04,Grain Mill & Bakery,Food Mfg,181620167.4819436,4334.4,2.829075285001571
+SERV_015,Health & Social Work,Services,166158542.6799247,90644.0,2.58823143379376
+SERV_009,Financial Services,Services,164774266.6771383,42924.0,2.566668734665134
+SERV_004,Air Transport,Services,149669900.1643454,72134.0,2.3313898524275873
+SERV_018,Other Services,Services,140805670.1197918,32358.0,2.193312817881806
+CHEM_M04,Other Chemicals,Manufacturing,121245937.56432983,43068.8,1.8886332400513344
+SERV_010,Real Estate,Services,51553155.94219817,36606.0,0.803037247250665
+SERV_002,Railway Transport,Services,41513223.06633102,21128.0,0.6466464325300787
+TEXT_M01,Textiles,Textiles,37020735.965992466,6234.6,0.576667506731435
+TEXT_002,Leather Footwear,Textiles,35675703.14473741,19029.800000000003,0.5557160938741215
+SERV_M03,Support & Travel Agencies,Services,31011041.026969098,9418.0,0.48305521874540863
+WOOD_M03,Printing/Publishing,Manufacturing,17667001.585546043,5970.200000000001,0.2751967374477889
+UTIL_M01,"Electricity, Heat & Energy",Utilities,12476872.693256736,2078.2000000000003,0.19435073020793736
+WOOD_M02,Paper Products,Manufacturing,12435530.014450558,3287.4000000000005,0.19370674032262936
+FOOD_005,Tobacco Products,Food Mfg,6785535.457603686,3097.2000000000003,0.10569746149208309
+SERV_013,Public Administration,Services,5804974.909260333,4177.0,0.09042338895252569
+SERV_017,Cultural & Rec Services,Services,3255534.369008172,7925.0,0.050711063372132735
+SERV_M02,Pipeline/Water Transport,Services,1135443.734288486,1538.0,0.01768666911126378
+MIN_M02,Other Metallic Minerals,Mining,0.0,0.0,0.0
+SERV_007,Water Supply,Services,0.0,0.0,0.0
+MACH_M04,Transport Equipment,Manufacturing,0.0,0.0,0.0
+MISC_M01,Gems & Jewellery,Manufacturing,0.0,0.0,0.0
+MISC_M02,Misc Manufacturing,Manufacturing,0.0,0.0,0.0
+AGR_M05,Other Crops,Agriculture,0.0,0.0,0.0
+AGR_M04,Fruits & Vegetables,Agriculture,0.0,0.0,0.0
+AGR_M03,Cotton & Jute,Agriculture,0.0,0.0,0.0
+AGR_M02,Oil Seeds,Agriculture,0.0,0.0,0.0
+AGR_M01,Cereals & Pulses,Agriculture,0.0,0.0,0.0
+SERV_005,Construction,Services,0.0,0.0,0.0
+SERV_006,Gas Distribution,Services,0.0,0.0,0.0
+AGR_005,Wool/Silk,Agriculture,0.0,0.0,0.0
+SERV_008,Retail Trade,Services,0.0,0.0,0.0
+AGR_006,Egg & Poultry (Live),Agriculture,0.0,0.0,0.0
+MACH_M02,Electrical Machinery,Manufacturing,0.0,0.0,0.0
+SERV_011,IT & R&D,Services,0.0,0.0,0.0
+SERV_012,Business Services,Services,0.0,0.0,0.0
+SERV_014,Education,Services,0.0,0.0,0.0
+AGR_004,Milk (Raw),Agriculture,0.0,0.0,0.0
+SERV_016,Waste Management,Services,0.0,0.0,0.0
+AGR_003,Sugarcane,Agriculture,0.0,0.0,0.0
+SERV_019,Post & Telecom,Services,0.0,0.0,0.0
+SERV_M01,Wholesale Trade,Services,0.0,0.0,0.0
+MACH_M03,Electronics,Manufacturing,0.0,0.0,0.0
+MACH_M01,Machinery,Manufacturing,0.0,0.0,0.0
+MIN_M03,Non-Metallic Minerals,Mining,0.0,0.0,0.0
+MIN_002,Natural Gas,Mining,0.0,0.0,0.0
+FOOD_001,Processed Poultry,Food Mfg,0.0,0.0,0.0
+FOOD_002,Processed Fish,Food Mfg,0.0,0.0,0.0
+FOOD_003,Dairy Products,Food Mfg,0.0,0.0,0.0
+FOOD_004,Sugar,Food Mfg,0.0,0.0,0.0
+FOOD_M01,Processed Meat,Food Mfg,0.0,0.0,0.0
+MIN_M01,Coal & Lignite,Mining,0.0,0.0,0.0
+FOOD_M03,Edible Oils,Food Mfg,0.0,0.0,0.0
+MIN_004,Copper Ore,Mining,0.0,0.0,0.0
+FOOD_M05,Misc Food Products,Food Mfg,0.0,0.0,0.0
+MIN_003,Iron Ore,Mining,0.0,0.0,0.0
+FOOD_M07,Processed Tea/Coffee,Food Mfg,0.0,0.0,0.0
+MIN_001,Crude Petroleum,Mining,0.0,0.0,0.0
+METAL_M03,Non-Ferrous Metals,Manufacturing,0.0,0.0,0.0
+AGR_M08,Fishing,Agriculture,0.0,0.0,0.0
+TEXT_M02,Leather (excl. Ftwr),Textiles,0.0,0.0,0.0
+WOOD_M01,Wood & Furniture,Manufacturing,0.0,0.0,0.0
+AGR_002,Wheat,Agriculture,0.0,0.0,0.0
+AGR_M07,Forestry,Agriculture,0.0,0.0,0.0
+CHEM_M01,Rubber & Plastics,Manufacturing,0.0,0.0,0.0
+CHEM_M02,Petroleum Products,Manufacturing,0.0,0.0,0.0
+CHEM_M03,Fertilizers,Manufacturing,0.0,0.0,0.0
+AGR_M06,Other Livestock,Agriculture,0.0,0.0,0.0
+METAL_M01,Cement & Non-Metallic,Manufacturing,0.0,0.0,0.0
+METAL_M02,Iron & Steel,Manufacturing,0.0,0.0,0.0
+AGR_001,Paddy,Agriculture,0.0,0.0,0.0

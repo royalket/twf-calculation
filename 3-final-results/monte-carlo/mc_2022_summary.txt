@@ -1,0 +1,19 @@
+MONTE CARLO — 2022  (n=10,000)
+=======================================================
+
+Base estimate:  76.4503 bn m³
+5th  pct:       47.5545 bn m³
+25th pct:       62.5955 bn m³
+Median:         76.2318 bn m³
+75th pct:       92.9700 bn m³
+95th pct:       122.6125 bn m³
+Total range:    ±60.8%
+
+Variance contributors (Spearman rank correlation):
+  agr_water_mult                  r=+1.000  (100.0%)
+  inb_tourist_mult                r=-0.010  (0.0%)
+  dom_tourist_mult                r=-0.010  (0.0%)
+  hotel_coeff_mult                r=+0.008  (0.0%)
+  air_coeff_mult                  r=-0.008  (0.0%)
+  rest_coeff_mult                 r=-0.004  (0.0%)
+  rail_coeff_mult                 r=+0.002  (0.0%)

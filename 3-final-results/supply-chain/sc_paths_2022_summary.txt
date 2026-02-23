@@ -1,0 +1,26 @@
+SUPPLY-CHAIN PATH ANALYSIS — 2022
+=======================================================
+
+Top 10 dominant pathways:
+  #1: Paddy → Paddy                                                           26720.16M m³  (35.35%)
+  #2: Wheat → Wheat                                                           24325.49M m³  (32.18%)
+  #3: Sugarcane → Sugarcane                                                    4016.54M m³  (5.31%)
+  #4: Paddy → Coarse cereals                                                   1804.03M m³  (2.39%)
+  #5: Coarse cereals → Coarse cereals                                          1195.34M m³  (1.58%)
+  #6: Rapeseed and mustard → Rapeseed and mustard                              1154.38M m³  (1.53%)
+  #7: Paddy → kapas                                                            1042.84M m³  (1.38%)
+  #8: Paddy → Wheat                                                             929.67M m³  (1.23%)
+  #9: Wheat → Coarse cereals                                                    767.30M m³  (1.01%)
+  #10: Paddy → Arhar                                                             681.70M m³  (0.90%)
+
+Top 10 tourism-dependent sectors (HEM):
+  #1: Fertilizers                                    dep=8.049%
+  #2: Financial services                             dep=6.966%
+  #3: Organic chemicals                              dep=5.865%
+  #4: Petroleum products                             dep=5.737%
+  #5: Coarse cereals                                 dep=5.655%
+  #6: Crude petroleum                                dep=4.915%
+  #7: Wheat                                          dep=3.723%
+  #8: Miscellaneous manufacturing                    dep=3.634%
+  #9: Recreation, entertainment and radio & TV broa  dep=3.170%
+  #10: kapas                                          dep=3.033%

@@ -1,0 +1,37 @@
+INDIRECT TWF — 2015
+============================================================
+
+Total:        6,419,771,451 m³  (6.4198 billion m³)
+Demand (INR): ₹928,841 crore
+Demand (USD): $142,899 million  (@ ₹65.00/USD)
+Intensity:    6911.6 m³/₹ crore  |  44925.4 m³/USD million
+
+Top 20 categories (destination view):
+   1. Processed Fruit/Veg                       2,447,845,366 m³
+   2. Hotels & Restaurants                      1,880,597,255 m³
+   3. Road Transport                              378,259,292 m³
+   4. Beverages                                   314,970,162 m³
+   5. Ready Made Garments                         217,490,141 m³
+   6. Grain Mill & Bakery                         181,620,167 m³
+   7. Health & Social Work                        166,158,543 m³
+   8. Financial Services                          164,774,267 m³
+   9. Air Transport                               149,669,900 m³
+  10. Other Services                              140,805,670 m³
+  11. Other Chemicals                             121,245,938 m³
+  12. Real Estate                                  51,553,156 m³
+  13. Railway Transport                            41,513,223 m³
+  14. Textiles                                     37,020,736 m³
+  15. Leather Footwear                             35,675,703 m³
+  16. Support & Travel Agencies                    31,011,041 m³
+  17. Printing/Publishing                          17,667,002 m³
+  18. Electricity, Heat & Energy                   12,476,873 m³
+  19. Paper Products                               12,435,530 m³
+  20. Tobacco Products                              6,785,535 m³
+
+Water origin by source sector (upstream extraction):
+  Agriculture              5,492,218,418 m³  (85.6%)
+  Petroleum                  455,508,554 m³  (7.1%)
+  Electricity                284,758,720 m³  (4.4%)
+  Manufacturing              187,285,759 m³  (2.9%)
+  Mining                               0 m³  (0.0%)
+  Services                             0 m³  (0.0%)
