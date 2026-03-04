@@ -815,13 +815,12 @@ def check_a_stability(A_base: np.ndarray, A_new: np.ndarray,
     )
     if n_big > 0:
         warn(f"{n_big} sectors shifted >{threshold_pct}% — review NAS scaling", log)
-        # Log which sectors so user can check if tourism sectors are affected
+        # Emit sector names at warn level so they appear in WARNINGS.md summary
         big_idx = np.where(np.abs(pct_change) > threshold_pct)[0]
         for i in big_idx:
             name = products[i] if products and i < len(products) else f"col_{i+1}"
             pct  = pct_change[i]
-            if log:
-                log.info(f"    [{i+1:>3}] {name[:45]:<45}  Δ={pct:+.1f}%")
+            warn(f"    [{i+1:>3}] {name[:45]:<45}  Δ={pct:+.1f}%", log)
     else:
         ok(f"All column-sum changes ≤ {threshold_pct}% — A matrix stable", log)
     return pct_change
