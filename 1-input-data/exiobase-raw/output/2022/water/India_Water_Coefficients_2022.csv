@@ -1,0 +1,164 @@
+Sector_Code,Sector_Name,Category,Water_2022_m3_per_million_EUR,Water_2022_m3_per_million_INR,Water_2022_m3_per_INR_crore,Has_Water_Use_2022
+IN,Paddy rice,Agriculture & Livestock,168774.96064862754,2045.757098771243,20457.570987712428,True
+IN.1,Wheat,Agriculture & Livestock,109037.18933384828,1321.6629010163429,13216.62901016343,True
+IN.2,Cereal grains nec,Agriculture & Livestock,12752.898259496,154.58058496358788,1545.8058496358788,True
+IN.3,"Vegetables, fruit, nuts",Agriculture & Livestock,49719.9309,602.665829090909,6026.65829090909,True
+IN.4,Oil seeds,Agriculture & Livestock,35894.9,435.089696969697,4350.89696969697,True
+IN.5,"Sugar cane, sugar beet",Agriculture & Livestock,50479.94131801,611.8780765819395,6118.780765819394,True
+IN.6,Plant-based fibers,Agriculture & Livestock,324.82339,3.9372532121212123,39.372532121212124,True
+IN.7,Crops nec,Agriculture & Livestock,41527.23522238801,503.3604269380365,5033.604269380365,True
+IN.8,Cattle,Agriculture & Livestock,3118.31,37.79769696969697,377.9769696969697,True
+IN.9,Pigs,Agriculture & Livestock,40.1968,0.48723393939393944,4.872339393939394,True
+IN.10,Poultry,Agriculture & Livestock,54.581158,0.661589793939394,6.61589793939394,True
+IN.11,Meat animals nec,Agriculture & Livestock,401.41266499999995,4.86560806060606,48.6560806060606,True
+IN.12,Animal products nec,Mining & Primary,0.0,0.0,0.0,False
+IN.13,Raw milk,Mining & Primary,0.0,0.0,0.0,False
+IN.14,"Wool, silk-worm cocoons",Mining & Primary,0.0,0.0,0.0,False
+IN.15,"Forestry, logging",Mining & Primary,0.0,0.0,0.0,False
+IN.16,"Fishing, aquaculture",Mining & Primary,0.0,0.0,0.0,False
+IN.17,Anthracite,Mining & Primary,0.0,0.0,0.0,False
+IN.18,Coking Coal,Mining & Primary,0.0,0.0,0.0,False
+IN.19,Other Bituminous Coal,Mining & Primary,0.0,0.0,0.0,False
+IN.20,Sub-Bituminous Coal,Mining & Primary,0.0,0.0,0.0,False
+IN.21,Patent Fuel,Mining & Primary,0.0,0.0,0.0,False
+IN.22,Lignite/Brown Coal,Mining & Primary,0.0,0.0,0.0,False
+IN.23,BKB/Peat Briquettes,Mining & Primary,0.0,0.0,0.0,False
+IN.24,Peat,Mining & Primary,0.0,0.0,0.0,False
+IN.25,Crude petroleum,Mining & Primary,0.0,0.0,0.0,False
+IN.26,Natural gas,Mining & Primary,0.0,0.0,0.0,False
+IN.27,Natural gas liquids,Mining & Primary,0.0,0.0,0.0,False
+IN.28,Other hydrocarbons,Mining & Primary,0.0,0.0,0.0,False
+IN.29,Uranium and thorium ores,Mining & Primary,0.0,0.0,0.0,False
+IN.30,Iron ores,Mining & Primary,0.0,0.0,0.0,False
+IN.31,Copper ores,Mining & Primary,0.0,0.0,0.0,False
+IN.32,Nickel ores,Mining & Primary,0.0,0.0,0.0,False
+IN.33,Aluminium ores,Mining & Primary,0.0,0.0,0.0,False
+IN.34,Meat cattle products,Manufacturing,12.2099191227862,0.14799901967013576,1.4799901967013576,True
+IN.35,Meat pigs products,Manufacturing,2.6516908300011495,0.03214170703031696,0.3214170703031696,True
+IN.36,Meat poultry products,Manufacturing,157.06980622243552,1.9038764390598244,19.038764390598246,True
+IN.37,Meat products nec,Manufacturing,13.7505129944472,0.1666728847811782,1.666728847811782,True
+IN.38,Vegetable oils and fats,Manufacturing,76.95764904387389,0.9328199884105925,9.328199884105926,True
+IN.39,Dairy products,Manufacturing,600.6808126068835,7.280979546750102,72.80979546750102,True
+IN.40,Processed rice,Manufacturing,305.500476194982,3.703036075090691,37.03036075090691,True
+IN.41,Sugar,Manufacturing,17.512327586628203,0.2122706374136752,2.122706374136752,True
+IN.42,Food products nec,Manufacturing,893.681026686579,10.832497293170654,108.32497293170654,True
+IN.43,Beverages,Manufacturing,28.520596584144,0.34570420101992727,3.457042010199273,True
+IN.44,Fish products,Manufacturing,1195.0967462315405,14.486021166442915,144.86021166442916,True
+IN.45,Tobacco products,Manufacturing,3.4138633819100006,0.041380162204969706,0.41380162204969706,True
+IN.46,Textiles,Manufacturing,455.38361085237705,5.5198013436651765,55.19801343665176,True
+IN.47,Wearing apparel; furs,Manufacturing,243.54005822250002,2.952000705727273,29.52000705727273,True
+IN.48,Leather products,Manufacturing,35.778747436546006,0.43368178710964855,4.3368178710964855,True
+IN.49,Wood products,Manufacturing,335.2081245703,4.0631287826703035,40.63128782670304,True
+IN.50,Pulp,Manufacturing,0.0,0.0,0.0,False
+IN.51,Re-processing of paper,Manufacturing,1701.6763212774026,20.626379651847305,206.26379651847304,True
+IN.52,Paper products,Manufacturing,0.0,0.0,0.0,False
+IN.53,Printed matter,Manufacturing,631.1610018453482,7.650436386004221,76.5043638600422,True
+IN.54,Coke Oven Coke,Manufacturing,523.3170965025145,6.343237533363812,63.43237533363812,True
+IN.55,Gas Coke,Manufacturing,53.27636141216399,0.6457740777232,6.457740777231999,True
+IN.56,Coal Tar,Manufacturing,52.6812020779311,0.6385600251870436,6.385600251870436,True
+IN.57,Gas Works Gas,Manufacturing,0.0,0.0,0.0,False
+IN.58,Coke oven gas,Manufacturing,1294.3698032,15.689330947878787,156.89330947878787,True
+IN.59,Blast Furnace Gas,Manufacturing,0.0,0.0,0.0,False
+IN.60,Other recovered gases,Manufacturing,1556.6519175712417,18.868508091772625,188.68508091772625,True
+IN.61,Petroleum Refinery,Manufacturing,2545.1868627183603,30.85074985113164,308.5074985113164,True
+IN.62,Ethane,Manufacturing,302.648029342815,3.668460961731091,36.68460961731091,True
+IN.63,LPG,Manufacturing,52.90149861463,0.6412302862379394,6.412302862379394,True
+IN.64,Motor Gasoline,Manufacturing,146.965675049004,1.7814021218061091,17.814021218061093,True
+IN.65,Aviation Gasoline,Manufacturing,0.0,0.0,0.0,False
+IN.66,Gasoline Type Jet Fuel,Manufacturing,26.680775752216302,0.3234033424511067,3.234033424511067,True
+IN.67,Kerosene Type Jet Fuel,Manufacturing,156.0137710228373,1.8910760123980277,18.91076012398028,True
+IN.68,Kerosene,Manufacturing,188.2697629851178,2.2820577331529432,22.82057733152943,True
+IN.69,Gas/Diesel Oil,Manufacturing,0.0,0.0,0.0,False
+IN.70,Heavy Fuel Oil,Manufacturing,13.95159167673,0.16911020214218184,1.6911020214218184,True
+IN.71,Refinery Gas,Manufacturing,1442.1069460190802,17.48008419417067,174.8008419417067,True
+IN.72,Liquefied Refinery Gases,Manufacturing,2306.24669284196,27.954505367781334,279.5450536778133,True
+IN.73,Refinery Feedstocks,Manufacturing,0.2136082998971,0.0025891915139042423,0.025891915139042425,True
+IN.74,Additives/Blending,Manufacturing,0.0,0.0,0.0,False
+IN.75,Other Hydrocarbons,Manufacturing,205.6685470971009,2.4929520860254657,24.929520860254655,True
+IN.76,White Spirit & SBP,Manufacturing,0.0,0.0,0.0,False
+IN.77,Lubricants,Manufacturing,13.551135377643002,0.16425618639567274,1.6425618639567274,True
+IN.78,Bitumen,Manufacturing,0.0,0.0,0.0,False
+IN.79,Paraffin Waxes,Manufacturing,20.721857272736,0.25117402754831514,2.5117402754831515,True
+IN.80,Petroleum Coke,Manufacturing,0.0,0.0,0.0,False
+IN.81,Non-specified Petroleum,Manufacturing,263.6037980342039,3.1951975519297444,31.951975519297445,True
+IN.82,Industrial Biofuels,Manufacturing,0.0,0.0,0.0,False
+IN.83,Municipal wastes (renew),Manufacturing,0.5088340255154,0.006167685157762425,0.061676851577624245,True
+IN.84,Primary solid biofuels,Manufacturing,1082.119433123755,13.11659918937885,131.1659918937885,True
+IN.85,Other liquid biofuels,Manufacturing,0.0442063796993472,0.0005358349054466327,0.005358349054466327,True
+IN.86,Municipal Wastes (non-renew),Manufacturing,6.51832546,0.07901000557575757,0.7901000557575757,True
+IN.87,Primary solid biofuels,Manufacturing,45.63702440610645,0.5531760534073509,5.531760534073509,True
+IN.88,Other liquid biofuels,Manufacturing,3.37189454541271,0.040871449035305575,0.40871449035305574,True
+IN.89,N-fertiliser,Manufacturing,5.057797751979201,0.0613066394179297,0.613066394179297,True
+IN.90,P-fertiliser,Manufacturing,0.8305292098104999,0.010067020724975756,0.10067020724975756,True
+IN.91,Chemicals nec,Manufacturing,2.5565026222742997,0.030987910573021814,0.30987910573021815,True
+IN.92,Electricity - coal,Electricity & Utilities,147.33391402118292,1.7858656244991868,17.85865624499187,True
+IN.93,Electricity - gas,Electricity & Utilities,7.891918e-09,9.565961212121213e-11,9.565961212121214e-10,True
+IN.94,Electricity - nuclear,Electricity & Utilities,0.0,0.0,0.0,False
+IN.95,Electricity - hydro,Electricity & Utilities,1605.657,19.46250909090909,194.62509090909091,True
+IN.96,Electricity - wind,Electricity & Utilities,21.2617,0.25771757575757576,2.5771757575757577,True
+IN.97,Electricity - petroleum,Electricity & Utilities,74.0918,0.8980824242424243,8.980824242424244,True
+IN.98,Electricity - biomass/waste,Electricity & Utilities,0.0,0.0,0.0,False
+IN.99,Electricity - solar PV,Electricity & Utilities,0.0,0.0,0.0,False
+IN.100,Electricity - solar thermal,Electricity & Utilities,0.0654348,0.000793149090909091,0.00793149090909091,True
+IN.101,Electricity - tide/wave/ocean,Electricity & Utilities,0.69409,0.008413212121212122,0.08413212121212121,True
+IN.102,Electricity - geothermal,Electricity & Utilities,0.0,0.0,0.0,False
+IN.103,Electricity - nec,Electricity & Utilities,0.0,0.0,0.0,False
+IN.104,Electricity transmission,Electricity & Utilities,0.0,0.0,0.0,False
+IN.105,Electricity distribution,Electricity & Utilities,0.0,0.0,0.0,False
+IN.106,Gas distribution,Electricity & Utilities,0.0,0.0,0.0,False
+IN.107,Steam/hot water supply,Electricity & Utilities,0.0,0.0,0.0,False
+IN.108,Water supply,Electricity & Utilities,0.0,0.0,0.0,False
+IN.109,Construction,Electricity & Utilities,0.0,0.0,0.0,False
+IN.110,Motor vehicle sales/repair,Electricity & Utilities,0.0,0.0,0.0,False
+IN.111,Wholesale trade,Electricity & Utilities,0.0,0.0,0.0,False
+IN.112,Retail trade,Electricity & Utilities,0.0,0.0,0.0,False
+IN.113,Hotels and restaurants,Electricity & Utilities,0.0,0.0,0.0,False
+IN.114,Railway transport,Electricity & Utilities,0.0,0.0,0.0,False
+IN.115,Road transport,Electricity & Utilities,0.0,0.0,0.0,False
+IN.116,Pipeline transport,Services,0.0,0.0,0.0,False
+IN.117,Sea/coastal transport,Services,0.0,0.0,0.0,False
+IN.118,Inland water transport,Services,0.0,0.0,0.0,False
+IN.119,Air transport,Services,0.0,0.0,0.0,False
+IN.120,Transport support; travel agencies,Services,0.0,0.0,0.0,False
+IN.121,Post and telecom,Services,0.0,0.0,0.0,False
+IN.122,Financial services,Services,0.0,0.0,0.0,False
+IN.123,Insurance/pension,Services,0.0,0.0,0.0,False
+IN.124,Financial auxiliaries,Services,0.0,0.0,0.0,False
+IN.125,Real estate,Services,0.0,0.0,0.0,False
+IN.126,Machinery rental,Services,0.0,0.0,0.0,False
+IN.127,Computer services,Services,0.0,0.0,0.0,False
+IN.128,R&D services,Services,0.0,0.0,0.0,False
+IN.129,Business services,Services,0.0,0.0,0.0,False
+IN.130,Public administration,Services,0.0,0.0,0.0,False
+IN.131,Education,Services,0.0,0.0,0.0,False
+IN.132,Health and social work,Services,0.0,0.0,0.0,False
+IN.133,Sewage/refuse disposal,Services,0.0,0.0,0.0,False
+IN.134,Membership organizations,Services,0.0,0.0,0.0,False
+IN.135,Recreational/cultural services,Services,0.0,0.0,0.0,False
+IN.136,Other services,Services,0.0,0.0,0.0,False
+IN.137,Private households,Services,0.0,0.0,0.0,False
+IN.138,Other sector 138,Services,0.0,0.0,0.0,False
+IN.139,Other sector 139,Services,0.0,0.0,0.0,False
+IN.140,Other sector 140,Services,0.0,0.0,0.0,False
+IN.141,Other sector 141,Services,0.0,0.0,0.0,False
+IN.142,Other sector 142,Services,0.0,0.0,0.0,False
+IN.143,Other sector 143,Services,0.0,0.0,0.0,False
+IN.144,Other sector 144,Services,0.0,0.0,0.0,False
+IN.145,Other sector 145,Services,0.0,0.0,0.0,False
+IN.146,Other sector 146,Services,0.0,0.0,0.0,False
+IN.147,Other sector 147,Services,0.0,0.0,0.0,False
+IN.148,Other sector 148,Services,0.0,0.0,0.0,False
+IN.149,Other sector 149,Services,0.0,0.0,0.0,False
+IN.150,Other sector 150,Services,0.0,0.0,0.0,False
+IN.151,Other sector 151,Services,0.0,0.0,0.0,False
+IN.152,Other sector 152,Services,0.0,0.0,0.0,False
+IN.153,Other sector 153,Services,0.0,0.0,0.0,False
+IN.154,Other sector 154,Services,0.0,0.0,0.0,False
+IN.155,Other sector 155,Services,0.0,0.0,0.0,False
+IN.156,Other sector 156,Services,0.0,0.0,0.0,False
+IN.157,Other sector 157,Services,0.0,0.0,0.0,False
+IN.158,Other sector 158,Services,0.0,0.0,0.0,False
+IN.159,Other sector 159,Services,0.0,0.0,0.0,False
+IN.160,Other sector 160,Services,0.0,0.0,0.0,False
+IN.161,Other sector 161,Services,2.29467e-05,2.7814181818181817e-07,2.7814181818181817e-06,True
+IN.162,Other sector 162,Services,0.0,0.0,0.0,False
