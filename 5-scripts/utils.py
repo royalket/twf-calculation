@@ -797,6 +797,7 @@ def check_spectral_radius(A: np.ndarray, name: str = "A",
 def check_a_stability(A_base: np.ndarray, A_new: np.ndarray,
                        year_base: str, year_new: str,
                        threshold_pct: float = 30.0,
+                       products: list = None,
                        log: Logger | None = None):
     """Compare column sums of two A matrices. Changes > threshold_pct % are flagged."""
     col_base = A_base.sum(axis=0)
@@ -814,6 +815,13 @@ def check_a_stability(A_base: np.ndarray, A_new: np.ndarray,
     )
     if n_big > 0:
         warn(f"{n_big} sectors shifted >{threshold_pct}% — review NAS scaling", log)
+        # Log which sectors so user can check if tourism sectors are affected
+        big_idx = np.where(np.abs(pct_change) > threshold_pct)[0]
+        for i in big_idx:
+            name = products[i] if products and i < len(products) else f"col_{i+1}"
+            pct  = pct_change[i]
+            if log:
+                log.info(f"    [{i+1:>3}] {name[:45]:<45}  Δ={pct:+.1f}%")
     else:
         ok(f"All column-sum changes ≤ {threshold_pct}% — A matrix stable", log)
     return pct_change

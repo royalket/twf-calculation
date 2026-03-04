@@ -1212,6 +1212,7 @@ def fig9_blue_green_comparison(log=None):
     section("Figure 9 — Blue vs Blue+Green Indirect TWF", log=log)
 
     all_yrs_df = _load(DIRS["indirect"] / "indirect_twf_all_years.csv", log)
+    last_yr    = STUDY_YEARS[-1]
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
 
