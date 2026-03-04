@@ -1,0 +1,10 @@
+Pipeline run: 2026-02-21 07:50:21
+Steps: build_io, water_coefficients, tourism_demand, indirect_twf, direct_twf, compare
+Total time: 1s
+
+OK: build_io
+OK: water_coefficients
+FAILED: tourism_demand
+FAILED: indirect_twf
+OK: direct_twf
+OK: compare

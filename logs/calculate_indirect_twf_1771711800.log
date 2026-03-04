@@ -1,0 +1,26 @@
+# Log started: 2026-02-22T07:10:00.916875
+
+======================================================================
+  CALCULATE INDIRECT TWF  (W × L × Y)
+======================================================================
+
+======================================================================
+  Year: 2015
+======================================================================
+  ✓ Y_tourism 2015 [nominal]: ₹929,805 crore, 25/163 non-zero
+  ✓ L (2015-16): (141, 141)  diag mean=1.0769
+  ✓ Concordance 2015-16: 76 categories
+  ✓ SUT water 2015-16: 60/140 non-zero
+  ✓ L_2015: shape=(141, 141), non-zero=19045, max=1.7419, neg=0, diag_mean=1.0769
+  ✓ Y_140 vs Y_163 (crore): 928,841 ≈ 929,805  (Δ 0.104% — PASS)
+  ✓ Agriculture W check (IDs 1-29): 22/29 non-zero  max=607904.1417
+  ✗ Exception: operands could not be broadcast together with shapes (141,) (140,) 
+Traceback (most recent call last):
+  File "/Users/kumar.aniket/Downloads/surveydata/tourism-water-footprint/twf-calculation/5-scripts/calculate_indirect_twf.py", line 500, in run
+    TWF, WL = compute_twf(W_140, L, Y_140)
+              ~~~~~~~~~~~^^^^^^^^^^^^^^^^^
+  File "/Users/kumar.aniket/Downloads/surveydata/tourism-water-footprint/twf-calculation/5-scripts/calculate_indirect_twf.py", line 191, in compute_twf
+    TWF = WL * Y_140
+          ~~~^~~~~~~
+ValueError: operands could not be broadcast together with shapes (141,) (140,) 
+

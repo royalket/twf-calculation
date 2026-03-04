@@ -1,0 +1,46 @@
+# Log started: 2026-02-22T12:19:24.155552
+
+======================================================================
+  CALCULATE DIRECT TWF (Activity-Based)
+======================================================================
+
+======================================================================
+  Direct TWF — 2015
+======================================================================
+  ✓ BASE: Hotels=21.88M m³  Restaurants=273.32M m³  Rail=100.62M m³  Air=0.92M m³
+  ✓ BASE TOTAL: 0.3967 billion m³
+  ✓ Sensitivity range: 0.2743 – 0.5691 billion m³  (BASE = 0.3967)
+  ✓ Saved Direct TWF 2015  (3 rows)
+  ✓ Summary: direct_twf_2015_summary.txt
+
+======================================================================
+  Direct TWF — 2019
+======================================================================
+  ✓ BASE: Hotels=22.40M m³  Restaurants=456.47M m³  Rail=123.38M m³  Air=1.57M m³
+  ✓ BASE TOTAL: 0.6038 billion m³
+  ✓ Sensitivity range: 0.4030 – 0.8511 billion m³  (BASE = 0.6038)
+  ✓ Saved Direct TWF 2019  (3 rows)
+  ✓ Summary: direct_twf_2019_summary.txt
+
+======================================================================
+  Direct TWF — 2022
+======================================================================
+  ✓ BASE: Hotels=18.06M m³  Restaurants=364.12M m³  Rail=118.12M m³  Air=1.40M m³
+  ✓ BASE TOTAL: 0.5017 billion m³
+  ✓ Sensitivity range: 0.3273 – 0.6899 billion m³  (BASE = 0.5017)
+  ✓ Saved Direct TWF 2022  (3 rows)
+  ✓ Summary: direct_twf_2022_summary.txt
+  ✓ Saved Direct TWF all years  (9 rows)
+
+======================================================================
+  Cross-Year Direct TWF Comparison
+======================================================================
+
+  Direct TWF BASE (billion m³)
+  Year               Value       Abs_Chg     Pct_Chg          CAGR
+  ──────────────────────────────────────────────────────────────
+  2015              0.3967 bn m³        (base)
+  2019              0.6038 bn m³  ↑    0.2071      +52.2%      +11.1%/yr
+  2022              0.5017 bn m³  ↑    0.1050      +26.5%       +3.4%/yr
+  ✓ Hotel water efficiency: 1251.0 → 818.0 L/room/night  (-34.6% change  2015→2022)
+  ✓ Done in 0.0s

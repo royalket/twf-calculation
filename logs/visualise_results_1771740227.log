@@ -1,0 +1,52 @@
+# Log started: 2026-02-22T15:03:47.064022
+
+======================================================================
+  VISUALISE RESULTS
+======================================================================
+
+  ── SDA waterfall
+  ✓ Chart saved: waterfall_sda_2015_2019.png
+  ✓ Chart saved: waterfall_sda_2019_2022.png
+
+  ── MC violin
+  ✓ Chart saved: violin_monte_carlo.png
+
+  ── Water origin stacked
+  ⚠ Water origin stacked bar: no structural CSVs found
+
+  ── Top-10 categories
+  ✓ Chart saved: horizontal_bar_top10_2015.png
+  ✓ Chart saved: horizontal_bar_top10_2019.png
+  ✓ Chart saved: horizontal_bar_top10_2022.png
+
+  ── Slope per tourist
+  ✓ Chart saved: slope_per_tourist.png
+
+  ── Supply-chain paths
+  ✓ Chart saved: sc_paths_ranked_2015.png
+  ✓ Chart saved: sc_paths_ranked_2019.png
+  ✓ Chart saved: sc_paths_ranked_2022.png
+
+  ── MC variance pie
+  ✓ Chart saved: mc_variance_pie.png
+
+  ── Total TWF trend
+  ✓ Chart saved: total_twf_trend.png
+
+  ── Sector type stacked
+  ✓ Chart saved: sector_type_stacked.png
+
+======================================================================
+  Chart Summary
+======================================================================
+  ✓ SDA waterfall                       ✓
+  ✓ MC violin                           ✓
+  ✓ Water origin stacked                ✓
+  ✓ Top-10 categories                   ✓
+  ✓ Slope per tourist                   ✓
+  ✓ Supply-chain paths                  ✓
+  ✓ MC variance pie                     ✓
+  ✓ Total TWF trend                     ✓
+  ✓ Sector type stacked                 ✓
+  ✓ Charts saved to: /Users/kumar.aniket/Downloads/surveydata/tourism-water-footprint/twf-calculation/3-final-results/visualisation
+  ✓ Done in 1.0s

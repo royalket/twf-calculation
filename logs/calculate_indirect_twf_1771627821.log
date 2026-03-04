@@ -1,0 +1,34 @@
+# Log started: 2026-02-21T07:50:21.333507
+
+======================================================================
+  CALCULATE INDIRECT TWF  (W × L × Y)
+======================================================================
+
+======================================================================
+  Year: 2015
+======================================================================
+  ✗ Exception: 'Tourism_Demand_crore'
+Traceback (most recent call last):
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pandas/core/indexes/base.py", line 3812, in get_loc
+    return self._engine.get_loc(casted_key)
+           ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^
+  File "pandas/_libs/index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas/_libs/hashtable_class_helper.pxi", line 7088, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas/_libs/hashtable_class_helper.pxi", line 7096, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 'Tourism_Demand_crore'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/Users/kumar.aniket/Downloads/surveydata/tourism-water-footprint/twf-calculation/5-scripts/calculate_indirect_twf.py", line 362, in run
+    Y_163        = load_y_tourism(year, use_real=False, log=log)
+  File "/Users/kumar.aniket/Downloads/surveydata/tourism-water-footprint/twf-calculation/5-scripts/calculate_indirect_twf.py", line 65, in load_y_tourism
+    Y = df["Tourism_Demand_crore"].values
+        ~~^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pandas/core/frame.py", line 4113, in __getitem__
+    indexer = self.columns.get_loc(key)
+  File "/Library/Frameworks/Python.framework/Versions/3.13/lib/python3.13/site-packages/pandas/core/indexes/base.py", line 3819, in get_loc
+    raise KeyError(key) from err
+KeyError: 'Tourism_Demand_crore'
+

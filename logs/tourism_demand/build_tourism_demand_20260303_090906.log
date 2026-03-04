@@ -1,0 +1,114 @@
+══════════════════════════════════════════════════════════════════════
+  Log started : 2026-03-03 09:09:06
+  Step        : build_tourism_demand
+  Log file    : /Users/kumar.aniket/Documents/personal/research/tourism-water-footprint/twf-calculation/logs/tourism_demand/build_tourism_demand_20260303_090906.log
+══════════════════════════════════════════════════════════════════════
+
+══════════════════════════════════════════════════════════════════════
+  BUILD TOURISM DEMAND VECTORS (TSA → NAS-scaled → EXIOBASE Y)
+══════════════════════════════════════════════════════════════════════
+
+══════════════════════════════════════════════════════════════════════
+  NAS Growth Rates & TSA Scaling
+══════════════════════════════════════════════════════════════════════
+
+  ── NAS GVA growth multipliers (constant 2011-12 prices) ──
+  ✓  CPI multipliers vs 2015-16: 2015=1.0000  2019=1.1732  2022=1.3136
+
+    Sector key      NAS S.No.  ×2015   ×2019   ×2022 
+    ──────────────  ─────────  ──────  ──────  ──────
+    Hotels          6.2        1.0000  1.3769  0.8712
+    Trade           6.1        1.0000  1.4569  1.3197
+    Railway         7.1        1.0000  0.9631  0.9342
+    Road            7.2        1.0000  1.2594  1.2435
+    Water_Trans     7.3        1.0000  1.6079  1.6125
+    Air             7.4        1.0000  1.5130  0.8992
+    Transport_Svcs  7.5        1.0000  1.1257  1.0416
+    Food_Mfg        3.1        1.0000  1.1886  1.1361
+    Textiles        3.2        1.0000  1.1235  1.2086
+    Other_Mfg       3.5        1.0000  1.0982  1.2781
+    Real_Estate     9          1.0000  1.3032  1.4128
+    Finance         8          1.0000  1.1661  1.2356
+
+
+  Total tourism spending (₹ crore nominal)
+  Year               Value       Abs_Chg     Pct_Chg          CAGR
+  ──────────────────────────────────────────────────────────────
+  2015         929805.0000 cr        (base)
+  2019        1405015.4557 cr  ↑475210.4557      +51.1%      +10.9%/yr
+  2022        1499192.4000 cr  ↑569387.4000      +61.2%       +7.1%/yr
+  Total tourism spending (USD million equivalent):
+    2015: $143,047M  (@ ₹65.00/USD)
+    2019: $200,716M  (@ ₹70.00/USD)
+    2022: $188,578M  (@ ₹79.50/USD)
+  ✓  CAGR 2015→2019: 10.9%/yr
+  ✓  CAGR 2019→2022: 2.2%/yr
+  ✓  Saved TSA all years  (24 rows → tsa_all_years.csv)
+
+  ── Building demand vectors — 2015 ──
+  ✓  Saved TSA 2015  (24 rows → tsa_scaled_2015.csv)
+  ✓  Y_tourism 2015 [Total_2015]: ₹929,805 cr  non-zero: 25/163  deflator: 1.0000  real: ₹929,805 cr
+  ✓  Saved Y_tourism 2015  (163 rows → Y_tourism_2015.csv)
+  ✓  Saved Y_tourism 2015 real  (163 rows → Y_tourism_2015_real.csv)
+  ✓  Y_tourism 2015 [Inbound_2015]: ₹235,331 cr  non-zero: 21/163  deflator: 1.0000  real: ₹235,331 cr
+  ✓  Saved Y_tourism 2015 inbound  (163 rows → Y_tourism_2015_inbound.csv)
+  ✓  Y_tourism 2015 [Domestic_2015]: ₹694,474 cr  non-zero: 25/163  deflator: 1.0000  real: ₹694,474 cr
+  ✓  Saved Y_tourism 2015 domestic  (163 rows → Y_tourism_2015_domestic.csv)
+
+  ── Building demand vectors — 2019 ──
+  ✓  Saved TSA 2019  (24 rows → tsa_scaled_2019.csv)
+  ✓  Y_tourism 2019 [Total_2019]: ₹1,405,015 cr  non-zero: 25/163  deflator: 1.1732  real: ₹1,197,576 cr
+  ✓  Saved Y_tourism 2019  (163 rows → Y_tourism_2019.csv)
+  ✓  Saved Y_tourism 2019 real  (163 rows → Y_tourism_2019_real.csv)
+  ✓  Y_tourism 2019 [Inbound_2019]: ₹364,325 cr  non-zero: 21/163  deflator: 1.1732  real: ₹310,536 cr
+  ✓  Saved Y_tourism 2019 inbound  (163 rows → Y_tourism_2019_inbound.csv)
+  ✓  Y_tourism 2019 [Domestic_2019]: ₹1,040,690 cr  non-zero: 25/163  deflator: 1.1732  real: ₹887,041 cr
+  ✓  Saved Y_tourism 2019 domestic  (163 rows → Y_tourism_2019_domestic.csv)
+
+  ── Building demand vectors — 2022 ──
+  ✓  Saved TSA 2022  (24 rows → tsa_scaled_2022.csv)
+  ✓  Y_tourism 2022 [Total_2022]: ₹1,499,192 cr  non-zero: 25/163  deflator: 1.3136  real: ₹1,141,327 cr
+  ✓  Saved Y_tourism 2022  (163 rows → Y_tourism_2022.csv)
+  ✓  Saved Y_tourism 2022 real  (163 rows → Y_tourism_2022_real.csv)
+  ✓  Y_tourism 2022 [Inbound_2022]: ₹367,018 cr  non-zero: 21/163  deflator: 1.3136  real: ₹279,409 cr
+  ✓  Saved Y_tourism 2022 inbound  (163 rows → Y_tourism_2022_inbound.csv)
+  ✓  Y_tourism 2022 [Domestic_2022]: ₹1,132,174 cr  non-zero: 25/163  deflator: 1.3136  real: ₹861,918 cr
+  ✓  Saved Y_tourism 2022 domestic  (163 rows → Y_tourism_2022_domestic.csv)
+
+══════════════════════════════════════════════════════════════════════
+  Tourism Demand Cross-Year Comparison
+══════════════════════════════════════════════════════════════════════
+
+  Tourism demand (₹ crore nominal)
+  Year               Value       Abs_Chg     Pct_Chg          CAGR
+  ──────────────────────────────────────────────────────────────
+  2015         929805.0000        (base)
+  2019        1405015.4557  ↑475210.4557      +51.1%      +10.9%/yr
+  2022        1499192.4000  ↑569387.4000      +61.2%       +7.1%/yr
+
+  Tourism demand (₹ crore real 2015-16)
+  Year               Value       Abs_Chg     Pct_Chg          CAGR
+  ──────────────────────────────────────────────────────────────
+  2015         929805.0000        (base)
+  2019        1197576.4000  ↑267771.4000      +28.8%       +6.5%/yr
+  2022        1141326.5707  ↑211521.5707      +22.7%       +3.0%/yr
+
+  Tourism demand (USD million nominal)
+  Year               Value       Abs_Chg     Pct_Chg          CAGR
+  ──────────────────────────────────────────────────────────────
+  2015         143046.9000        (base)
+  2019         200716.5000  ↑57669.6000      +40.3%       +8.8%/yr
+  2022         188577.7000  ↑45530.8000      +31.8%       +4.0%/yr
+
+  Tourism demand (USD million real 2015-16)
+  Year               Value       Abs_Chg     Pct_Chg          CAGR
+  ──────────────────────────────────────────────────────────────
+  2015         143046.9000        (base)
+  2019         184242.5000  ↑41195.6000      +28.8%       +6.5%/yr
+  2022         175588.7000  ↑32541.8000      +22.7%       +3.0%/yr
+  ✓  Saved Demand comparison  (12 rows → demand_intensity_comparison.csv)
+  ✓  Done in 0.0s
+
+──────────────────────────────────────────────────────────────────────
+  Step 'build_tourism_demand' finished  |  elapsed: 0.0s
+  Warnings: 0  |  Errors: 0

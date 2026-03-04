@@ -1,51 +1,51 @@
 Rank,Source_ID,Source_Name,Source_Group,Dest_ID,Dest_Name,Dest_Group,Water_m3,Share_pct,Path
-1,1,Paddy,Agriculture,1,Paddy,Agriculture,26720163124,35.3469,Paddy → Paddy
-2,2,Wheat,Agriculture,2,Wheat,Agriculture,24325486142,32.179,Wheat → Wheat
-3,12,Sugarcane,Agriculture,12,Sugarcane,Agriculture,4016540347,5.3133,Sugarcane → Sugarcane
-4,1,Paddy,Agriculture,3,Coarse cereals,Agriculture,1804034072,2.3865,Paddy → Coarse cereals
-5,3,Coarse cereals,Agriculture,3,Coarse cereals,Agriculture,1195335637,1.5813,Coarse cereals → Coarse cereals
-6,8,Rapeseed and mustard,Agriculture,8,Rapeseed and mustard,Agriculture,1154380433,1.5271,Rapeseed and mustard → Rapeseed and mustard
-7,1,Paddy,Agriculture,10,kapas,Agriculture,1042838862,1.3795,Paddy → kapas
-8,1,Paddy,Agriculture,2,Wheat,Agriculture,929668714,1.2298,Paddy → Wheat
-9,2,Wheat,Agriculture,3,Coarse cereals,Agriculture,767302672,1.015,Wheat → Coarse cereals
-10,1,Paddy,Agriculture,5,Arhar,Agriculture,681696112,0.9018,Paddy → Arhar
-11,14,Tobacco,Agriculture,14,Tobacco,Agriculture,637527354,0.8434,Tobacco → Tobacco
-12,13,Coconut,Agriculture,13,Coconut,Agriculture,580030334,0.7673,Coconut → Coconut
-13,1,Paddy,Agriculture,8,Rapeseed and mustard,Agriculture,528536726,0.6992,Paddy → Rapeseed and mustard
-14,2,Wheat,Agriculture,10,kapas,Agriculture,443546526,0.5867,Wheat → kapas
-15,7,Groundnut,Agriculture,7,Groundnut,Agriculture,429917222,0.5687,Groundnut → Groundnut
-16,1,Paddy,Agriculture,14,Tobacco,Agriculture,415473356,0.5496,Paddy → Tobacco
-17,5,Arhar,Agriculture,5,Arhar,Agriculture,408585744,0.5405,Arhar → Arhar
-18,1,Paddy,Agriculture,12,Sugarcane,Agriculture,395480903,0.5232,Paddy → Sugarcane
-19,71,Petroleum products,Manufacturing,3,Coarse cereals,Agriculture,302251695,0.3998,Petroleum products → Coarse cereals
-20,2,Wheat,Agriculture,5,Arhar,Agriculture,289943109,0.3836,Wheat → Arhar
-21,2,Wheat,Agriculture,1,Paddy,Agriculture,252415624,0.3339,Wheat → Paddy
-22,15,Tea,Agriculture,15,Tea,Agriculture,243502675,0.3221,Tea → Tea
-23,20,Other food crops,Agriculture,3,Coarse cereals,Agriculture,225885692,0.2988,Other food crops → Coarse cereals
-24,2,Wheat,Agriculture,8,Rapeseed and mustard,Agriculture,224800434,0.2974,Wheat → Rapeseed and mustard
-25,12,Sugarcane,Agriculture,3,Coarse cereals,Agriculture,194993956,0.2579,Sugarcane → Coarse cereals
-26,19,Vegetables,Agriculture,19,Vegetables,Agriculture,189488897,0.2507,Vegetables → Vegetables
-27,1,Paddy,Agriculture,4,Gram,Agriculture,188013750,0.2487,Paddy → Gram
-28,1,Paddy,Agriculture,13,Coconut,Agriculture,184262236,0.2438,Paddy → Coconut
-29,1,Paddy,Agriculture,7,Groundnut,Agriculture,181502046,0.2401,Paddy → Groundnut
-30,2,Wheat,Agriculture,14,Tobacco,Agriculture,176711638,0.2338,Wheat → Tobacco
-31,1,Paddy,Agriculture,6,Other pulses,Agriculture,174878998,0.2313,Paddy → Other pulses
-32,71,Petroleum products,Manufacturing,10,kapas,Agriculture,174719435,0.2311,Petroleum products → kapas
-33,18,Fruits,Agriculture,18,Fruits,Agriculture,169443430,0.2241,Fruits → Fruits
-34,2,Wheat,Agriculture,12,Sugarcane,Agriculture,168208327,0.2225,Wheat → Sugarcane
-35,1,Paddy,Agriculture,15,Tea,Agriculture,161094460,0.2131,Paddy → Tea
-36,71,Petroleum products,Manufacturing,2,Wheat,Agriculture,155758668,0.206,Petroleum products → Wheat
-37,20,Other food crops,Agriculture,10,kapas,Agriculture,130575349,0.1727,Other food crops → kapas
-38,17,Rubber,Agriculture,17,Rubber,Agriculture,121001818,0.1601,Rubber → Rubber
-39,20,Other food crops,Agriculture,2,Wheat,Agriculture,116405152,0.154,Other food crops → Wheat
-40,4,Gram,Agriculture,4,Gram,Agriculture,114736873,0.1518,Gram → Gram
-41,71,Petroleum products,Manufacturing,5,Arhar,Agriculture,114212813,0.1511,Petroleum products → Arhar
-42,12,Sugarcane,Agriculture,10,kapas,Agriculture,112718090,0.1491,Sugarcane → kapas
-43,6,Other pulses,Agriculture,6,Other pulses,Agriculture,108594803,0.1437,Other pulses → Other pulses
-44,12,Sugarcane,Agriculture,2,Wheat,Agriculture,100485785,0.1329,Sugarcane → Wheat
-45,71,Petroleum products,Manufacturing,1,Paddy,Agriculture,99430189,0.1315,Petroleum products → Paddy
-46,19,Vegetables,Agriculture,3,Coarse cereals,Agriculture,93215126,0.1233,Vegetables → Coarse cereals
-47,114,Electricity,Electricity,3,Coarse cereals,Agriculture,92426753,0.1223,Electricity → Coarse cereals
-48,20,Other food crops,Agriculture,20,Other food crops,Agriculture,89326785,0.1182,Other food crops → Other food crops
-49,71,Petroleum products,Manufacturing,8,Rapeseed and mustard,Agriculture,88552164,0.1171,Petroleum products → Rapeseed and mustard
-50,20,Other food crops,Agriculture,5,Arhar,Agriculture,85356147,0.1129,Other food crops → Arhar
+1,1,Paddy,Agriculture,44,Processed fruits & Processed Vegetables,Manufacturing,724937656,13.4632,Paddy → Processed fruits & Processed Vegetables
+2,71,Petroleum products,Petroleum,118,Repair & Maintenance of Motor Vehicle,Services,402828262,7.4811,Petroleum products → Repair & Maintenance of Motor Vehicle
+3,9,Other oil seeds,Agriculture,44,Processed fruits & Processed Vegetables,Manufacturing,325324687,6.0418,Other oil seeds → Processed fruits & Processed Vegetables
+4,8,Rapeseed and mustard,Agriculture,44,Processed fruits & Processed Vegetables,Manufacturing,271684289,5.0456,Rapeseed and mustard → Processed fruits & Processed Vegetables
+5,2,Wheat,Agriculture,44,Processed fruits & Processed Vegetables,Manufacturing,245638752,4.5619,Wheat → Processed fruits & Processed Vegetables
+6,1,Paddy,Agriculture,120,Railway Transport,Services,192736717,3.5794,Paddy → Railway Transport
+7,44,Processed fruits & Processed Vegetables,Manufacturing,44,Processed fruits & Processed Vegetables,Manufacturing,138944593,2.5804,Processed fruits & Processed Vegetables → Processed fruits & Processed Vegetables
+8,1,Paddy,Agriculture,52,Non alcoholic beverages,Manufacturing,126900663,2.3567,Paddy → Non alcoholic beverages
+9,1,Paddy,Agriculture,47,"Grain Mill products, starch and starch products",Manufacturing,111660036,2.0737,"Paddy → Grain Mill products, starch and starch products"
+10,20,Other food crops,Agriculture,44,Processed fruits & Processed Vegetables,Manufacturing,110518777,2.0525,Other food crops → Processed fruits & Processed Vegetables
+11,71,Petroleum products,Petroleum,120,Railway Transport,Services,103619359,1.9244,Petroleum products → Railway Transport
+12,1,Paddy,Agriculture,136,Public administration and defence,Services,102054651,1.8953,Paddy → Public administration and defence
+13,71,Petroleum products,Petroleum,122,Air transport,Services,101462368,1.8843,Petroleum products → Air transport
+14,1,Paddy,Agriculture,51,Alcoholic beverages,Manufacturing,93977544,1.7453,Paddy → Alcoholic beverages
+15,71,Petroleum products,Petroleum,44,Processed fruits & Processed Vegetables,Manufacturing,80240610,1.4902,Petroleum products → Processed fruits & Processed Vegetables
+16,2,Wheat,Agriculture,136,Public administration and defence,Services,79535466,1.4771,Wheat → Public administration and defence
+17,1,Paddy,Agriculture,118,Repair & Maintenance of Motor Vehicle,Services,76518551,1.4211,Paddy → Repair & Maintenance of Motor Vehicle
+18,2,Wheat,Agriculture,120,Railway Transport,Services,68913454,1.2798,Wheat → Railway Transport
+19,1,Paddy,Agriculture,61,Ready made garments,Manufacturing,68334790,1.2691,Paddy → Ready made garments
+20,7,Groundnut,Agriculture,44,Processed fruits & Processed Vegetables,Manufacturing,61391567,1.1401,Groundnut → Processed fruits & Processed Vegetables
+21,12,Sugarcane,Agriculture,44,Processed fruits & Processed Vegetables,Manufacturing,55541339,1.0315,Sugarcane → Processed fruits & Processed Vegetables
+22,19,Vegetables,Agriculture,44,Processed fruits & Processed Vegetables,Manufacturing,53231495,0.9886,Vegetables → Processed fruits & Processed Vegetables
+23,12,Sugarcane,Agriculture,49,Bread & Bakery products,Manufacturing,43698422,0.8115,Sugarcane → Bread & Bakery products
+24,114,Electricity,Electricity,120,Railway Transport,Services,43011861,0.7988,Electricity → Railway Transport
+25,18,Fruits,Agriculture,44,Processed fruits & Processed Vegetables,Manufacturing,41699273,0.7744,Fruits → Processed fruits & Processed Vegetables
+26,2,Wheat,Agriculture,52,Non alcoholic beverages,Manufacturing,36476356,0.6774,Wheat → Non alcoholic beverages
+27,20,Other food crops,Agriculture,120,Railway Transport,Services,32742214,0.6081,Other food crops → Railway Transport
+28,13,Coconut,Agriculture,44,Processed fruits & Processed Vegetables,Manufacturing,32171567,0.5975,Coconut → Processed fruits & Processed Vegetables
+29,61,Ready made garments,Manufacturing,61,Ready made garments,Manufacturing,31753492,0.5897,Ready made garments → Ready made garments
+30,1,Paddy,Agriculture,132,Research & Development Services,Services,31172916,0.5789,Paddy → Research & Development Services
+31,114,Electricity,Electricity,44,Processed fruits & Processed Vegetables,Manufacturing,30975514,0.5753,Electricity → Processed fruits & Processed Vegetables
+32,71,Petroleum products,Petroleum,61,Ready made garments,Manufacturing,30697123,0.5701,Petroleum products → Ready made garments
+33,2,Wheat,Agriculture,47,"Grain Mill products, starch and starch products",Manufacturing,28554795,0.5303,"Wheat → Grain Mill products, starch and starch products"
+34,24,Other livestock products,Agriculture,44,Processed fruits & Processed Vegetables,Manufacturing,28549667,0.5302,Other livestock products → Processed fruits & Processed Vegetables
+35,114,Electricity,Electricity,118,Repair & Maintenance of Motor Vehicle,Services,26996967,0.5014,Electricity → Repair & Maintenance of Motor Vehicle
+36,2,Wheat,Agriculture,61,Ready made garments,Manufacturing,26158063,0.4858,Wheat → Ready made garments
+37,2,Wheat,Agriculture,51,Alcoholic beverages,Manufacturing,25564464,0.4748,Wheat → Alcoholic beverages
+38,2,Wheat,Agriculture,118,Repair & Maintenance of Motor Vehicle,Services,25400715,0.4717,Wheat → Repair & Maintenance of Motor Vehicle
+39,12,Sugarcane,Agriculture,120,Railway Transport,Services,25186533,0.4678,Sugarcane → Railway Transport
+40,114,Electricity,Electricity,61,Ready made garments,Manufacturing,24995363,0.4642,Electricity → Ready made garments
+41,66,"Paper, Paper products and newsprint",Manufacturing,132,Research & Development Services,Services,23632400,0.4389,"Paper, Paper products and newsprint → Research & Development Services"
+42,1,Paddy,Agriculture,122,Air transport,Services,21945631,0.4076,Paddy → Air transport
+43,20,Other food crops,Agriculture,119,Hotels & Restaurant,Services,21673730,0.4025,Other food crops → Hotels & Restaurant
+44,1,Paddy,Agriculture,49,Bread & Bakery products,Manufacturing,21663936,0.4023,Paddy → Bread & Bakery products
+45,12,Sugarcane,Agriculture,52,Non alcoholic beverages,Manufacturing,21601838,0.4012,Sugarcane → Non alcoholic beverages
+46,71,Petroleum products,Petroleum,126,Communication services,Services,21570804,0.4006,Petroleum products → Communication services
+47,71,Petroleum products,Petroleum,132,Research & Development Services,Services,21511582,0.3995,Petroleum products → Research & Development Services
+48,114,Electricity,Electricity,132,Research & Development Services,Services,17876851,0.332,Electricity → Research & Development Services
+49,70,Plastic products,Manufacturing,120,Railway Transport,Services,17160302,0.3187,Plastic products → Railway Transport
+50,71,Petroleum products,Petroleum,124,Supportive and Auxiliary transport activities,Services,16687809,0.3099,Petroleum products → Supportive and Auxiliary transport activities

@@ -58,10 +58,13 @@ import sys
 import time
 
 sys.path.insert(0, str(Path(__file__).parent))
-from config import BASE_DIR, DIRS, STUDY_YEARS, YEARS, DIRECT_WATER, ACTIVITY_DATA, CPI
+from config import BASE_DIR, DIRS, STUDY_YEARS, YEARS, DIRECT_WATER, ACTIVITY_DATA, CPI, USD_INR
 from utils import (
-    section, subsection, ok, warn, save_csv,
+    section, subsection, ok, warn, save_csv, safe_csv,
     compare_across_years, top_n, Timer, Logger,
+    crore_to_usd_m, fmt_crore_usd,
+    classify_source_group, find_blue_water_col,
+    six_polar_sda,
 )
 
 # ── Output directories ────────────────────────────────────────────────────────
@@ -78,22 +81,29 @@ RNG_SEED      = 42        # reproducibility
 # DATA LOADERS  (read from existing pipeline outputs)
 # ══════════════════════════════════════════════════════════════════════════════
 
-def _safe_csv(path: Path) -> pd.DataFrame:
-    try:
-        return pd.read_csv(path) if Path(path).exists() else pd.DataFrame()
-    except Exception:
-        return pd.DataFrame()
+# _safe_csv is available as safe_csv() from utils — no local definition needed.
 
 
 def load_w(year: str, log: Logger = None) -> np.ndarray:
-    """Load water coefficient vector W (140,) from sut water CSV."""
-    cfg = YEARS[year]
+    """Load blue water coefficient vector W (140,) from sut water CSV.
+    Uses find_blue_water_col() to safely locate the Blue column — never picks
+    the Green column accidentally (previously: [c for c in cols if 'Water' in c
+    and 'crore' in c][0] could pick Green if Blue was absent).
+    """
+    cfg  = YEARS[year]
     path = DIRS["concordance"] / f"water_coefficients_140_{cfg['io_tag']}.csv"
-    df = pd.read_csv(path)
-    wc = [c for c in df.columns if "Water" in c and "crore" in c][0]
+    df   = pd.read_csv(path)
+    wc   = find_blue_water_col(df, year)
+    if wc is None:
+        raise ValueError(
+            f"No blue water coefficient column found in {path}. "
+            "Available columns: " + str(df.columns.tolist())
+        )
     W = df[wc].values.astype(float)
-    ok(f"W {year}: shape={W.shape}  non-zero={np.count_nonzero(W)}", log)
-    return W, df["Product_ID"].values, df.get("Product_Name", pd.Series(dtype=str)).values
+    ok(f"W {year} (blue, col='{wc}'): shape={W.shape}  non-zero={np.count_nonzero(W)}", log)
+    pid_col  = df["Product_ID"].values if "Product_ID" in df.columns else np.arange(1, len(W)+1)
+    name_col = df["Product_Name"].values if "Product_Name" in df.columns else np.array([""] * len(W))
+    return W, pid_col, name_col
 
 
 def load_l(year: str, log: Logger = None) -> np.ndarray:
@@ -106,14 +116,41 @@ def load_l(year: str, log: Logger = None) -> np.ndarray:
 
 
 def load_y(year: str, log: Logger = None) -> np.ndarray:
-    """Load tourism demand vector Y (140,) from mapped demand CSV."""
+    """Load tourism demand vector Y (140,) from mapped demand CSV.
+
+    BUG FIX (v2): indirect_twf_{year}_by_sut.csv is saved sorted by
+    Total_Water_m3 descending (for display purposes).  Reading .values
+    directly from that sorted frame misaligns Y with W and L, which are
+    always in product-ID order (1→140).  Fix: sort by Product_ID before
+    extracting .values so the Y vector is guaranteed to be in product order.
+    """
+    _usd_rate = USD_INR.get(year, 70.0)
     # Try the already-mapped 140-product version first (written by indirect_twf)
     path_sut = DIRS["indirect"] / f"indirect_twf_{year}_by_sut.csv"
     if path_sut.exists():
         df = pd.read_csv(path_sut)
         if "Tourism_Demand_crore" in df.columns:
+            # ── FIX: restore product-ID order ───────────────────────────────
+            # The CSV is written sorted by Total_Water_m3 (descending) for
+            # display.  W and L are in Product_ID order.  Sorting here before
+            # extracting .values aligns all three vectors correctly.
+            if "Product_ID" in df.columns:
+                df = df.sort_values("Product_ID").reset_index(drop=True)
+            else:
+                warn(
+                    f"Y {year}: 'Product_ID' column missing from sut CSV — "
+                    "cannot guarantee product-order alignment with W and L. "
+                    "Re-run calculate_indirect_twf.py to regenerate the file.",
+                    log,
+                )
             Y = df["Tourism_Demand_crore"].values.astype(float)
-            ok(f"Y {year} (from sut results): ₹{Y.sum():,.0f} cr  non-zero={np.count_nonzero(Y)}", log)
+            ok(
+                f"Y {year} (from sut results, sorted by Product_ID): "
+                f"₹{Y.sum():,.0f} cr  "
+                f"(${crore_to_usd_m(Y.sum(), _usd_rate):,.0f}M)  "
+                f"non-zero={np.count_nonzero(Y)}",
+                log,
+            )
             return Y
     # Fallback: 163-sector demand
     path_163 = DIRS["demand"] / f"Y_tourism_{year}.csv"
@@ -124,14 +161,18 @@ def load_y(year: str, log: Logger = None) -> np.ndarray:
         Y = Y[:140]
     elif len(Y) < 140:
         Y = np.concatenate([Y, np.zeros(140 - len(Y))])
-    ok(f"Y {year} (padded from 163): ₹{Y.sum():,.0f} cr", log)
+    ok(
+        f"Y {year} (padded from 163): ₹{Y.sum():,.0f} cr  "
+        f"(${crore_to_usd_m(Y.sum(), _usd_rate):,.0f}M)",
+        log,
+    )
     return Y
 
 
 def load_product_names(year: str) -> list:
     cfg = YEARS[year]
     path = DIRS["io"] / cfg["io_year"] / f"io_products_{cfg['io_tag']}.csv"
-    df = _safe_csv(path)
+    df = safe_csv(path)
     if not df.empty and "Product_Name" in df.columns:
         return df["Product_Name"].tolist()
     return [f"Product_{i+1}" for i in range(140)]
@@ -153,7 +194,18 @@ def two_polar_decomposition(
       ΔL effect = 0.5 * [W0 @ ΔL @ Y0  +  W1 @ ΔL @ Y1]
       ΔY effect = 0.5 * [W0 @ L0 @ ΔY  +  W1 @ L1 @ ΔY]
 
-    Returns dict with scalar effects and their sum (should equal ΔTWF).
+    By construction the three effects sum exactly to ΔTWF (residual ≈ 0 up to
+    floating-point precision, typically <0.001%).  The percentages reported are
+    therefore each effect as a share of |ΔTWF|, which can exceed ±100% and even
+    ±1000% when opposing effects nearly cancel (near-cancellation instability).
+
+    NEAR-CANCELLATION INSTABILITY:
+    When |ΔTWF| is small relative to the individual effects, the percentage
+    attribution becomes numerically large and economically uninterpretable.
+    The flag `near_cancellation` is set True when max(|W|,|L|,|Y|) > 5×|ΔTWF|.
+    In that case the absolute bn m³ values are meaningful; the percentages are not.
+
+    Returns dict with scalar effects, their sum, residual, and instability flag.
     """
     TWF0 = float(np.dot(W0 @ L0, Y0))
     TWF1 = float(np.dot(W1 @ L1, Y1))
@@ -172,19 +224,28 @@ def two_polar_decomposition(
 
     residual = dTWF - (W_eff + L_eff + Y_eff)
 
+    # Near-cancellation instability: flag when max individual effect > 5× |ΔTWF|
+    max_effect = max(abs(W_eff), abs(L_eff), abs(Y_eff))
+    near_cancellation = bool(abs(dTWF) > 0 and max_effect > 5 * abs(dTWF))
+    instability_ratio = max_effect / abs(dTWF) if abs(dTWF) > 0 else float("inf")
+
     return {
-        "TWF0_m3":          TWF0,
-        "TWF1_m3":          TWF1,
-        "dTWF_m3":          dTWF,
-        "W_effect_m3":      W_eff,
-        "L_effect_m3":      L_eff,
-        "Y_effect_m3":      Y_eff,
-        "Sum_effects_m3":   W_eff + L_eff + Y_eff,
-        "Residual_m3":      residual,
-        "W_effect_pct":     100 * W_eff / abs(dTWF) if dTWF else 0,
-        "L_effect_pct":     100 * L_eff / abs(dTWF) if dTWF else 0,
-        "Y_effect_pct":     100 * Y_eff / abs(dTWF) if dTWF else 0,
-        "Residual_pct":     100 * residual / abs(dTWF) if dTWF else 0,
+        "TWF0_m3":              TWF0,
+        "TWF1_m3":              TWF1,
+        "dTWF_m3":              dTWF,
+        "W_effect_m3":          W_eff,
+        "L_effect_m3":          L_eff,
+        "Y_effect_m3":          Y_eff,
+        "Sum_effects_m3":       W_eff + L_eff + Y_eff,
+        "Residual_m3":          residual,
+        # Percentages: meaningful only when near_cancellation is False
+        "W_effect_pct":         100 * W_eff / abs(dTWF) if dTWF else 0,
+        "L_effect_pct":         100 * L_eff / abs(dTWF) if dTWF else 0,
+        "Y_effect_pct":         100 * Y_eff / abs(dTWF) if dTWF else 0,
+        "Residual_pct":         100 * residual / abs(dTWF) if dTWF else 0,
+        # Instability metadata
+        "Near_cancellation":    near_cancellation,
+        "Instability_ratio":    round(instability_ratio, 1),
     }
 
 
@@ -218,7 +279,10 @@ def run_sda(log: Logger = None) -> list:
         W0, L0, Y0 = data[y0]
         W1, L1, Y1 = data[y1]
 
-        res = two_polar_decomposition(W0, L0, Y0, W1, L1, Y1)
+        # Use six-polar SDA (all 3!=6 permutations) — residual = 0 by construction.
+        # Previously used two_polar_decomposition which had a residual of
+        # 0.5*(dW@dL@dY) ≈ 6% for 2015→2019 where all three factors change.
+        res = six_polar_sda(W0, L0, Y0, W1, L1, Y1)
         res["Year_from"] = y0
         res["Year_to"]   = y1
         res["Period"]    = f"{y0}→{y1}"
@@ -233,7 +297,18 @@ def run_sda(log: Logger = None) -> list:
         ok(f"  Y effect (demand):         {res['Y_effect_m3']/1e9:+.4f} bn m³  "
            f"({res['Y_effect_pct']:+.1f}% of |ΔTWF|)", log)
         ok(f"  Residual (should be ~0):   {res['Residual_m3']/1e9:+.6f} bn m³  "
-           f"({res['Residual_pct']:+.3f}%)", log)
+           f"({res['Residual_pct']:+.3f}%)  [six-polar: ~0 by construction]", log)
+
+        if res["Near_cancellation"]:
+            warn(
+                f"SDA {y0}→{y1}: NEAR-CANCELLATION INSTABILITY detected "
+                f"(max|effect| = {res['Instability_ratio']:.0f}× |ΔTWF|). "
+                f"ΔTWF is small ({res['dTWF_m3']/1e9:.4f} bn m³) while opposing effects "
+                f"are large (~{max(abs(res['L_effect_m3']),abs(res['Y_effect_m3']))/1e9:.2f} bn m³). "
+                "Percentage attribution exceeds ±100% and is NOT economically interpretable. "
+                "Report absolute effects (bn m³) only for this period.",
+                log,
+            )
 
         # Save year-pair CSV
         df = pd.DataFrame([res])
@@ -247,15 +322,22 @@ def run_sda(log: Logger = None) -> list:
             f.write(f"TWF {y0}:  {res['TWF0_m3']:>20,.0f} m³\n")
             f.write(f"TWF {y1}:  {res['TWF1_m3']:>20,.0f} m³\n")
             f.write(f"Change:    {res['dTWF_m3']:>+20,.0f} m³\n\n")
-            f.write("Two-polar decomposition:\n")
+            f.write("Six-polar decomposition (Dietzenbacher & Los 1998 — residual=0):\n")
             f.write(f"  W effect (water technology):  {res['W_effect_m3']:>+15,.0f} m³  "
                     f"({res['W_effect_pct']:+.1f}%)\n")
             f.write(f"  L effect (supply structure):  {res['L_effect_m3']:>+15,.0f} m³  "
                     f"({res['L_effect_pct']:+.1f}%)\n")
             f.write(f"  Y effect (tourism demand):    {res['Y_effect_m3']:>+15,.0f} m³  "
                     f"({res['Y_effect_pct']:+.1f}%)\n")
-            f.write(f"  Residual:                     {res['Residual_m3']:>+15,.0f} m³  "
+            f.write(f"  Residual (numerical noise):   {res['Residual_m3']:>+15,.0f} m³  "
                     f"({res['Residual_pct']:+.3f}%)\n")
+            if res["Near_cancellation"]:
+                f.write(
+                    f"\n⚠ NEAR-CANCELLATION INSTABILITY (ratio={res['Instability_ratio']:.0f}×):\n"
+                    "  ΔTWF is near zero while opposing L and Y effects are large.\n"
+                    "  Percentage figures above exceed ±100% and are NOT interpretable.\n"
+                    "  Cite absolute effects (bn m³) only — do not cite percentages.\n"
+                )
         ok(f"Summary: {txt_path.name}", log)
         all_results.append(res)
 
@@ -279,7 +361,10 @@ def _mc_distributions(year: str) -> dict:
     All distributions produce scalar multipliers applied to the base value.
 
     Sources for uncertainty ranges:
-      - Agricultural water coefficients: WaterGAP ±30-40% (1-sigma)
+      - Agricultural water coefficients: WaterGAP ±30-40% (1-sigma);
+        σ=0.30 on log scale is a conservative upper bound following
+        Biemans et al. (2011) and Mekonnen & Hoekstra (2011) who report
+        ±30–40% estimation uncertainty for South Asian crop water use.
       - Hotel coefficients: CHSB India log-normal (σ=0.25 on log scale)
       - Restaurant coefficients: Lee et al. (2021) ±20%
       - Tourist volumes: MoT ±8% (domestic), ±5% (inbound)
@@ -362,8 +447,11 @@ def run_monte_carlo(log: Logger = None) -> dict:
             warn(f"MC {year}: missing input — {e}", log)
             continue
 
-        # Identify agricultural product indices (IDs 1-29)
-        agr_mask = np.array([1 <= int(pid) <= 29 for pid in pids])
+        # Identify agricultural product indices using the shared classify_source_group()
+        # function (from utils). Previously used hardcoded `1 <= pid <= 29` which matches
+        # Agriculture range but doesn't benefit from the centralised boundary definition.
+        agr_mask = np.array([classify_source_group(int(pid)) == "Agriculture"
+                             for pid in pids])
 
         dist_specs = _mc_distributions(year)
         samples    = _sample_distributions(dist_specs, N_SIMULATIONS, rng)
@@ -474,11 +562,14 @@ def run_monte_carlo(log: Logger = None) -> dict:
 # ══════════════════════════════════════════════════════════════════════════════
 
 def _source_group(pid: int) -> str:
-    """Classify a SUT product ID into a broad source group."""
+    """Classify a SUT product ID into a broad source group.
+    Note: Petroleum (71-80) is a sub-range of Manufacturing (41-113).
+    Check Petroleum FIRST to avoid it being classified as Manufacturing.
+    """
     if 1  <= pid <= 29:  return "Agriculture"
     if 30 <= pid <= 40:  return "Mining"
+    if 71 <= pid <= 80:  return "Petroleum"   # must precede Manufacturing check
     if 41 <= pid <= 113: return "Manufacturing"
-    if 71 <= pid <= 80:  return "Petroleum"
     if pid == 114:       return "Electricity"
     return "Services"
 

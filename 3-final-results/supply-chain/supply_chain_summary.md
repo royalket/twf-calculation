@@ -9,9 +9,10 @@
 
 | Source Group | 2015 m³ | 2015 % | 2019 m³ | 2019 % | 2022 m³ | 2022 % |
 |---|---|---|---|---|---|---|
-| Agriculture | 44,488,756,481 | 99.6% | 71,308,964,556 | 99.4% | 70,574,105,480 | 98.6% |
-| Manufacturing | 87,953,991 | 0.2% | 162,714,744 | 0.2% | 934,924,964 | 1.3% |
-| Electricity | 103,122,468 | 0.2% | 303,095,305 | 0.4% | 92,426,753 | 0.1% |
+| Agriculture | 3,604,159,720 | 85.3% | 3,339,348,663 | 74.1% | 3,233,160,554 | 74.0% |
+| Manufacturing | 0 | 0.0% | 60,747,190 | 1.3% | 211,490,787 | 4.8% |
+| Petroleum | 344,011,916 | 8.1% | 506,315,466 | 11.2% | 778,617,917 | 17.8% |
+| Electricity | 275,641,718 | 6.5% | 598,186,364 | 13.3% | 143,856,556 | 3.3% |
 
 ---
 
@@ -21,31 +22,31 @@
 
 | Rank | Path | Water (m³) | Share % |
 |---|---|---|---|
-| 1 | Wheat → Wheat | 19,532,109,294 | 40.816% |
-| 2 | Paddy → Paddy | 12,637,426,729 | 26.408% |
-| 3 | Rapeseed and mustard → Rapeseed and mustard | 1,019,731,218 | 2.131% |
-| 4 | Paddy → Coarse cereals | 816,779,128 | 1.707% |
-| 5 | Wheat → Coarse cereals | 705,394,176 | 1.474% |
+| 1 | Sugarcane → Processed fruits & Processed Vegetables | 1,401,464,890 | 27.195% |
+| 2 | Paddy → Processed fruits & Processed Vegetables | 343,162,398 | 6.659% |
+| 3 | Wheat → Processed fruits & Processed Vegetables | 224,013,574 | 4.347% |
+| 4 | Other food crops → Processed fruits & Processed Vegetables | 135,474,032 | 2.629% |
+| 5 | Wheat → Hotels & Restaurant | 116,621,249 | 2.263% |
 
 ### 2019
 
 | Rank | Path | Water (m³) | Share % |
 |---|---|---|---|
-| 1 | Wheat → Wheat | 30,168,241,051 | 39.288% |
-| 2 | Paddy → Paddy | 24,303,991,826 | 31.651% |
-| 3 | Groundnut → Groundnut | 1,823,354,706 | 2.375% |
-| 4 | Paddy → Coarse cereals | 1,239,914,207 | 1.615% |
-| 5 | Coarse cereals → Coarse cereals | 1,107,843,196 | 1.443% |
+| 1 | Paddy → Processed fruits & Processed Vegetables | 572,096,842 | 9.931% |
+| 2 | Other oil seeds → Processed fruits & Processed Vegetables | 289,150,979 | 5.019% |
+| 3 | Wheat → Processed fruits & Processed Vegetables | 279,294,108 | 4.848% |
+| 4 | Petroleum products → Repair & Maintenance of Motor Vehicle | 234,651,613 | 4.073% |
+| 5 | Electricity → Railway Transport | 232,953,268 | 4.044% |
 
 ### 2022
 
 | Rank | Path | Water (m³) | Share % |
 |---|---|---|---|
-| 1 | Paddy → Paddy | 26,720,163,124 | 35.347% |
-| 2 | Wheat → Wheat | 24,325,486,142 | 32.179% |
-| 3 | Sugarcane → Sugarcane | 4,016,540,347 | 5.313% |
-| 4 | Paddy → Coarse cereals | 1,804,034,072 | 2.386% |
-| 5 | Coarse cereals → Coarse cereals | 1,195,335,637 | 1.581% |
+| 1 | Paddy → Processed fruits & Processed Vegetables | 724,937,656 | 13.463% |
+| 2 | Petroleum products → Repair & Maintenance of Motor Vehicle | 402,828,262 | 7.481% |
+| 3 | Other oil seeds → Processed fruits & Processed Vegetables | 325,324,687 | 6.042% |
+| 4 | Rapeseed and mustard → Processed fruits & Processed Vegetables | 271,684,289 | 5.046% |
+| 5 | Wheat → Processed fruits & Processed Vegetables | 245,638,752 | 4.562% |
 
 ---
 

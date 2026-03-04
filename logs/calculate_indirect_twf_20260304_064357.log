@@ -1,0 +1,324 @@
+══════════════════════════════════════════════════════════════════════
+  Log started : 2026-03-04 06:43:57
+  Step        : calculate_indirect_twf
+  Log file    : /Users/kumar.aniket/Documents/personal/research/tourism-water-footprint/twf-calculation/logs/calculate_indirect_twf_20260304_064357.log
+══════════════════════════════════════════════════════════════════════
+
+══════════════════════════════════════════════════════════════════════
+  CALCULATE INDIRECT TWF  (W × L × Y  +  Scarce_TWF  +  Multiplier_Ratio)
+══════════════════════════════════════════════════════════════════════
+     WSI source: WRI Aqueduct 4.0 (Kuzma et al. 2023)
+       Agriculture WSI = 0.827 (Irr-weighted bws)
+       Industry WSI    = 0.814 (Ind-weighted bws)
+       Services WSI    = 0.000 (no direct basin extraction)
+
+══════════════════════════════════════════════════════════════════════
+  Year: 2015
+══════════════════════════════════════════════════════════════════════
+  ✓  Y_tourism 2015 (nominal): ₹929,805 cr  ($143,046.9M / $143.05B), 25/163 non-zero
+  ✓  L (2015-16): (140, 140)  diag mean=1.0711
+  ✓  Concordance 2015-16: 76 categories
+  ✓  Concordance 2015-16: no duplicate SUT_Product_IDs
+  ✓  Blue water column: 'Water_2015_Blue_m3_per_crore'  non-zero: 60/140
+  ✓  Green water column: 'Water_2015_Green_m3_per_crore'  non-zero: 20/140
+  ✓  Split demand 2015: inbound ₹235,331 cr  domestic ₹694,474 cr
+  ✓  L_2015: shape=(140, 140)  non-zero=19,322  max=3.2042  neg=0  diag_mean=1.0711
+  ✓  Y_140: ₹929,805 crore  (coverage 100.0%)
+  ✓  Green EEIO TWF 2015: 10.6663 bn m³  (green/blue ratio = 2.070)
+  ✓  Using IO total output for economy WL benchmark (2015)
+
+  Indirect TWF — 2015
+  Blue TWF total:          5,153,412,700 m³  (5.1534 bn m³)
+  Scarce TWF total:        2,771,859,786 m³  (2.7719 bn m³)
+  Scarce/Blue ratio:              0.538  (WSI-weighted; Aqueduct 4.0 Agriculture=0.827, Industry=0.814)
+  Tourism demand:                929,805 crore  ($143,047M)
+  Water intensity:                5542.5 m³/crore
+
+  Top 10 by Total_Water_m3:
+  Rank  Category_Name                                     Total_Water_m3        %
+  ────────────────────────────────────────────────────────────────────────────────
+  1     Processed Fruit/Veg                                2,447,845,366 m³    47.5%
+  2     Hotels & Restaurants                                 413,463,801 m³     8.0%
+  3     Road Transport                                       397,892,690 m³     7.7%
+  4     Beverages                                            314,970,162 m³     6.1%
+  5     Railway Transport                                    310,386,986 m³     6.0%
+  6     Ready Made Garments                                  217,490,141 m³     4.2%
+  7     Grain Mill & Bakery                                  181,620,167 m³     3.5%
+  8     Health & Social Work                                 166,158,543 m³     3.2%
+  9     Air Transport                                        149,669,900 m³     2.9%
+  10    Other Services                                       140,805,670 m³     2.7%
+
+  ── By sector type (blue TWF) ──
+         Agriculture         :                0 m³ (0.0%)  scarce:              0 m³
+         Food Mfg            :    2,951,221,231 m³ (57.3%)  scarce:  2,402,294,082 m³
+         Manufacturing       :      151,348,469 m³ (2.9%)  scarce:    123,197,654 m³
+         Mining              :                0 m³ (0.0%)  scarce:              0 m³
+         Services            :    1,748,179,547 m³ (33.9%)  scarce:              0 m³
+         Textiles            :      290,186,580 m³ (5.6%)  scarce:    236,211,876 m³
+         Utilities           :       12,476,873 m³ (0.2%)  scarce:     10,156,174 m³
+
+  ── Structural decomposition — 2015 ──
+  ✓  Green origin by source group (2015): Agriculture=10666.3M  Electricity=0.0M  Manufacturing=0.0M  Mining=0.0M  Petroleum=0.0M  Services=0.0M
+  ✓  Saved Structural decomp 2015  (10,360 rows → indirect_twf_2015_structural.csv)
+  ✓  Saved Water origin 2015  (6 rows → indirect_twf_2015_origin.csv)
+
+  Water origin by source sector — 2015  (Blue | Scarce)
+    Agriculture      WSI=0.827  Blue:  4,180,444,407 m³ (81.1%)  Scarce: 3,457,227,524 m³ (81.4%)
+    Petroleum        WSI=0.814  Blue:    433,495,957 m³ (8.4%)  Scarce:   352,865,709 m³ (8.3%)
+    Electricity      WSI=0.814  Blue:    365,019,722 m³ (7.1%)  Scarce:   297,126,054 m³ (7.0%)
+    Manufacturing    WSI=0.814  Blue:    174,452,614 m³ (3.4%)  Scarce:   142,004,428 m³ (3.3%)
+    Mining           WSI=0.814  Blue:              0 m³ (0.0%)  Scarce:             0 m³ (0.0%)
+    Services         WSI=0.000  Blue:              0 m³ (0.0%)  Scarce:             0 m³ (0.0%)
+  ✓  Saved Sector intensity 2015  (76 rows → indirect_twf_2015_intensity.csv)
+  ✓  Saved Multiplier ratio 2015  (24 rows → water_multiplier_ratio_2015.csv)
+
+  ── Water multiplier ratio — 2015  (WL[j] / economy_avg_WL) ──
+    Sectors ABOVE economy average (ratio > 1):
+      Grain Mill & Bakery                       ratio=3.83x  WL=41902.0 m³/cr
+      Processed Fruit/Veg                       ratio=2.67x  WL=29159.8 m³/cr
+      Railway Transport                         ratio=1.34x  WL=14690.8 m³/cr
+    Sectors BELOW economy average (ratio < 1):
+      Beverages                                 ratio=0.78x  WL=8499.5 m³/cr
+      Electricity, Heat & Energy                ratio=0.55x  WL=6003.7 m³/cr
+      Textiles                                  ratio=0.54x  WL=5937.9 m³/cr
+      Other Services                            ratio=0.40x  WL=4351.5 m³/cr
+      Machinery Rental                          ratio=0.35x  WL=3838.7 m³/cr
+  ✓  Y_140: ₹929,805 crore  (coverage 100.0%)
+  ✓  Real-price intensity: 5542.5 m³/₹ crore (2015-16 prices)
+
+  ── Sensitivity — 2015 ──
+  ✓  Sensitivity Agriculture: LOW=4.3173  BASE=5.1534  HIGH=5.9895 bn m³
+  ✓  Sensitivity Electricity: LOW=5.0804  BASE=5.1534  HIGH=5.2264 bn m³
+  ✓  Sensitivity Petroleum: LOW=5.0667  BASE=5.1534  HIGH=5.2401 bn m³
+  ✓  Saved Sensitivity 2015  (9 rows → indirect_twf_2015_sensitivity.csv)
+  ✓  Y_140: ₹235,331 crore  (coverage 100.0%)
+  ✓  Y_140: ₹694,474 crore  (coverage 100.0%)
+  ✓  Split TWF 2015: inbound=1.4379  domestic=3.7155 bn m³  scarce_inb=1.1856  scarce_dom=3.0636 bn m³
+  ✓  Saved Split 2015  (2 rows → indirect_twf_2015_split.csv)
+  ✓  Saved SUT results 2015  (140 rows → indirect_twf_2015_by_sut.csv)
+  ✓  Saved Category results 2015  (76 rows → indirect_twf_2015_by_category.csv)
+  ✓  Summary: indirect_twf_2015_summary.txt
+
+══════════════════════════════════════════════════════════════════════
+  Year: 2019
+══════════════════════════════════════════════════════════════════════
+  ✓  Y_tourism 2019 (nominal): ₹1,405,015 cr  ($200,716.5M / $200.72B), 25/163 non-zero
+  ✓  L (2019-20): (140, 140)  diag mean=1.1062
+  ✓  Concordance 2019-20: 76 categories
+  ✓  Concordance 2019-20: no duplicate SUT_Product_IDs
+  ✓  Blue water column: 'Water_2019_Blue_m3_per_crore'  non-zero: 60/140
+  ✓  Green water column: 'Water_2019_Green_m3_per_crore'  non-zero: 20/140
+  ✓  Split demand 2019: inbound ₹364,325 cr  domestic ₹1,040,690 cr
+  ✓  L_2019: shape=(140, 140)  non-zero=19,183  max=8.8126  neg=0  diag_mean=1.1062
+  ✓  Y_140: ₹1,405,015 crore  (coverage 100.0%)
+  ✓  Green EEIO TWF 2019: 13.5720 bn m³  (green/blue ratio = 2.356)
+  ✓  Using IO total output for economy WL benchmark (2019)
+
+  Indirect TWF — 2019
+  Blue TWF total:          5,760,820,540 m³  (5.7608 bn m³)
+  Scarce TWF total:        2,696,963,548 m³  (2.6970 bn m³)
+  Scarce/Blue ratio:              0.468  (WSI-weighted; Aqueduct 4.0 Agriculture=0.827, Industry=0.814)
+  Tourism demand:              1,405,015 crore  ($200,716M)
+  Water intensity:                4100.2 m³/crore
+
+  Top 10 by Total_Water_m3:
+  Rank  Category_Name                                     Total_Water_m3        %
+  ────────────────────────────────────────────────────────────────────────────────
+  1     Processed Fruit/Veg                                1,888,268,847 m³    32.8%
+  2     Road Transport                                       692,640,791 m³    12.0%
+  3     Hotels & Restaurants                                 633,830,131 m³    11.0%
+  4     Beverages                                            538,525,647 m³     9.3%
+  5     Ready Made Garments                                  286,976,604 m³     5.0%
+  6     Grain Mill & Bakery                                  281,095,334 m³     4.9%
+  7     Health & Social Work                                 274,434,877 m³     4.8%
+  8     Air Transport                                        258,035,014 m³     4.5%
+  9     Other Services                                       189,033,644 m³     3.3%
+  10    Railway Transport                                    179,974,212 m³     3.1%
+
+  ── By sector type (blue TWF) ──
+         Agriculture         :                0 m³ (0.0%)  scarce:              0 m³
+         Food Mfg            :    2,717,433,638 m³ (47.2%)  scarce:  2,211,990,981 m³
+         Manufacturing       :      197,151,533 m³ (3.4%)  scarce:    160,481,348 m³
+         Mining              :                0 m³ (0.0%)  scarce:              0 m³
+         Services            :    2,447,597,508 m³ (42.5%)  scarce:              0 m³
+         Textiles            :      377,973,379 m³ (6.6%)  scarce:    307,670,330 m³
+         Utilities           :       20,664,483 m³ (0.4%)  scarce:     16,820,889 m³
+
+  ── Structural decomposition — 2019 ──
+  ✓  Green origin by source group (2019): Agriculture=13572.0M  Electricity=0.0M  Manufacturing=0.0M  Mining=0.0M  Petroleum=0.0M  Services=0.0M
+  ✓  Saved Structural decomp 2019  (10,360 rows → indirect_twf_2019_structural.csv)
+  ✓  Saved Water origin 2019  (6 rows → indirect_twf_2019_origin.csv)
+
+  Water origin by source sector — 2019  (Blue | Scarce)
+    Agriculture      WSI=0.827  Blue:  4,082,295,575 m³ (70.9%)  Scarce: 3,376,058,440 m³ (71.2%)
+    Electricity      WSI=0.814  Blue:    735,332,319 m³ (12.8%)  Scarce:   598,560,508 m³ (12.6%)
+    Petroleum        WSI=0.814  Blue:    639,230,932 m³ (11.1%)  Scarce:   520,333,979 m³ (11.0%)
+    Manufacturing    WSI=0.814  Blue:    303,961,715 m³ (5.3%)  Scarce:   247,424,836 m³ (5.2%)
+    Mining           WSI=0.814  Blue:              0 m³ (0.0%)  Scarce:             0 m³ (0.0%)
+    Services         WSI=0.000  Blue:              0 m³ (0.0%)  Scarce:             0 m³ (0.0%)
+  ✓  Saved Sector intensity 2019  (76 rows → indirect_twf_2019_intensity.csv)
+  ✓  Saved Multiplier ratio 2019  (24 rows → water_multiplier_ratio_2019.csv)
+
+  ── Water multiplier ratio — 2019  (WL[j] / economy_avg_WL) ──
+    Sectors ABOVE economy average (ratio > 1):
+      Grain Mill & Bakery                       ratio=4.46x  WL=46506.7 m³/cr
+      Processed Fruit/Veg                       ratio=1.37x  WL=14265.7 m³/cr
+    Sectors BELOW economy average (ratio < 1):
+      Beverages                                 ratio=0.83x  WL=8703.0 m³/cr
+      Electricity, Heat & Energy                ratio=0.74x  WL=7717.8 m³/cr
+      Railway Transport                         ratio=0.72x  WL=7538.4 m³/cr
+      Textiles                                  ratio=0.52x  WL=5400.9 m³/cr
+      Paper Products                            ratio=0.45x  WL=4660.3 m³/cr
+  ✓  Y_140: ₹1,197,576 crore  (coverage 100.0%)
+  ✓  Real-price intensity: 4810.4 m³/₹ crore (2015-16 prices)
+
+  ── Sensitivity — 2019 ──
+  ✓  Sensitivity Agriculture: LOW=4.9444  BASE=5.7608  HIGH=6.5773 bn m³
+  ✓  Sensitivity Electricity: LOW=5.6138  BASE=5.7608  HIGH=5.9079 bn m³
+  ✓  Sensitivity Petroleum: LOW=5.6330  BASE=5.7608  HIGH=5.8887 bn m³
+  ✓  Saved Sensitivity 2019  (9 rows → indirect_twf_2019_sensitivity.csv)
+  ✓  Y_140: ₹364,325 crore  (coverage 100.0%)
+  ✓  Y_140: ₹1,040,690 crore  (coverage 100.0%)
+  ✓  Split TWF 2019: inbound=1.6698  domestic=4.0910 bn m³  scarce_inb=1.3743  scarce_dom=3.3681 bn m³
+  ✓  Saved Split 2019  (2 rows → indirect_twf_2019_split.csv)
+  ✓  Saved SUT results 2019  (140 rows → indirect_twf_2019_by_sut.csv)
+  ✓  Saved Category results 2019  (76 rows → indirect_twf_2019_by_category.csv)
+  ✓  Summary: indirect_twf_2019_summary.txt
+
+══════════════════════════════════════════════════════════════════════
+  Year: 2022
+══════════════════════════════════════════════════════════════════════
+  ✓  Y_tourism 2022 (nominal): ₹1,499,192 cr  ($188,577.7M / $188.58B), 25/163 non-zero
+  ✓  L (2021-22): (140, 140)  diag mean=1.0428
+  ✓  Concordance 2021-22: 76 categories
+  ✓  Concordance 2021-22: no duplicate SUT_Product_IDs
+  ✓  Blue water column: 'Water_2022_Blue_m3_per_crore'  non-zero: 63/140
+  ✓  Green water column: 'Water_2022_Green_m3_per_crore'  non-zero: 41/140
+  ✓  Split demand 2022: inbound ₹367,018 cr  domestic ₹1,132,174 cr
+  ✓  L_2022: shape=(140, 140)  non-zero=18,909  max=1.5681  neg=0  diag_mean=1.0428
+  ✓  Y_140: ₹1,499,192 crore  (coverage 100.0%)
+  ✓  Green EEIO TWF 2022: 14.0003 bn m³  (green/blue ratio = 2.600)
+  ✓  Using IO total output for economy WL benchmark (2022)
+
+  Indirect TWF — 2022
+  Blue TWF total:          5,384,599,518 m³  (5.3846 bn m³)
+  Scarce TWF total:        2,865,305,577 m³  (2.8653 bn m³)
+  Scarce/Blue ratio:              0.532  (WSI-weighted; Aqueduct 4.0 Agriculture=0.827, Industry=0.814)
+  Tourism demand:              1,499,192 crore  ($188,578M)
+  Water intensity:                3591.7 m³/crore
+
+  Top 10 by Total_Water_m3:
+  Rank  Category_Name                                     Total_Water_m3        %
+  ────────────────────────────────────────────────────────────────────────────────
+  1     Processed Fruit/Veg                                2,236,637,723 m³    41.5%
+  2     Hotels & Restaurants                                 604,447,969 m³    11.2%
+  3     Road Transport                                       544,801,642 m³    10.1%
+  4     Beverages                                            439,005,122 m³     8.2%
+  5     Grain Mill & Bakery                                  242,294,351 m³     4.5%
+  6     Ready Made Garments                                  230,235,101 m³     4.3%
+  7     Other Services                                       221,515,893 m³     4.1%
+  8     Other Chemicals                                      189,736,851 m³     3.5%
+  9     Air Transport                                        154,187,602 m³     2.9%
+  10    Health & Social Work                                 135,348,034 m³     2.5%
+
+  ── By sector type (blue TWF) ──
+         Agriculture         :                0 m³ (0.0%)  scarce:              0 m³
+         Food Mfg            :    2,927,073,315 m³ (54.4%)  scarce:  2,382,637,678 m³
+         Manufacturing       :      235,035,256 m³ (4.4%)  scarce:    191,318,698 m³
+         Mining              :                0 m³ (0.0%)  scarce:              0 m³
+         Services            :    1,864,568,097 m³ (34.6%)  scarce:              0 m³
+         Textiles            :      338,792,463 m³ (6.3%)  scarce:    275,777,065 m³
+         Utilities           :       19,130,387 m³ (0.4%)  scarce:     15,572,135 m³
+
+  ── Structural decomposition — 2022 ──
+  ✓  Green origin by source group (2022): Agriculture=13317.7M  Electricity=1.8M  Manufacturing=680.8M  Mining=0.0M  Petroleum=0.0M  Services=0.0M
+  ✓  Saved Structural decomp 2022  (10,360 rows → indirect_twf_2022_structural.csv)
+  ✓  Saved Water origin 2022  (6 rows → indirect_twf_2022_origin.csv)
+
+  Water origin by source sector — 2022  (Blue | Scarce)
+    Agriculture      WSI=0.827  Blue:  3,844,287,337 m³ (71.4%)  Scarce: 3,179,225,628 m³ (71.7%)
+    Petroleum        WSI=0.814  Blue:    909,322,981 m³ (16.9%)  Scarce:   740,188,906 m³ (16.7%)
+    Manufacturing    WSI=0.814  Blue:    395,441,894 m³ (7.3%)  Scarce:   321,889,701 m³ (7.3%)
+    Electricity      WSI=0.814  Blue:    235,547,306 m³ (4.4%)  Scarce:   191,735,507 m³ (4.3%)
+    Mining           WSI=0.814  Blue:              0 m³ (0.0%)  Scarce:             0 m³ (0.0%)
+    Services         WSI=0.000  Blue:              0 m³ (0.0%)  Scarce:             0 m³ (0.0%)
+  ✓  Saved Sector intensity 2022  (76 rows → indirect_twf_2022_intensity.csv)
+  ✓  Saved Multiplier ratio 2022  (24 rows → water_multiplier_ratio_2022.csv)
+
+  ── Water multiplier ratio — 2022  (WL[j] / economy_avg_WL) ──
+    Sectors ABOVE economy average (ratio > 1):
+      Grain Mill & Bakery                       ratio=4.14x  WL=37458.4 m³/cr
+      Processed Fruit/Veg                       ratio=1.81x  WL=16325.9 m³/cr
+    Sectors BELOW economy average (ratio < 1):
+      Beverages                                 ratio=0.77x  WL=6955.3 m³/cr
+      Electricity, Heat & Energy                ratio=0.61x  WL=5483.2 m³/cr
+      Textiles                                  ratio=0.51x  WL=4625.5 m³/cr
+      Other Services                            ratio=0.41x  WL=3688.9 m³/cr
+      Paper Products                            ratio=0.38x  WL=3459.9 m³/cr
+  ✓  Y_140: ₹1,141,327 crore  (coverage 100.0%)
+  ✓  Real-price intensity: 4717.8 m³/₹ crore (2015-16 prices)
+
+  ── Sensitivity — 2022 ──
+  ✓  Sensitivity Agriculture: LOW=4.6157  BASE=5.3846  HIGH=6.1535 bn m³
+  ✓  Sensitivity Electricity: LOW=5.3375  BASE=5.3846  HIGH=5.4317 bn m³
+  ✓  Sensitivity Petroleum: LOW=5.2027  BASE=5.3846  HIGH=5.5665 bn m³
+  ✓  Saved Sensitivity 2022  (9 rows → indirect_twf_2022_sensitivity.csv)
+  ✓  Y_140: ₹367,018 crore  (coverage 100.0%)
+  ✓  Y_140: ₹1,132,174 crore  (coverage 100.0%)
+  ✓  Split TWF 2022: inbound=1.6186  domestic=3.7660 bn m³  scarce_inb=1.3316  scarce_dom=3.1014 bn m³
+  ✓  Saved Split 2022  (2 rows → indirect_twf_2022_split.csv)
+  ✓  Saved SUT results 2022  (140 rows → indirect_twf_2022_by_sut.csv)
+  ✓  Saved Category results 2022  (76 rows → indirect_twf_2022_by_category.csv)
+  ✓  Summary: indirect_twf_2022_summary.txt
+
+══════════════════════════════════════════════════════════════════════
+  Cross-Year Comparison
+══════════════════════════════════════════════════════════════════════
+
+  Blue indirect TWF (billion m³)
+  Year               Value       Abs_Chg     Pct_Chg          CAGR
+  ──────────────────────────────────────────────────────────────
+  2015              5.1534 bn m³        (base)
+  2019              5.7608 bn m³  ↑    0.6074      +11.8%       +2.8%/yr
+  2022              5.3846 bn m³  ↑    0.2312       +4.5%       +0.6%/yr
+
+  Green indirect TWF (billion m³)
+  Year               Value       Abs_Chg     Pct_Chg          CAGR
+  ──────────────────────────────────────────────────────────────
+  2015             10.6663 bn m³        (base)
+  2019             13.5720 bn m³  ↑    2.9057      +27.2%       +6.2%/yr
+  2022             14.0003 bn m³  ↑    3.3340      +31.3%       +4.0%/yr
+
+  Blue+Green indirect TWF (billion m³)
+  Year               Value       Abs_Chg     Pct_Chg          CAGR
+  ──────────────────────────────────────────────────────────────
+  2015             15.8197 bn m³        (base)
+  2019             19.3328 bn m³  ↑    3.5131      +22.2%       +5.1%/yr
+  2022             19.3849 bn m³  ↑    3.5652      +22.5%       +2.9%/yr
+
+  Scarce TWF (billion m³, Aqueduct 4.0)
+  Year               Value       Abs_Chg     Pct_Chg          CAGR
+  ──────────────────────────────────────────────────────────────
+  2015              2.7719 bn m³        (base)
+  2019              2.6970 bn m³  ↓    0.0749       -2.7%       -0.7%/yr
+  2022              2.8653 bn m³  ↑    0.0934       +3.4%       +0.5%/yr
+
+  Water intensity nominal (m³/₹ crore)
+  Year               Value       Abs_Chg     Pct_Chg          CAGR
+  ──────────────────────────────────────────────────────────────
+  2015           5542.4661 m³/cr        (base)
+  2019           4100.1830 m³/cr  ↓ 1442.2831      -26.0%       -7.3%/yr
+  2022           3591.6668 m³/cr  ↓ 1950.7993      -35.2%       -6.0%/yr
+
+  Agriculture share of water origin (%)
+  Year               Value       Abs_Chg     Pct_Chg          CAGR
+  ──────────────────────────────────────────────────────────────
+  2015             81.1199%        (base)
+  2019             70.8631%  ↓   10.2568      -12.6%       -3.3%/yr
+  2022             71.3941%  ↓    9.7258      -12.0%       -1.8%/yr
+  ✓  Saved All-year summary  (3 rows → indirect_twf_all_years.csv)
+  ✓  Done in 0.6s
+
+──────────────────────────────────────────────────────────────────────
+  Step 'calculate_indirect_twf' finished  |  elapsed: 0.6s
+  Warnings: 0  |  Errors: 0

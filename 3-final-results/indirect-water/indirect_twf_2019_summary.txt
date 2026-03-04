@@ -1,37 +1,40 @@
 INDIRECT TWF — 2019
 ============================================================
 
-Total:        6,537,352,753 m³  (6.5374 billion m³)
-Demand (INR): ₹1,403,742 crore
-Demand (USD): $200,535 million  (@ ₹70.00/USD)
-Intensity:    4657.1 m³/₹ crore  |  32599.6 m³/USD million
+Blue TWF:     5,760,820,540 m³  (5.7608 billion m³)
+Scarce TWF:   2,696,963,548 m³  (2.6970 billion m³)
+  (Scarce = Blue × WSI; WSI from WRI Aqueduct 4.0, Kuzma et al. 2023)
+  Agriculture WSI=0.827 (Irr-weighted bws); Industry WSI=0.814 (Ind-weighted)
 
-Top 20 categories (destination view):
-   1. Processed Fruit/Veg                       1,888,268,847 m³
-   2. Hotels & Restaurants                      1,616,222,902 m³
-   3. Road Transport                              547,560,841 m³
-   4. Beverages                                   538,525,647 m³
-   5. Ready Made Garments                         286,976,604 m³
-   6. Grain Mill & Bakery                         281,095,334 m³
-   7. Health & Social Work                        274,434,877 m³
-   8. Air Transport                               258,035,014 m³
-   9. Other Services                              189,033,644 m³
-  10. Financial Services                          165,697,997 m³
-  11. Other Chemicals                             157,469,827 m³
-  12. Real Estate                                  76,320,443 m³
-  13. Railway Transport                            55,267,225 m³
-  14. Leather Footwear                             47,613,748 m³
-  15. Textiles                                     43,383,026 m³
-  16. Support & Travel Agencies                    24,978,121 m³
-  17. Electricity, Heat & Energy                   20,664,483 m³
-  18. Printing/Publishing                          19,943,107 m³
-  19. Paper Products                               19,738,600 m³
-  20. Tobacco Products                              9,543,809 m³
+Tourism demand: ₹1,405,015 crore  ($200,716M @ ₹70.0/USD)
+Blue intensity: 4100.2 m³/₹ crore
 
-Water origin by source sector (upstream extraction):
-  Agriculture              5,205,300,199 m³  (79.6%)
-  Electricity                529,260,916 m³  (8.1%)
-  Petroleum                  496,593,554 m³  (7.6%)
-  Manufacturing              306,198,084 m³  (4.7%)
-  Mining                               0 m³  (0.0%)
-  Services                             0 m³  (0.0%)
+Top 20 categories (blue TWF, destination view):
+   1. Processed Fruit/Veg                       1,888,268,847 m³  scarce: 1,537,050,841 m³
+   2. Road Transport                              692,640,791 m³  scarce:            0 m³
+   3. Hotels & Restaurants                        633,830,131 m³  scarce:            0 m³
+   4. Beverages                                   538,525,647 m³  scarce:  438,359,877 m³
+   5. Ready Made Garments                         286,976,604 m³  scarce:  233,598,956 m³
+   6. Grain Mill & Bakery                         281,095,334 m³  scarce:  228,811,602 m³
+   7. Health & Social Work                        274,434,877 m³  scarce:            0 m³
+   8. Air Transport                               258,035,014 m³  scarce:            0 m³
+   9. Other Services                              189,033,644 m³  scarce:            0 m³
+  10. Railway Transport                           179,974,212 m³  scarce:            0 m³
+  11. Other Chemicals                             157,469,827 m³  scarce:  128,180,439 m³
+  12. Real Estate                                  92,893,434 m³  scarce:            0 m³
+  13. Financial Services                           80,080,922 m³  scarce:            0 m³
+  14. Leather Footwear                             47,613,748 m³  scarce:   38,757,591 m³
+  15. Textiles                                     43,383,026 m³  scarce:   35,313,783 m³
+  16. Support & Travel Agencies                    24,978,121 m³  scarce:            0 m³
+  17. Electricity, Heat & Energy                   20,664,483 m³  scarce:   16,820,889 m³
+  18. Printing/Publishing                          19,943,107 m³  scarce:   16,233,689 m³
+  19. Paper Products                               19,738,600 m³  scarce:   16,067,220 m³
+  20. Public Admin & Education                     10,364,152 m³  scarce:            0 m³
+
+Water origin (upstream extraction):
+  Agriculture      WSI=0.827  blue= 4,082,295,575 m³ (70.9%)  scarce=3,376,058,440 m³ (71.2%)
+  Electricity      WSI=0.814  blue=   735,332,319 m³ (12.8%)  scarce= 598,560,508 m³ (12.6%)
+  Petroleum        WSI=0.814  blue=   639,230,932 m³ (11.1%)  scarce= 520,333,979 m³ (11.0%)
+  Manufacturing    WSI=0.814  blue=   303,961,715 m³ (5.3%)  scarce= 247,424,836 m³ (5.2%)
+  Mining           WSI=0.814  blue=             0 m³ (0.0%)  scarce=           0 m³ (0.0%)
+  Services         WSI=0.000  blue=             0 m³ (0.0%)  scarce=           0 m³ (0.0%)

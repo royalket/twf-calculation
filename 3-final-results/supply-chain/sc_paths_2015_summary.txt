@@ -2,25 +2,25 @@ SUPPLY-CHAIN PATH ANALYSIS — 2015
 =======================================================
 
 Top 10 dominant pathways:
-  #1: Wheat → Wheat                                                           19532.11M m³  (40.82%)
-  #2: Paddy → Paddy                                                           12637.43M m³  (26.41%)
-  #3: Rapeseed and mustard → Rapeseed and mustard                              1019.73M m³  (2.13%)
-  #4: Paddy → Coarse cereals                                                    816.78M m³  (1.71%)
-  #5: Wheat → Coarse cereals                                                    705.39M m³  (1.47%)
-  #6: Coconut → Coconut                                                         651.95M m³  (1.36%)
-  #7: Groundnut → Groundnut                                                     610.95M m³  (1.28%)
-  #8: Coarse cereals → Coarse cereals                                           607.89M m³  (1.27%)
-  #9: Paddy → Wheat                                                             470.07M m³  (0.98%)
-  #10: Other food crops → Coarse cereals                                         432.26M m³  (0.90%)
+  #1: Sugarcane → Processed fruits & Processed Vegetables                      1401.46M m³  (27.19%)
+  #2: Paddy → Processed fruits & Processed Vegetables                           343.16M m³  (6.66%)
+  #3: Wheat → Processed fruits & Processed Vegetables                           224.01M m³  (4.35%)
+  #4: Other food crops → Processed fruits & Processed Vegetables                135.47M m³  (2.63%)
+  #5: Wheat → Hotels & Restaurant                                               116.62M m³  (2.26%)
+  #6: Petroleum products → Railway Transport                                    106.26M m³  (2.06%)
+  #7: Petroleum products → Repair & Maintenance of Motor Vehicle                105.92M m³  (2.06%)
+  #8: Electricity → Railway Transport                                           101.58M m³  (1.97%)
+  #9: Paddy → Hotels & Restaurant                                                98.00M m³  (1.90%)
+  #10: Sugarcane → Non alcoholic beverages                                        77.11M m³  (1.50%)
 
 Top 10 tourism-dependent sectors (HEM):
-  #1: Crude petroleum                                dep=14.020%
-  #2: Fertilizers                                    dep=6.934%
-  #3: Organic chemicals                              dep=6.337%
-  #4: Financial services                             dep=5.453%
-  #5: Coarse cereals                                 dep=4.848%
-  #6: Petroleum products                             dep=3.674%
-  #7: Wheat                                          dep=3.490%
-  #8: Other food crops                               dep=3.316%
-  #9: Recreation, entertainment and radio & TV broa  dep=2.920%
-  #10: Electricity                                    dep=2.880%
+  #1: Crude petroleum                                dep=13.679%
+  #2: Railway Transport                              dep=6.466%
+  #3: Petroleum products                             dep=5.101%
+  #4: Repair & Maintenance of Motor Vehicle          dep=4.846%
+  #5: Financial services                             dep=4.305%
+  #6: Organic chemicals                              dep=3.847%
+  #7: Communication services                         dep=3.007%
+  #8: Electricity                                    dep=2.996%
+  #9: Research & Development Services                dep=2.817%
+  #10: Processed fruits & Processed Vegetables        dep=2.670%

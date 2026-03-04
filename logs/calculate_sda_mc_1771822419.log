@@ -1,0 +1,189 @@
+# Log started: 2026-02-23T13:53:39.591705
+
+======================================================================
+  SDA + MONTE CARLO + SUPPLY-CHAIN ANALYSIS
+======================================================================
+
+======================================================================
+  STRUCTURAL DECOMPOSITION ANALYSIS (SDA)
+======================================================================
+  ✓ W 2015: shape=(140,)  non-zero=60
+  ✓ L 2015: shape=(140, 140)  diag_mean=1.0711
+  ✓ Y 2015 (from sut results): ₹928,841 cr  non-zero=38
+  ✓ W 2019: shape=(140,)  non-zero=60
+  ✓ L 2019: shape=(140, 140)  diag_mean=1.1062
+  ✓ Y 2019 (from sut results): ₹1,403,742 cr  non-zero=38
+  ✓ W 2022: shape=(140,)  non-zero=60
+  ✓ L 2022: shape=(140, 140)  diag_mean=1.0428
+  ✓ Y 2022 (from sut results): ₹1,497,873 cr  non-zero=38
+
+  ── SDA: 2015 → 2019
+  ✓ TWF: 47.8547 → 76.7864 bn m³  (Δ +28.9318 bn m³)
+  ✓   W effect (technology):     +2.1627 bn m³  (+7.5% of |ΔTWF|)
+  ✓   L effect (structure):      -1.2858 bn m³  (-4.4% of |ΔTWF|)
+  ✓   Y effect (demand):         +28.0318 bn m³  (+96.9% of |ΔTWF|)
+  ✓   Residual (should be ~0):   +0.023028 bn m³  (+0.080%)
+  ✓ Saved SDA 2015→2019  (1 rows)
+  ✓ Summary: sda_2015_2019_summary.txt
+
+  ── SDA: 2019 → 2022
+  ✓ TWF: 76.7864 → 75.5942 bn m³  (Δ -1.1923 bn m³)
+  ✓   W effect (technology):     -3.7183 bn m³  (-311.9% of |ΔTWF|)
+  ✓   L effect (structure):      -0.7867 bn m³  (-66.0% of |ΔTWF|)
+  ✓   Y effect (demand):         +3.3236 bn m³  (+278.8% of |ΔTWF|)
+  ✓   Residual (should be ~0):   -0.010841 bn m³  (-0.909%)
+  ✓ Saved SDA 2019→2022  (1 rows)
+  ✓ Summary: sda_2019_2022_summary.txt
+  ✓ Saved SDA all periods  (2 rows)
+
+======================================================================
+  MONTE CARLO SENSITIVITY ANALYSIS
+======================================================================
+
+  ── Monte Carlo — 2015  (n=10,000)
+  ✓ W 2015: shape=(140,)  non-zero=60
+  ✓ L 2015: shape=(140, 140)  diag_mean=1.0711
+  ✓ Y 2015 (from sut results): ₹928,841 cr  non-zero=38
+  ✓   BASE:    49.0647 bn m³
+  ✓   Median:  48.8848 bn m³
+  ✓   5th–95th: 30.5502 – 78.9553 bn m³  (range ±61.5%)
+  ✓ Saved MC results 2015  (10,000 rows)
+
+  ── Top variance contributors — 2015
+  ✓   agr_water_mult                  r=+1.000  share=100.0%
+  ✓   hotel_coeff_mult                r=-0.011  share=0.0%
+  ✓   rest_coeff_mult                 r=+0.009  share=0.0%
+  ✓   rail_coeff_mult                 r=-0.008  share=0.0%
+  ✓   dom_tourist_mult                r=+0.007  share=0.0%
+  ✓ Summary: mc_2015_summary.txt
+
+  ── Monte Carlo — 2019  (n=10,000)
+  ✓ W 2019: shape=(140,)  non-zero=60
+  ✓ L 2019: shape=(140, 140)  diag_mean=1.1062
+  ✓ Y 2019 (from sut results): ₹1,403,742 cr  non-zero=38
+  ✓   BASE:    79.1110 bn m³
+  ✓   Median:  78.5504 bn m³
+  ✓   5th–95th: 49.7207 – 126.1042 bn m³  (range ±60.5%)
+  ✓ Saved MC results 2019  (10,000 rows)
+
+  ── Top variance contributors — 2019
+  ✓   agr_water_mult                  r=+1.000  share=100.0%
+  ✓   dom_tourist_mult                r=+0.017  share=0.0%
+  ✓   rest_coeff_mult                 r=+0.011  share=0.0%
+  ✓   air_coeff_mult                  r=+0.007  share=0.0%
+  ✓   rail_coeff_mult                 r=+0.005  share=0.0%
+  ✓ Summary: mc_2019_summary.txt
+
+  ── Monte Carlo — 2022  (n=10,000)
+  ✓ W 2022: shape=(140,)  non-zero=60
+  ✓ L 2022: shape=(140, 140)  diag_mean=1.0428
+  ✓ Y 2022 (from sut results): ₹1,497,873 cr  non-zero=38
+  ✓   BASE:    77.7517 bn m³
+  ✓   Median:  77.4960 bn m³
+  ✓   5th–95th: 48.8348 – 123.8485 bn m³  (range ±59.8%)
+  ✓ Saved MC results 2022  (10,000 rows)
+
+  ── Top variance contributors — 2022
+  ✓   agr_water_mult                  r=+1.000  share=100.0%
+  ✓   inb_tourist_mult                r=-0.011  share=0.0%
+  ✓   air_coeff_mult                  r=-0.008  share=0.0%
+  ✓   hotel_coeff_mult                r=+0.008  share=0.0%
+  ✓   dom_tourist_mult                r=-0.005  share=0.0%
+  ✓ Summary: mc_2022_summary.txt
+  ✓ Saved MC summary all years  (3 rows)
+  ✓ Saved MC variance decomposition  (21 rows)
+
+======================================================================
+  SUPPLY-CHAIN PATH ANALYSIS + HEM
+======================================================================
+
+  ── Year: 2015
+  ✓ W 2015: shape=(140,)  non-zero=60
+  ✓ L 2015: shape=(140, 140)  diag_mean=1.0711
+  ✓ Y 2015 (from sut results): ₹928,841 cr  non-zero=38
+
+  ── Supply-chain path analysis — 2015
+  ✓ Total pull cells: 2,280  |  Top 50 shown
+  ✓ Top-5 paths:
+  ✓   #1: Wheat → Wheat                                                             19532.11M m³  (40.82%)
+  ✓   #2: Paddy → Paddy                                                             12637.43M m³  (26.41%)
+  ✓   #3: Rapeseed and mustard → Rapeseed and mustard                                1019.73M m³  (2.13%)
+  ✓   #4: Paddy → Coarse cereals                                                      816.78M m³  (1.71%)
+  ✓   #5: Wheat → Coarse cereals                                                      705.39M m³  (1.47%)
+
+  ── Hypothetical Extraction Method (HEM) — 2015
+  ✓ Top-5 tourism-dependent sectors:
+  ✓   #1: Crude petroleum                                dep=14.020%  water=0.00M m³
+  ✓   #2: Fertilizers                                    dep=6.934%  water=1.59M m³
+  ✓   #3: Organic chemicals                              dep=6.337%  water=0.02M m³
+  ✓   #4: Financial services                             dep=5.453%  water=0.00M m³
+  ✓   #5: Coarse cereals                                 dep=4.848%  water=616.86M m³
+  ✓ Saved SC paths 2015  (50 rows)
+  ✓ Saved SC HEM 2015  (140 rows)
+  ✓ Summary: sc_paths_2015_summary.txt
+  ✓ Supply-chain MD: supply_chain_analysis_2015.md
+
+  ── Year: 2019
+  ✓ W 2019: shape=(140,)  non-zero=60
+  ✓ L 2019: shape=(140, 140)  diag_mean=1.1062
+  ✓ Y 2019 (from sut results): ₹1,403,742 cr  non-zero=38
+
+  ── Supply-chain path analysis — 2019
+  ✓ Total pull cells: 2,280  |  Top 50 shown
+  ✓ Top-5 paths:
+  ✓   #1: Wheat → Wheat                                                             30168.24M m³  (39.29%)
+  ✓   #2: Paddy → Paddy                                                             24303.99M m³  (31.65%)
+  ✓   #3: Groundnut → Groundnut                                                      1823.35M m³  (2.37%)
+  ✓   #4: Paddy → Coarse cereals                                                     1239.91M m³  (1.61%)
+  ✓   #5: Coarse cereals → Coarse cereals                                            1107.84M m³  (1.44%)
+
+  ── Hypothetical Extraction Method (HEM) — 2019
+  ✓ Top-5 tourism-dependent sectors:
+  ✓   #1: Crude petroleum                                dep=33.867%  water=0.00M m³
+  ✓   #2: Financial services                             dep=5.780%  water=0.00M m³
+  ✓   #3: Organic chemicals                              dep=4.259%  water=0.03M m³
+  ✓   #4: Coarse cereals                                 dep=3.802%  water=1144.48M m³
+  ✓   #5: Fertilizers                                    dep=3.724%  water=1.95M m³
+  ✓ Saved SC paths 2019  (50 rows)
+  ✓ Saved SC HEM 2019  (140 rows)
+  ✓ Summary: sc_paths_2019_summary.txt
+  ✓ Supply-chain MD: supply_chain_analysis_2019.md
+
+  ── Year: 2022
+  ✓ W 2022: shape=(140,)  non-zero=60
+  ✓ L 2022: shape=(140, 140)  diag_mean=1.0428
+  ✓ Y 2022 (from sut results): ₹1,497,873 cr  non-zero=38
+
+  ── Supply-chain path analysis — 2022
+  ✓ Total pull cells: 2,280  |  Top 50 shown
+  ✓ Top-5 paths:
+  ✓   #1: Paddy → Paddy                                                             26720.16M m³  (35.35%)
+  ✓   #2: Wheat → Wheat                                                             24325.49M m³  (32.18%)
+  ✓   #3: Sugarcane → Sugarcane                                                      4016.54M m³  (5.31%)
+  ✓   #4: Paddy → Coarse cereals                                                     1804.03M m³  (2.39%)
+  ✓   #5: Coarse cereals → Coarse cereals                                            1195.34M m³  (1.58%)
+
+  ── Hypothetical Extraction Method (HEM) — 2022
+  ✓ Top-5 tourism-dependent sectors:
+  ✓   #1: Fertilizers                                    dep=8.049%  water=3.18M m³
+  ✓   #2: Financial services                             dep=6.966%  water=0.00M m³
+  ✓   #3: Organic chemicals                              dep=5.865%  water=0.13M m³
+  ✓   #4: Petroleum products                             dep=5.737%  water=1328.88M m³
+  ✓   #5: Coarse cereals                                 dep=5.655%  water=1208.25M m³
+  ✓ Saved SC paths 2022  (50 rows)
+  ✓ Saved SC HEM 2022  (140 rows)
+  ✓ Summary: sc_paths_2022_summary.txt
+  ✓ Supply-chain MD: supply_chain_analysis_2022.md
+  ✓ Cross-year supply-chain MD: supply_chain_summary.md
+
+======================================================================
+  SUMMARY
+======================================================================
+  ✓ SDA periods computed: 2
+  ✓ MC years computed: 3
+  ✓ Supply-chain years computed: 3
+  ✓ Outputs written to:
+  ✓   SDA:          /Users/kumar.aniket/Downloads/surveydata/tourism-water-footprint/twf-calculation/3-final-results/sda
+  ✓   Monte Carlo:  /Users/kumar.aniket/Downloads/surveydata/tourism-water-footprint/twf-calculation/3-final-results/monte-carlo
+  ✓   Supply-chain: /Users/kumar.aniket/Downloads/surveydata/tourism-water-footprint/twf-calculation/3-final-results/supply-chain
+  ✓ Done in 0.3s

@@ -1,0 +1,264 @@
+# Log started: 2026-02-23T11:17:50.686991
+
+======================================================================
+  CALCULATE INDIRECT TWF  (W × L × Y)
+======================================================================
+
+======================================================================
+  Year: 2015
+======================================================================
+  ✓ Y_tourism 2015 (nominal): ₹929,805 crore, 25/163 non-zero
+  ✓ L (2015-16): (140, 140)  diag mean=1.0711
+  ✓ Concordance 2015-16: 76 categories
+  ✓ SUT water 2015-16: 60/140 non-zero
+  ✓ Split demand 2015: inbound ₹235,331 cr  domestic ₹694,474 cr
+  ✓ L_2015: shape=(140, 140), non-zero=19322, max=3.2042, neg=0, diag_mean=1.0711
+  ✓ Y_140: ₹928,841 crore from ₹929,805 EXIO total (coverage 99.9%)
+
+  Indirect TWF — 2015
+  Total:                 27,373,939,664 m³
+  Total (bn m³):                27.3739
+  Tourism demand:               928,841 crore
+  Water intensity:              29471.1 m³/crore
+
+  Top 10 by Total_Water_m3:
+  Rank  Category_Name                                     Total_Water_m3        %
+  ────────────────────────────────────────────────────────────────────────────────
+  1     Processed Fruit/Veg                                8,372,493,460 m³    30.6%
+  2     Hotels & Restaurants                               7,135,321,150 m³    26.1%
+  3     Road Transport                                     2,609,496,972 m³     9.5%
+  4     Ready Made Garments                                1,253,417,654 m³     4.6%
+  5     Beverages                                          1,230,089,998 m³     4.5%
+  6     Health & Social Work                               1,110,414,695 m³     4.1%
+  7     Financial Services                                 1,107,953,968 m³     4.0%
+  8     Air Transport                                      1,014,202,241 m³     3.7%
+  9     Other Chemicals                                      755,478,849 m³     2.8%
+  10    Grain Mill & Bakery                                  620,237,731 m³     2.3%
+
+  ── By sector type
+      Agriculture         :                0 m³  (0.0%)
+      Food Mfg            :   10,261,918,465 m³  (37.5%)
+      Manufacturing       :      971,144,606 m³  (3.5%)
+      Mining              :                0 m³  (0.0%)
+      Services            :   14,371,541,908 m³  (52.5%)
+      Textiles            :    1,663,481,442 m³  (6.1%)
+      Utilities           :      105,853,243 m³  (0.4%)
+
+  ── Structural decomposition — 2015
+  ✓ Saved Structural decomp 2015  (10,640 rows)
+  ✓ Saved Water origin 2015  (6 rows)
+
+  Water origin by source sector — 2015
+    Agriculture             19,645,578,348 m³  (71.8%)
+    Petroleum                3,549,158,025 m³  (13.0%)
+    Electricity              2,726,917,352 m³  (10.0%)
+    Manufacturing            1,452,285,940 m³  (5.3%)
+    Mining                               0 m³  (0.0%)
+    Services                             0 m³  (0.0%)
+  ✓ Saved Sector intensity 2015  (76 rows)
+
+  ── Top 5 most water-intensive tourism spending categories
+      Grain Mill & Bakery                        143,096.6 m³/crore  (demand: ₹4,334 cr)
+      Processed Fruit/Veg                         99,736.7 m³/crore  (demand: ₹83,946 cr)
+      Hotels & Restaurants                        55,739.5 m³/crore  (demand: ₹128,012 cr)
+      Electricity, Heat & Energy                  50,935.1 m³/crore  (demand: ₹2,078 cr)
+      Textiles                                    33,397.7 m³/crore  (demand: ₹6,235 cr)
+  ✓ Y_140: ₹928,841 crore from ₹929,805 EXIO total (coverage 99.9%)
+  ✓ Real-price intensity: 29471.1 m³/crore (2015-16 prices)
+
+  ── Sensitivity (±20% agr./elec./petrol.) — 2015
+  ✓ Sensitivity Agriculture: LOW=23.4448 bn m³  BASE=27.3739  HIGH=31.3031
+  ✓ Sensitivity Electricity: LOW=26.8286 bn m³  BASE=27.3739  HIGH=27.9193
+  ✓ Sensitivity Petroleum: LOW=26.6641 bn m³  BASE=27.3739  HIGH=28.0838
+  ✓ Saved Sensitivity 2015  (9 rows)
+  ✓ Y_140: ₹235,001 crore from ₹235,331 EXIO total (coverage 99.9%)
+  ✓ Y_140: ₹693,840 crore from ₹694,474 EXIO total (coverage 99.9%)
+  ✓ Split TWF 2015: inbound=9.1850 bn m³  domestic=18.1889 bn m³
+  ✓ Saved Split 2015  (2 rows)
+  ✓ Saved SUT results 2015  (140 rows)
+  ✓ Saved Category results 2015  (76 rows)
+  ✓ Summary: indirect_twf_2015_summary.txt
+
+======================================================================
+  Year: 2019
+======================================================================
+  ✓ Y_tourism 2019 (nominal): ₹1,405,015 crore, 25/163 non-zero
+  ✓ L (2019-20): (140, 140)  diag mean=1.1062
+  ✓ Concordance 2019-20: 76 categories
+  ✓ SUT water 2019-20: 60/140 non-zero
+  ✓ Split demand 2019: inbound ₹364,325 cr  domestic ₹1,040,690 cr
+  ✓ L_2019: shape=(140, 140), non-zero=19183, max=8.8126, neg=0, diag_mean=1.1062
+  ✓ Y_140: ₹1,403,742 crore from ₹1,405,015 EXIO total (coverage 99.9%)
+
+  Indirect TWF — 2019
+  Total:                 33,665,116,372 m³
+  Total (bn m³):                33.6651
+  Tourism demand:             1,403,742 crore
+  Water intensity:              23982.4 m³/crore
+
+  Top 10 by Total_Water_m3:
+  Rank  Category_Name                                     Total_Water_m3        %
+  ────────────────────────────────────────────────────────────────────────────────
+  1     Processed Fruit/Veg                                9,570,754,650 m³    28.4%
+  2     Hotels & Restaurants                               6,462,387,850 m³    19.2%
+  3     Road Transport                                     3,810,693,702 m³    11.3%
+  4     Beverages                                          2,381,891,957 m³     7.1%
+  5     Health & Social Work                               1,879,134,788 m³     5.6%
+  6     Air Transport                                      1,792,358,108 m³     5.3%
+  7     Ready Made Garments                                1,704,895,257 m³     5.1%
+  8     Financial Services                                 1,136,541,614 m³     3.4%
+  9     Other Chemicals                                    1,003,709,370 m³     3.0%
+  10    Grain Mill & Bakery                                  993,903,324 m³     3.0%
+
+  ── By sector type
+      Agriculture         :                0 m³  (0.0%)
+      Food Mfg            :   13,002,537,574 m³  (38.6%)
+      Manufacturing       :    1,277,360,200 m³  (3.8%)
+      Mining              :                0 m³  (0.0%)
+      Services            :   16,945,582,113 m³  (50.3%)
+      Textiles            :    2,250,674,229 m³  (6.7%)
+      Utilities           :      188,962,256 m³  (0.6%)
+
+  ── Structural decomposition — 2019
+  ✓ Saved Structural decomp 2019  (10,640 rows)
+  ✓ Saved Water origin 2019  (6 rows)
+
+  Water origin by source sector — 2019
+    Agriculture             21,998,164,829 m³  (65.3%)
+    Electricity              5,463,289,765 m³  (16.2%)
+    Petroleum                3,837,660,699 m³  (11.4%)
+    Manufacturing            2,366,001,079 m³  (7.0%)
+    Mining                               0 m³  (0.0%)
+    Services                             0 m³  (0.0%)
+  ✓ Saved Sector intensity 2019  (76 rows)
+
+  ── Top 5 most water-intensive tourism spending categories
+      Grain Mill & Bakery                        164,439.3 m³/crore  (demand: ₹6,044 cr)
+      Processed Fruit/Veg                         72,306.2 m³/crore  (demand: ₹132,364 cr)
+      Electricity, Heat & Energy                  70,573.5 m³/crore  (demand: ₹2,678 cr)
+      Beverages                                   38,493.3 m³/crore  (demand: ₹61,878 cr)
+      Paper Products                              31,867.1 m³/crore  (demand: ₹4,235 cr)
+  ✓ Y_140: ₹1,196,491 crore from ₹1,197,576 EXIO total (coverage 99.9%)
+  ✓ Real-price intensity: 23982.4 m³/crore (2015-16 prices)
+
+  ── Sensitivity (±20% agr./elec./petrol.) — 2019
+  ✓ Sensitivity Agriculture: LOW=29.2655 bn m³  BASE=33.6651  HIGH=38.0647
+  ✓ Sensitivity Electricity: LOW=32.5725 bn m³  BASE=33.6651  HIGH=34.7578
+  ✓ Sensitivity Petroleum: LOW=32.8976 bn m³  BASE=33.6651  HIGH=34.4326
+  ✓ Saved Sensitivity 2019  (9 rows)
+  ✓ Y_140: ₹363,890 crore from ₹364,325 EXIO total (coverage 99.9%)
+  ✓ Y_140: ₹1,039,853 crore from ₹1,040,690 EXIO total (coverage 99.9%)
+  ✓ Split TWF 2019: inbound=10.6020 bn m³  domestic=23.0631 bn m³
+  ✓ Saved Split 2019  (2 rows)
+  ✓ Saved SUT results 2019  (140 rows)
+  ✓ Saved Category results 2019  (76 rows)
+  ✓ Summary: indirect_twf_2019_summary.txt
+
+======================================================================
+  Year: 2022
+======================================================================
+  ✓ Y_tourism 2022 (nominal): ₹1,499,192 crore, 25/163 non-zero
+  ✓ L (2021-22): (140, 140)  diag mean=1.0428
+  ✓ Concordance 2021-22: 76 categories
+  ✓ SUT water 2021-22: 60/140 non-zero
+  ✓ Split demand 2022: inbound ₹367,018 cr  domestic ₹1,132,174 cr
+  ✓ L_2022: shape=(140, 140), non-zero=18909, max=1.5681, neg=0, diag_mean=1.0428
+  ✓ Y_140: ₹1,497,873 crore from ₹1,499,192 EXIO total (coverage 99.9%)
+
+  Indirect TWF — 2022
+  Total:                 28,113,256,534 m³
+  Total (bn m³):                28.1133
+  Tourism demand:             1,497,873 crore
+  Water intensity:              18768.8 m³/crore
+
+  Top 10 by Total_Water_m3:
+  Rank  Category_Name                                     Total_Water_m3        %
+  ────────────────────────────────────────────────────────────────────────────────
+  1     Processed Fruit/Veg                               11,263,680,093 m³    40.1%
+  2     Hotels & Restaurants                               3,207,287,315 m³    11.4%
+  3     Road Transport                                     2,737,786,440 m³     9.7%
+  4     Beverages                                          2,028,020,884 m³     7.2%
+  5     Ready Made Garments                                1,424,479,807 m³     5.1%
+  6     Other Chemicals                                    1,150,986,877 m³     4.1%
+  7     Air Transport                                      1,067,508,464 m³     3.8%
+  8     Grain Mill & Bakery                                  938,349,357 m³     3.3%
+  9     Health & Social Work                                 883,963,229 m³     3.1%
+  10    Other Services                                       843,746,384 m³     3.0%
+
+  ── By sector type
+      Agriculture         :                0 m³  (0.0%)
+      Food Mfg            :   14,290,894,878 m³  (50.8%)
+      Manufacturing       :    1,472,657,799 m³  (5.2%)
+      Mining              :                0 m³  (0.0%)
+      Services            :   10,117,228,140 m³  (36.0%)
+      Textiles            :    2,067,063,762 m³  (7.4%)
+      Utilities           :      165,411,954 m³  (0.6%)
+
+  ── Structural decomposition — 2022
+  ✓ Saved Structural decomp 2022  (10,640 rows)
+  ✓ Saved Water origin 2022  (6 rows)
+
+  Water origin by source sector — 2022
+    Agriculture             18,306,450,380 m³  (65.1%)
+    Petroleum                4,808,784,671 m³  (17.1%)
+    Manufacturing            2,778,875,041 m³  (9.9%)
+    Electricity              2,219,146,442 m³  (7.9%)
+    Mining                               0 m³  (0.0%)
+    Services                             0 m³  (0.0%)
+  ✓ Saved Sector intensity 2022  (76 rows)
+
+  ── Top 5 most water-intensive tourism spending categories
+      Grain Mill & Bakery                        145,067.7 m³/crore  (demand: ₹6,468 cr)
+      Processed Fruit/Veg                         82,216.8 m³/crore  (demand: ₹137,000 cr)
+      Electricity, Heat & Energy                  47,410.6 m³/crore  (demand: ₹3,489 cr)
+      Beverages                                   32,130.5 m³/crore  (demand: ₹63,118 cr)
+      Textiles                                    25,833.2 m³/crore  (demand: ₹10,467 cr)
+  ✓ Y_140: ₹1,140,322 crore from ₹1,141,327 EXIO total (coverage 99.9%)
+  ✓ Real-price intensity: 18768.8 m³/crore (2015-16 prices)
+
+  ── Sensitivity (±20% agr./elec./petrol.) — 2022
+  ✓ Sensitivity Agriculture: LOW=24.4520 bn m³  BASE=28.1133  HIGH=31.7745
+  ✓ Sensitivity Electricity: LOW=27.6694 bn m³  BASE=28.1133  HIGH=28.5571
+  ✓ Sensitivity Petroleum: LOW=27.1515 bn m³  BASE=28.1133  HIGH=29.0750
+  ✓ Saved Sensitivity 2022  (9 rows)
+  ✓ Y_140: ₹366,567 crore from ₹367,018 EXIO total (coverage 99.9%)
+  ✓ Y_140: ₹1,131,307 crore from ₹1,132,174 EXIO total (coverage 99.9%)
+  ✓ Split TWF 2022: inbound=8.4795 bn m³  domestic=19.6338 bn m³
+  ✓ Saved Split 2022  (2 rows)
+  ✓ Saved SUT results 2022  (140 rows)
+  ✓ Saved Category results 2022  (76 rows)
+  ✓ Summary: indirect_twf_2022_summary.txt
+
+======================================================================
+  Cross-Year Indirect TWF Comparison
+======================================================================
+
+  Indirect TWF (billion m³)
+  Year               Value       Abs_Chg     Pct_Chg          CAGR
+  ──────────────────────────────────────────────────────────────
+  2015             27.3739 bn m³        (base)
+  2019             33.6651 bn m³  ↑    6.2912      +23.0%       +5.3%/yr
+  2022             28.1133 bn m³  ↑    0.7393       +2.7%       +0.4%/yr
+
+  Water intensity nominal (m³/crore)
+  Year               Value       Abs_Chg     Pct_Chg          CAGR
+  ──────────────────────────────────────────────────────────────
+  2015          29471.0717 m³/cr        (base)
+  2019          23982.4045 m³/cr  ↓ 5488.6671      -18.6%       -5.0%/yr
+  2022          18768.7792 m³/cr  ↓10702.2924      -36.3%       -6.2%/yr
+
+  Water intensity real 2015-16 (m³/crore)
+  Year               Value       Abs_Chg     Pct_Chg          CAGR
+  ──────────────────────────────────────────────────────────────
+  2015          29471.0717 m³/cr        (base)
+  2019          23982.4045 m³/cr  ↓ 5488.6671      -18.6%       -5.0%/yr
+  2022          18768.7792 m³/cr  ↓10702.2924      -36.3%       -6.2%/yr
+
+  Agriculture share of water origin (%)
+  Year               Value       Abs_Chg     Pct_Chg          CAGR
+  ──────────────────────────────────────────────────────────────
+  2015             71.7674%        (base)
+  2019             65.3441%  ↓    6.4234       -9.0%       -2.3%/yr
+  2022             65.1168%  ↓    6.6507       -9.3%       -1.4%/yr
+  ✓ Saved All-year summary  (3 rows)
+  ✓ Done in 0.5s

@@ -1,12 +1,12 @@
 SDA — 2019 → 2022
 =======================================================
 
-TWF 2019:        76,786,447,883 m³
-TWF 2022:        75,594,175,793 m³
-Change:          -1,192,272,090 m³
+TWF 2019:         5,760,820,540 m³
+TWF 2022:         5,384,599,518 m³
+Change:            -376,221,022 m³
 
-Two-polar decomposition:
-  W effect (water technology):   -3,718,316,606 m³  (-311.9%)
-  L effect (supply structure):     -786,727,501 m³  (-66.0%)
-  Y effect (tourism demand):     +3,323,612,885 m³  (+278.8%)
-  Residual:                         -10,840,868 m³  (-0.909%)
+Six-polar decomposition (Dietzenbacher & Los 1998 — residual=0):
+  W effect (water technology):      -13,809,090 m³  (-3.7%)
+  L effect (supply structure):     -636,374,369 m³  (-169.1%)
+  Y effect (tourism demand):       +273,962,437 m³  (+72.8%)
+  Residual (numerical noise):                -0 m³  (-0.000%)

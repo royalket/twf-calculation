@@ -1,325 +1,187 @@
 """
-Build tourism demand vectors: TSA 2015-16 → NAS-scaled 2019 & 2022 → EXIOBASE Y vectors.
+build_tourism_demand.py — Build Tourism Demand Vectors
+=======================================================
 
-This script merges the former scale_tsa_demand.py and build_demand_vectors.py, eliminating
-an intermediate file-read step. The full pipeline is:
-
+Pipeline:
   TSA 2015-16 base (₹ crore)
     × NAS real growth rates (Statement 6.1, constant 2011-12 prices)
     × CPI deflator (real → nominal crore)
-  → Scaled TSA for 2019 and 2022
-  → Split into EXIOBASE 163-sector demand vectors (Y_tourism, ₹ crore)
-  → Optionally deflated to 2015-16 constant prices for real intensity comparisons
+  → Scaled TSA for each study year
+  → 163-sector EXIOBASE demand vectors (Y_tourism, ₹ crore)
+  → Deflated to 2015-16 constant prices for real intensity comparisons
 
-Why scale TSA with NAS?
------------------------
-India's Tourism Satellite Account (TSA) was last published for 2015-16. No TSA exists
-for 2019-20 or 2021-22. The standard approach (Temurshoev & Timmer 2011, OECD practice)
-is to extrapolate base-year sectoral demand using national accounts growth rates at the
-most granular available sector level (NAS Statement 6.1: GVA by economic activity).
+WHY NAS SCALING?
+India's TSA was last published for 2015-16. The standard approach
+(Temurshoev & Timmer 2011; OECD practice) extrapolates base-year sectoral
+demand using NAS Statement 6.1 GVA growth rates.
 
-The method uses NOMINAL scaling: real growth × CPI inflation = nominal crore factor.
-This preserves consistency with SUT data (which is in nominal crore).
+WHY NOMINAL SCALING?
+Real growth × CPI = nominal factor, preserving consistency with SUT data
+(published in nominal ₹ crore).
 
-NAS growth rates are loaded from reference_data.md via config.NAS_GROWTH_RATES.
-This eliminates all runtime string matching and CSV parsing, making the pipeline
-deterministic and audit-friendly. To update values, edit reference_data.md.
+All mapping data (TSA_TO_NAS, TSA_TO_EXIOBASE, TSA_BASE, EXIO_CODES) is
+loaded from config.py → reference_data.md. Edit reference_data.md to change
+any mapping — no code changes needed.
 
-EXIOBASE demand vector construction
-------------------------------------
-The 163-sector Y_tourism vector maps each TSA category to one or more EXIOBASE India
-sectors. The mapping uses fixed assumed shares where a TSA category spans multiple
-EXIOBASE sectors (e.g. "Travel related consumer goods" split across Other Mfg,
-Leather, Chemicals, Printing, Paper, Electronics).
-
-EXIOBASE India sectors: IN (Paddy rice = sector 0) through IN.162 (Private households
-= sector 162), totalling 163 sectors. Codes IN.138–IN.162 correspond to additional
-service/household sectors not individually mapped in TSA_TO_EXIOBASE — they receive
-zero tourism demand but are included to keep the Y vector the correct length.
-
-NEW: Inbound and domestic split vectors
-----------------------------------------
-In addition to the combined Y vector, this script now produces separate inbound-only
-and domestic-only Y vectors for each year. These allow calculate_indirect_twf.py to
-run W×L×Y separately for each tourist type, revealing:
-  - Whether inbound or domestic tourists have higher per-day water footprint
-  - Which supply chain sectors are disproportionately driven by inbound spend
-  - Whether cross-year intensity changes are driven by domestic or inbound shifts
-This directly replicates the Lee et al. (2021) inbound/domestic comparison for China,
-where inbound per-day TWF was ~3× domestic.
-
-Price deflation for real intensity comparison
----------------------------------------------
-When comparing water intensity (m³/₹ crore) across 2015, 2019, 2022, the denominator
-(tourism demand in ₹ crore) should be in constant prices. Without deflation, part of
-the apparent intensity change is just price inflation, not a real change in economic
-activity. This script outputs BOTH nominal and real (2015-16 constant price) demand.
-
-Outputs
--------
-  tsa_scaled_{year}.csv            — TSA in nominal crore by year
-  tsa_all_years.csv                — all years combined
-  Y_tourism_{year}.csv             — 163-sector EXIOBASE combined demand vector (nominal crore)
-  Y_tourism_{year}_real.csv        — 163-sector combined demand vector (2015-16 constant prices)
-  Y_tourism_{year}_inbound.csv     — 163-sector inbound-only demand vector (NEW)
-  Y_tourism_{year}_domestic.csv    — 163-sector domestic-only demand vector (NEW)
-  demand_intensity_comparison.csv  — per-crore demand comparison across years
+OUTPUTS
+───────
+  tsa/tsa_scaled_{year}.csv              TSA in nominal crore by year
+  tsa/tsa_all_years.csv                  all years combined
+  demand/Y_tourism_{year}.csv            163-sector combined demand (nominal)
+  demand/Y_tourism_{year}_real.csv       163-sector demand (2015-16 prices)
+  demand/Y_tourism_{year}_inbound.csv    inbound-only demand vector
+  demand/Y_tourism_{year}_domestic.csv   domestic-only demand vector
+  demand/demand_intensity_comparison.csv cross-year demand comparison
 """
 
-import time
-import pandas as pd
-import numpy as np
-from pathlib import Path
 import sys
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).parent))
-from config import BASE_DIR, DIRS, CPI, TSA_BASE, STUDY_YEARS, NAS_GROWTH_RATES, NAS_GVA_CONSTANT
+from config import (
+    DIRS, CPI, STUDY_YEARS, NAS_GROWTH_RATES, NAS_GVA_CONSTANT,
+    TSA_BASE, TSA_TO_NAS, TSA_TO_EXIOBASE, EXIO_IDX, EXIO_CODES, USD_INR,
+)
 from utils import (
-    section, subsection, ok, warn, save_csv,
-    compare_across_years, Timer, Logger,
+    section, subsection, ok, warn, save_csv, compare_across_years,
+    Timer, Logger, fmt_crore_usd, crore_to_usd_m, table_str,
 )
 
 
+# ── IO-year helper ────────────────────────────────────────────────────────────
+
+_YEAR_TO_IO: dict = {"2015": "2015-16", "2019": "2019-20", "2022": "2021-22"}
+
+def _cpi_mult(year: str) -> float:
+    """CPI multiplier vs 2015-16 base for a study year."""
+    return CPI[_YEAR_TO_IO[year]] / CPI["2015-16"]
+
+
 # ══════════════════════════════════════════════════════════════════════════════
-# PART 0 — NAS growth rate accessor
+# TSA SCALING
 # ══════════════════════════════════════════════════════════════════════════════
 
-def load_nas_growth_rates(log: Logger = None) -> dict:
+def scale_tsa(log: Logger = None) -> pd.DataFrame:
     """
-    Return NAS real GVA growth multipliers from config.NAS_GROWTH_RATES.
+    Scale TSA 2015-16 base to each study year using NAS growth rates + CPI.
 
-    Previously this function parsed a NAS CSV file at runtime using fragile
-    string matching. Growth rates are now pre-computed in config.py from the
-    values in reference_data.md (NAS Statement 6.1, constant 2011-12 prices,
-    NAS 2024 edition). To update the values, edit reference_data.md.
+    Nominal scaling factor:
+        nom_factor = real_GVA_growth(sector, year) × CPI(year) / CPI(2015-16)
 
-    The returned dict has the same structure as before so all callers are unchanged:
-      {sector_key: {"2019": float, "2022": float}}
-
-    Growth rates are real (constant-price) multipliers vs 2015-16 base.
-    They are combined with CPI deflation in scale_tsa() to produce nominal factors.
+    Returns DataFrame with one row per TSA category, columns for each year:
+        Inbound_{year}, Domestic_{year}, Total_{year},
+        Real_G{yr}, Nominal_G{yr} (growth multipliers)
     """
-    section("NAS Growth Rates (Constant Prices, Statement 6.1)", log=log)
-    ok("Loading from config.NAS_GROWTH_RATES (pre-computed from reference_data.md)", log)
+    section("NAS Growth Rates & TSA Scaling", log=log)
 
-    lines = [
-        f"\n  {'Sector':<18} {'NAS S.No.':>10} {'×2019':>10} {'×2022':>10}",
-        "  " + "─" * 52,
-    ]
+    # ── Growth rate table ────────────────────────────────────────────────────
+    subsection("NAS GVA growth multipliers (constant 2011-12 prices)", log=log)
+    cpi_mults = {yr: _cpi_mult(yr) for yr in STUDY_YEARS}
+    ok("CPI multipliers vs 2015-16: " +
+       "  ".join(f"{yr}={cpi_mults[yr]:.4f}" for yr in STUDY_YEARS), log)
 
+    growth_rows = []
     for key, rates in NAS_GROWTH_RATES.items():
         sno = NAS_GVA_CONSTANT[key]["nas_sno"]
-        lines.append(
-            f"  {key:<18} {sno:>10} {rates['2019']:>10.4f} {rates['2022']:>10.4f}"
-        )
-
-    output = "\n".join(lines)
+        row = [key, sno] + [f"{rates.get(yr, 1.0):.4f}" for yr in STUDY_YEARS]
+        growth_rows.append(row)
+    hdrs = ["Sector key", "NAS S.No."] + [f"×{yr}" for yr in STUDY_YEARS]
     if log:
-        log._log(output)
+        log.table(hdrs, growth_rows)
     else:
-        print(output)
+        print(table_str(hdrs, growth_rows))
 
-    return NAS_GROWTH_RATES
-
-
-# ══════════════════════════════════════════════════════════════════════════════
-# PART 1 — TSA scaling
-# ══════════════════════════════════════════════════════════════════════════════
-
-# FIX (restaurants): mapped to "Trade" (NAS 6.1) not "Hotels" (NAS 6.2).
-# NAS 6.2 tracks hotel occupancy; restaurants during COVID pivoted to delivery,
-# tracking more closely with trade/retail dynamics. Using Trade gives a more
-# appropriate growth trajectory and avoids conflating accommodation contraction
-# (2021-22 NAS 6.2 fell below 2015-16 baseline) with food service activity.
-TSA_TO_NAS = {
-    "Accommodation services/hotels":                  "Hotels",
-    "Food and beverage serving services/restaurants": "Trade",
-    "Railway passenger transport services":           "Railway",
-    "Road passenger transport services":              "Road",
-    "Water passenger transport services":             "Water_Trans",
-    "Air passenger transport services":               "Air",
-    "Transport equipment rental services":            "Transport_Svcs",
-    "Travel agencies and other reservation services": "Transport_Svcs",
-    "Cultural and religious services":                "Real_Estate",
-    "Sports and other recreational services":         "Real_Estate",
-    "Health and medical related services":            "Real_Estate",
-    "Readymade garments":                             "Textiles",
-    "Processed Food":                                 "Food_Mfg",
-    "Alcohol and tobacco products":                   "Food_Mfg",
-    "Travel related consumer goods":                  "Other_Mfg",
-    "Footwear":                                       "Textiles",
-    "Soaps, cosmetics and glycerine":                 "Other_Mfg",
-    "Gems and jewellery":                             "Other_Mfg",
-    "Books, journals, magazines, stationery":         "Other_Mfg",
-    "Vacation homes":                                 "Real_Estate",
-    "Social transfers in kind":                       "Real_Estate",
-    "FISIM":                                          "Finance",
-    "Producers guest houses":                         "Real_Estate",
-    "Imputed expenditures on food":                   "Food_Mfg",
-}
-
-
-def scale_tsa(growth: dict, log: Logger = None) -> pd.DataFrame:
-    section("Scaling TSA 2015-16 → 2019, 2022", log=log)
-
+    # ── Scale each TSA category ──────────────────────────────────────────────
     cols = ["ID", "Category", "Category_Type", "Inbound_2015", "Domestic_2015"]
     base = pd.DataFrame(TSA_BASE, columns=cols)
     base["Total_2015"] = base["Inbound_2015"] + base["Domestic_2015"]
 
-    cpi_2019 = CPI["2019-20"] / CPI["2015-16"]
-    cpi_2022 = CPI["2021-22"] / CPI["2015-16"]
-    ok(f"CPI multipliers: 2019={cpi_2019:.4f}  2022={cpi_2022:.4f}", log)
-
     rows = []
-    header = (
-        f"\n  {'Category':<55} {'NAS':>12} "
-        f"{'real×2019':>10} {'nom×2019':>10} "
-        f"{'real×2022':>10} {'nom×2022':>10}\n"
-        f"  {'─'*112}"
-    )
-    if log:
-        log.info(header)
-    else:
-        print(header)
-
     for _, r in base.iterrows():
-        nas_key  = TSA_TO_NAS.get(r["Category"], "Other_Mfg")
-        real_g19 = growth[nas_key]["2019"]
-        real_g22 = growth[nas_key]["2022"]
-        nom_g19  = real_g19 * cpi_2019   # real × CPI = nominal scaling factor
-        nom_g22  = real_g22 * cpi_2022
-
-        line = (
-            f"  {r['Category'][:54]:<55} {nas_key:>12} "
-            f"{real_g19:>10.4f} {nom_g19:>10.4f} "
-            f"{real_g22:>10.4f} {nom_g22:>10.4f}"
-        )
-        if log:
-            log.info(line)
-        else:
-            print(line)
-
-        rows.append({
-            **r.to_dict(),
-            "NAS_Sector":    nas_key,
-            "Real_G19":      real_g19,
-            "Nominal_G19":   nom_g19,
-            "Real_G22":      real_g22,
-            "Nominal_G22":   nom_g22,
-            "Inbound_2019":  r["Inbound_2015"]  * nom_g19,
-            "Domestic_2019": r["Domestic_2015"] * nom_g19,
-            "Total_2019":    r["Total_2015"]    * nom_g19,
-            "Inbound_2022":  r["Inbound_2015"]  * nom_g22,
-            "Domestic_2022": r["Domestic_2015"] * nom_g22,
-            "Total_2022":    r["Total_2015"]    * nom_g22,
-        })
+        nas_key = TSA_TO_NAS.get(r["Category"], "Other_Mfg")
+        row     = {**r.to_dict(), "NAS_Sector": nas_key}
+        for yr in STUDY_YEARS:
+            real_g = NAS_GROWTH_RATES[nas_key].get(yr, 1.0)
+            nom_g  = real_g * cpi_mults[yr]
+            row[f"Real_G{yr[2:]}"]    = real_g
+            row[f"Nominal_G{yr[2:]}"] = nom_g
+            row[f"Inbound_{yr}"]      = r["Inbound_2015"]  * nom_g
+            row[f"Domestic_{yr}"]     = r["Domestic_2015"] * nom_g
+            row[f"Total_{yr}"]        = r["Total_2015"]    * nom_g
+        rows.append(row)
 
     df = pd.DataFrame(rows)
 
-    totals = {
-        "2015": df["Total_2015"].sum(),
-        "2019": df["Total_2019"].sum(),
-        "2022": df["Total_2022"].sum(),
-    }
-    compare_across_years(totals, "Total tourism spending (₹ crore nominal)", unit=" cr", log=log)
+    # ── Summary across years ─────────────────────────────────────────────────
+    totals = {yr: df[f"Total_{yr}"].sum() for yr in STUDY_YEARS}
+    compare_across_years(totals, "Total tourism spending (₹ crore nominal)",
+                          unit=" cr", log=log)
 
-    t15, t19, t22 = totals["2015"], totals["2019"], totals["2022"]
-    cagr_15_19 = 100 * ((t19 / t15) ** 0.25 - 1)
-    cagr_19_22 = 100 * ((t22 / t19) ** (1 / 3) - 1)
-    ok(f"CAGR 2015→2019: {cagr_15_19:.1f}%/yr  |  CAGR 2019→2022: {cagr_19_22:.1f}%/yr", log)
-    if abs(cagr_19_22) > 25:
-        warn("CAGR 2019→2022 >25% — COVID impact visible; review", log)
+    usd_lines = ["  Total tourism spending (USD million equivalent):"]
+    for yr in STUDY_YEARS:
+        rate  = USD_INR.get(yr, 70.0)
+        usd_m = crore_to_usd_m(totals[yr], rate)
+        usd_lines.append(f"    {yr}: ${usd_m:,.0f}M  (@ ₹{rate:.2f}/USD)")
+    _log_block(usd_lines, log)
+
+    # CAGR and COVID flag
+    yrs = STUDY_YEARS
+    for i in range(1, len(yrs)):
+        n_yrs = int(yrs[i]) - int(yrs[i - 1])
+        cagr  = 100 * ((totals[yrs[i]] / totals[yrs[i - 1]]) ** (1 / n_yrs) - 1)
+        ok(f"CAGR {yrs[i-1]}→{yrs[i]}: {cagr:.1f}%/yr", log)
+        if abs(cagr) > 25:
+            warn(f"CAGR {yrs[i-1]}→{yrs[i]} >25% — COVID impact likely visible; review NAS scaling", log)
+
     return df
 
 
+def _log_block(lines: list, log: Logger | None):
+    msg = "\n".join(lines)
+    if log:
+        log._log(msg)
+    else:
+        print(msg)
+
+
 # ══════════════════════════════════════════════════════════════════════════════
-# PART 2 — EXIOBASE demand vector construction
+# DEMAND VECTOR BUILDER  (merged build_y_vector + build_y_real)
 # ══════════════════════════════════════════════════════════════════════════════
 
-# Mapping: TSA category → list of (EXIOBASE_sector_code, share)
-# Shares sum to 1.0 per category. Where multiple EXIOBASE sectors map to one TSA
-# category, shares reflect approximate production proportions (documented below).
-#
-# FIX: Duplicate IN.91 entries in "Travel related consumer goods" corrected.
-# The original had IN.91 at shares 0.45 and 0.15 (copy-paste error).
-# The 0.15 entry is corrected to IN.46 (Textiles — luggage/bags/accessories).
-TSA_TO_EXIOBASE = {
-    "Accommodation services/hotels":                  [("IN.113", 1.0)],
-    "Food and beverage serving services/restaurants": [("IN.113", 0.5), ("IN.42", 0.3), ("IN.43", 0.2)],
-    "Railway passenger transport services":           [("IN.114", 1.0)],
-    "Road passenger transport services":              [("IN.115", 1.0)],
-    "Water passenger transport services":             [("IN.117", 0.7), ("IN.118", 0.3)],
-    "Air passenger transport services":               [("IN.119", 1.0)],
-    "Transport equipment rental services":            [("IN.126", 1.0)],
-    "Travel agencies and other reservation services": [("IN.120", 1.0)],
-    "Cultural and religious services":                [("IN.135", 1.0)],
-    "Sports and other recreational services":         [("IN.135", 1.0)],
-    "Health and medical related services":            [("IN.132", 1.0)],
-    "Readymade garments":                             [("IN.47",  1.0)],
-    "Processed Food":                                 [("IN.42",  0.7), ("IN.40", 0.3)],
-    "Alcohol and tobacco products":                   [("IN.43",  0.6), ("IN.45", 0.4)],
-    # Travel goods: split across EXIOBASE sectors.
-    # IN.91 = Chemicals nec (toiletries/cosmetics in travel kits): 0.45
-    # IN.48 = Leather products (luggage, bags): 0.20
-    # IN.46 = Textiles (soft goods, scarves, accessories): 0.15
-    # IN.53 = Printed matter (guides, maps): 0.10
-    # IN.52 = Paper products: 0.05
-    # IN.103 = Electricity nec (electronics, adapters): 0.05
-    "Travel related consumer goods": [
-        ("IN.91", 0.45), ("IN.48", 0.20), ("IN.46", 0.15),
-        ("IN.53", 0.10), ("IN.52", 0.05), ("IN.103", 0.05),
-    ],
-    "Footwear":                                       [("IN.48",  1.0)],
-    "Soaps, cosmetics and glycerine":                 [("IN.91",  1.0)],
-    "Gems and jewellery":                             [("IN.91",  1.0)],
-    "Books, journals, magazines, stationery":         [("IN.53",  0.6), ("IN.52", 0.4)],
-    "Vacation homes":                                 [("IN.125", 1.0)],
-    "Social transfers in kind":                       [("IN.130", 1.0)],
-    "FISIM":                                          [("IN.122", 1.0)],
-    "Producers guest houses":                         [("IN.125", 0.5), ("IN.136", 0.5)],
-    "Imputed expenditures on food":                   [("IN.42",  1.0)],
-}
-
-# EXIOBASE India sector codes: IN (sector 0) through IN.162 (sector 162) = 163 total.
-# FIX: was range(1, 138) producing only 138 codes, causing a length mismatch with
-# Y = np.zeros(163). Corrected to range(1, 163) for 163 codes total.
-# Sectors IN.138–IN.162 are not individually mapped in TSA_TO_EXIOBASE but must
-# be present to keep the Y vector the correct shape for W @ L @ Y in EEIO.
-_EXIO_CODES = ["IN"] + [f"IN.{i}" for i in range(1, 163)]   # 163 elements
-EXIO_IDX    = {code: i for i, code in enumerate(_EXIO_CODES)}
-
-
-def build_y_vector(tsa_df: pd.DataFrame, year: str,
-                   demand_col: str = None, log: Logger = None) -> np.ndarray:
+def build_demand_vectors(tsa_df: pd.DataFrame, year: str,
+                          demand_col: str = None,
+                          log: Logger = None) -> tuple:
     """
-    Build 163-sector EXIOBASE demand vector from scaled TSA.
+    Build nominal and real 163-sector EXIOBASE demand vectors.
 
-    Algorithm:
-      For each TSA category, take the demand from demand_col (₹ crore nominal).
-      Distribute across EXIOBASE sectors according to TSA_TO_EXIOBASE shares.
-      Shares for duplicate sector codes within one category are summed.
+    For each TSA category, demand_col (₹ crore nominal) is distributed
+    across EXIOBASE sectors via TSA_TO_EXIOBASE shares (normalised to sum 1.0).
 
     Parameters
     ----------
-    demand_col : column to use for demand values.
-                 Defaults to Total_{year} (combined inbound + domestic).
+    demand_col : column to use (default: Total_{year}).
                  Pass "Inbound_{year}" or "Domestic_{year}" for split vectors.
 
-    Returns np.ndarray of shape (163,) in ₹ crore nominal.
+    Returns
+    -------
+    (Y_nominal, Y_real) : both shape (163,) in ₹ crore
+        Y_real is deflated to 2015-16 constant prices via CPI.
     """
     if demand_col is None:
         demand_col = f"Total_{year}"
 
     Y = np.zeros(163)
-
     for _, row in tsa_df.iterrows():
         cat    = row["Category"]
         demand = row[demand_col]
         if demand == 0:
             continue
-        mappings = TSA_TO_EXIOBASE.get(cat, [("IN.136", 1.0)])  # fallback: Other Services
+        mappings = TSA_TO_EXIOBASE.get(cat, [("IN.136", 1.0)])
 
-        # Normalise shares in case of duplicate codes or rounding != 1.0
+        # Normalise shares per category (handles rounding / duplicates)
         share_by_code: dict = {}
         for code, share in mappings:
             share_by_code[code] = share_by_code.get(code, 0) + share
@@ -332,49 +194,44 @@ def build_y_vector(tsa_df: pd.DataFrame, year: str,
             else:
                 warn(f"EXIOBASE code '{code}' not in EXIO_IDX — check TSA_TO_EXIOBASE", log)
 
-    label = demand_col
+    # Deflate to 2015-16 real prices
+    # BUG FIX: previously used CPI.get(year, 1.0) as fallback which would
+    # look up "2015" (study year string) instead of "2015-16" (IO year key).
+    # Now uses _YEAR_TO_IO to get the correct fiscal-year key, with "2015-16"
+    # as the explicit fallback so the base year always returns deflator=1.0.
+    io_year_key = _YEAR_TO_IO.get(year, "2015-16")
+    deflator = CPI.get(io_year_key, CPI["2015-16"]) / CPI["2015-16"]
+    Y_real   = Y / deflator
+
     ok(
-        f"Y_tourism {year} [{label}]: ₹{Y.sum():,.0f} crore  "
-        f"non-zero sectors: {np.count_nonzero(Y)}/163",
+        f"Y_tourism {year} [{demand_col}]: ₹{Y.sum():,.0f} cr  "
+        f"non-zero: {np.count_nonzero(Y)}/163  "
+        f"deflator: {deflator:.4f}  real: ₹{Y_real.sum():,.0f} cr",
         log,
     )
-    return Y
-
-
-def build_y_real(Y_nominal: np.ndarray, year: str) -> np.ndarray:
-    """
-    Deflate nominal demand vector to 2015-16 constant prices.
-
-    Deflator = CPI[year] / CPI["2015-16"]
-    Dividing by deflator converts nominal → real (2015-16 base).
-    """
-    year_map = {"2015": "2015-16", "2019": "2019-20", "2022": "2021-22"}
-    fy = year_map.get(year, year)
-    deflator = CPI.get(fy, 1.0) / CPI["2015-16"]
-    return Y_nominal / deflator
+    return Y, Y_real
 
 
 def _make_y_df(Y: np.ndarray) -> pd.DataFrame:
-    """Package a Y vector into a standard DataFrame for saving."""
+    """Convert 163-element array to labelled DataFrame."""
     return pd.DataFrame({
-        "Sector_Index":         range(len(_EXIO_CODES)),
-        "Sector_Code":          _EXIO_CODES,
+        "Sector_Index":         range(len(EXIO_CODES)),
+        "Sector_Code":          EXIO_CODES,
         "Tourism_Demand_crore": Y,
     })
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# PART 3 — Main
+# MAIN ENTRY POINT
 # ══════════════════════════════════════════════════════════════════════════════
 
 def run(**kwargs):
-    with Logger("build_tourism_demand", DIRS["logs"]) as log:
+    log_dir = DIRS["logs"] / "tourism_demand"
+    with Logger("build_tourism_demand", log_dir) as log:
         t = Timer()
-        log.section("BUILD TOURISM DEMAND VECTORS (TSA → NAS scale → EXIOBASE Y)")
+        log.section("BUILD TOURISM DEMAND VECTORS (TSA → NAS-scaled → EXIOBASE Y)")
 
-        growth  = load_nas_growth_rates(log)
-        tsa_df  = scale_tsa(growth, log)
-
+        tsa_df  = scale_tsa(log)
         tsa_out = DIRS["tsa"]
         tsa_out.mkdir(parents=True, exist_ok=True)
         save_csv(tsa_df, tsa_out / "tsa_all_years.csv", "TSA all years", log=log)
@@ -382,72 +239,65 @@ def run(**kwargs):
         demand_out = DIRS["demand"]
         demand_out.mkdir(parents=True, exist_ok=True)
 
-        intensity_comparison = []
-
+        intensity_rows = []
         for year in STUDY_YEARS:
-            total_col  = f"Total_{year}"
-            inb_col    = f"Inbound_{year}"
-            dom_col    = f"Domestic_{year}"
+            log.subsection(f"Building demand vectors — {year}")
+            total_col = f"Total_{year}"
+            inb_col   = f"Inbound_{year}"
+            dom_col   = f"Domestic_{year}"
 
-            year_cols  = [
-                "ID", "Category", "Category_Type",
-                inb_col, dom_col, total_col,
-                "NAS_Sector",
-                f"Real_G{year[2:]}", f"Nominal_G{year[2:]}",
-            ]
-            # Only keep columns that actually exist (future-proofs new years)
-            year_cols = [c for c in year_cols if c in tsa_df.columns]
-            save_csv(
-                tsa_df[year_cols],
-                tsa_out / f"tsa_scaled_{year}.csv",
-                f"TSA {year}",
-                log=log,
-            )
+            # Per-year TSA slice
+            year_cols = [c for c in [
+                "ID", "Category", "Category_Type", inb_col, dom_col, total_col,
+                "NAS_Sector", f"Real_G{year[2:]}", f"Nominal_G{year[2:]}",
+            ] if c in tsa_df.columns]
+            save_csv(tsa_df[year_cols], tsa_out / f"tsa_scaled_{year}.csv",
+                     f"TSA {year}", log=log)
 
-            # ── Combined (inbound + domestic) ────────────────────────────────
-            Y      = build_y_vector(tsa_df, year, demand_col=total_col, log=log)
-            Y_real = build_y_real(Y, year)
+            # Combined demand vector (nominal + real)
+            Y, Y_real = build_demand_vectors(tsa_df, year, demand_col=total_col, log=log)
+            save_csv(_make_y_df(Y),      demand_out / f"Y_tourism_{year}.csv",      f"Y_tourism {year}",      log=log)
+            save_csv(_make_y_df(Y_real), demand_out / f"Y_tourism_{year}_real.csv", f"Y_tourism {year} real", log=log)
 
-            save_csv(_make_y_df(Y),      demand_out / f"Y_tourism_{year}.csv",
-                     f"Y_tourism {year}",      log=log)
-            save_csv(_make_y_df(Y_real), demand_out / f"Y_tourism_{year}_real.csv",
-                     f"Y_tourism {year} real", log=log)
+            # Inbound / domestic split
+            for col, suffix in [(inb_col, "inbound"), (dom_col, "domestic")]:
+                if col in tsa_df.columns:
+                    Y_split, _ = build_demand_vectors(tsa_df, year, demand_col=col, log=log)
+                    save_csv(_make_y_df(Y_split),
+                             demand_out / f"Y_tourism_{year}_{suffix}.csv",
+                             f"Y_tourism {year} {suffix}", log=log)
+                else:
+                    warn(f"Column {col} not found — {suffix} split skipped for {year}", log)
 
-            # ── NEW: Inbound-only vector ─────────────────────────────────────
-            if inb_col in tsa_df.columns:
-                Y_inb = build_y_vector(tsa_df, year, demand_col=inb_col, log=log)
-                save_csv(_make_y_df(Y_inb), demand_out / f"Y_tourism_{year}_inbound.csv",
-                         f"Y_tourism {year} inbound", log=log)
-            else:
-                warn(f"Column {inb_col} not found — inbound split not saved for {year}", log)
-
-            # ── NEW: Domestic-only vector ────────────────────────────────────
-            if dom_col in tsa_df.columns:
-                Y_dom = build_y_vector(tsa_df, year, demand_col=dom_col, log=log)
-                save_csv(_make_y_df(Y_dom), demand_out / f"Y_tourism_{year}_domestic.csv",
-                         f"Y_tourism {year} domestic", log=log)
-            else:
-                warn(f"Column {dom_col} not found — domestic split not saved for {year}", log)
-
-            log.ok(
-                f"{year}: nominal total ₹{Y.sum():,.0f} cr  |  "
-                f"real total ₹{Y_real.sum():,.0f} cr  |  "
-                f"non-zero sectors: {np.count_nonzero(Y)}/163"
-            )
-            intensity_comparison.append({
+            usd_rate = USD_INR.get(year, 70.0)
+            intensity_rows.append({
                 "Year":          year,
                 "Nominal_crore": Y.sum(),
                 "Real_crore":    Y_real.sum(),
+                "Nominal_USD_M": round(crore_to_usd_m(Y.sum(), usd_rate), 1),
+                "Real_USD_M":    round(crore_to_usd_m(Y_real.sum(), USD_INR.get("2015", 65.0)), 1),
+                "USD_INR_Rate":  usd_rate,
+                "NonZero_Sectors": int(np.count_nonzero(Y)),
             })
 
-        # Cross-year comparison
+        # ── Cross-year demand comparison ──────────────────────────────────────
         log.section("Tourism Demand Cross-Year Comparison")
-        nominal_dict = {r["Year"]: r["Nominal_crore"] for r in intensity_comparison}
-        real_dict    = {r["Year"]: r["Real_crore"]    for r in intensity_comparison}
-        df1 = compare_across_years(nominal_dict, "Tourism demand (₹ crore nominal)",      unit=" cr", log=log)
-        df2 = compare_across_years(real_dict,    "Tourism demand (₹ crore real 2015-16)", unit=" cr", log=log)
-        combined = pd.concat([df1, df2], ignore_index=True)
-        save_csv(combined, demand_out / "demand_intensity_comparison.csv", "Demand comparison", log=log)
+        df_list = []
+        for label, key in [
+            ("Tourism demand (₹ crore nominal)",              "Nominal_crore"),
+            ("Tourism demand (₹ crore real 2015-16)",         "Real_crore"),
+            ("Tourism demand (USD million nominal)",           "Nominal_USD_M"),
+            ("Tourism demand (USD million real 2015-16)",      "Real_USD_M"),
+        ]:
+            df_list.append(compare_across_years(
+                {r["Year"]: r[key] for r in intensity_rows},
+                label, unit="" if "real" in label.lower() else "", log=log,
+            ))
+        save_csv(
+            pd.concat(df_list, ignore_index=True),
+            demand_out / "demand_intensity_comparison.csv",
+            "Demand comparison", log=log,
+        )
 
         log.ok(f"Done in {t.elapsed()}")
 

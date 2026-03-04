@@ -1,0 +1,197 @@
+# Log started: 2026-02-23T21:15:45.918360
+
+======================================================================
+  BUILD WATER COEFFICIENTS  (EXIOBASE → concordance → SUT 140)
+======================================================================
+  ✓ Self-check passed: 135 unique EXIOBASE sectors assigned, 0 duplicates
+
+======================================================================
+  Year: 2015-16  (water: 2015)
+======================================================================
+
+======================================================================
+  Extracting EXIOBASE water — 2015
+======================================================================
+  ✓ F.txt loaded: 196 extensions × 7987 sectors
+  ✓ Water rows: ['Water Consumption Blue - Agriculture - rice', 'Water Consumption Blue - Agriculture - wheat', 'Water Consumption Blue - Agriculture - other cereals', 'Water Consumption Blue - Agriculture - roots and tubers', 'Water Consumption Blue - Agriculture - sugar crops', 'Water Consumption Blue - Agriculture - pulses', 'Water Consumption Blue - Agriculture - nuts', 'Water Consumption Blue - Agriculture - oil crops', 'Water Consumption Blue - Agriculture - vegetables', 'Water Consumption Blue - Agriculture - fruits', 'Water Consumption Blue - Agriculture - fibres', 'Water Consumption Blue - Agriculture - other crops', 'Water Consumption Blue - Agriculture - fodder crops', 'Water Consumption Blue - Livestock - dairy cattle', 'Water Consumption Blue - Livestock - nondairy cattle', 'Water Consumption Blue - Livestock - pigs', 'Water Consumption Blue - Livestock - sheep', 'Water Consumption Blue - Livestock - goats', 'Water Consumption Blue - Livestock - buffaloes', 'Water Consumption Blue - Livestock - camels', 'Water Consumption Blue - Livestock - horses', 'Water Consumption Blue - Livestock - chicken', 'Water Consumption Blue - Livestock - turkeys', 'Water Consumption Blue - Livestock - ducks', 'Water Consumption Blue - Livestock - geese', 'Water Consumption Blue - Manufacturing - Products of meat cattle', 'Water Consumption Blue - Manufacturing - Products of meat pigs', 'Water Consumption Blue - Manufacturing - Products of meat poultry', 'Water Consumption Blue - Manufacturing - Meat products nec', 'Water Consumption Blue - Manufacturing - products of Vegetable oils and fats', 'Water Consumption Blue - Manufacturing - Dairy products', 'Water Consumption Blue - Manufacturing - Processed rice', 'Water Consumption Blue - Manufacturing - Sugar', 'Water Consumption Blue - Manufacturing - Food products nec', 'Water Consumption Blue - Manufacturing - Beverages', 'Water Consumption Blue - Manufacturing - Fish products', 'Water Consumption Blue - Manufacturing - Tobacco products (16)', 'Water Consumption Blue - Manufacturing - Textiles (17)', 'Water Consumption Blue - Manufacturing - Wearing apparel; furs (18)', 'Water Consumption Blue - Manufacturing - Leather and leather products (19)', 'Water Consumption Blue - Manufacturing - Pulp', 'Water Consumption Blue - Manufacturing - Secondary paper for treatment, Re-processing of secondary paper into new pulp', 'Water Consumption Blue - Manufacturing - Paper and paper products', 'Water Consumption Blue - Manufacturing - Printed matter and recorded media (22)', 'Water Consumption Blue - Manufacturing - Plastics, basic', 'Water Consumption Blue - Manufacturing - Secondary plastic for treatment, Re-processing of secondary plastic into new plastic', 'Water Consumption Blue - Manufacturing - N-fertiliser', 'Water Consumption Blue - Manufacturing - P- and other fertiliser', 'Water Consumption Blue - Manufacturing - Chemicals nec', 'Water Consumption Blue - Manufacturing - Rubber and plastic products (25)', 'Water Consumption Blue - Manufacturing - Glass and glass products', 'Water Consumption Blue - Manufacturing - Secondary glass for treatment, Re-processing of secondary glass into new glass', 'Water Consumption Blue - Manufacturing - Ceramic goods', 'Water Consumption Blue - Manufacturing - Bricks, tiles and construction products, in baked clay', 'Water Consumption Blue - Manufacturing - Cement, lime and plaster', 'Water Consumption Blue - Manufacturing - Ash for treatment, Re-processing of ash into clinker', 'Water Consumption Blue - Manufacturing - Other non-metallic mineral products', 'Water Consumption Blue - Manufacturing - Basic iron and steel and of ferro-alloys and first products thereof', 'Water Consumption Blue - Manufacturing - Secondary steel for treatment, Re-processing of secondary steel into new steel', 'Water Consumption Blue - Manufacturing - Precious metals', 'Water Consumption Blue - Manufacturing - Secondary preciuos metals for treatment, Re-processing of secondary preciuos metals into new preciuos metals', 'Water Consumption Blue - Manufacturing - Aluminium and aluminium products', 'Water Consumption Blue - Manufacturing - Secondary aluminium for treatment, Re-processing of secondary aluminium into new aluminium', 'Water Consumption Blue - Manufacturing - Lead, zinc and tin and products thereof', 'Water Consumption Blue - Manufacturing - Secondary lead for treatment, Re-processing of secondary lead into new lead', 'Water Consumption Blue - Manufacturing - Copper products', 'Water Consumption Blue - Manufacturing - Secondary copper for treatment, Re-processing of secondary copper into new copper', 'Water Consumption Blue - Manufacturing - Other non-ferrous metal products', 'Water Consumption Blue - Manufacturing - Secondary other non-ferrous metals for treatment, Re-processing of secondary other non-ferrous metals into new other non-ferrous metals', 'Water Consumption Blue - Manufacturing - Fabricated metal products, except machinery and equipment (28)', 'Water Consumption Blue - Manufacturing - Machinery and equipment n.e.c. (29)', 'Water Consumption Blue - Manufacturing - Office machinery and computers (30)', 'Water Consumption Blue - Manufacturing - Electrical machinery and apparatus n.e.c. (31)', 'Water Consumption Blue - Manufacturing - Radio, television and communication equipment and apparatus (32)', 'Water Consumption Blue - Manufacturing - Medical, precision and optical instruments, watches and clocks (33)', 'Water Consumption Blue - Manufacturing - Motor vehicles, trailers and semi-trailers (34)', 'Water Consumption Blue - Manufacturing - Other transport equipment (35)', 'Water Consumption Blue - Manufacturing - Furniture; other manufactured goods n.e.c. (36)', 'Water Consumption Blue - Electricity - tower - Electricity by coal', 'Water Consumption Blue - Electricity - tower - Electricity by gas', 'Water Consumption Blue - Electricity - tower - Electricity by nuclear', 'Water Consumption Blue - Electricity - tower - Electricity by hydro', 'Water Consumption Blue - Electricity - tower - Electricity by wind', 'Water Consumption Blue - Electricity - tower - Electricity by petroleum and other oil derivatives', 'Water Consumption Blue - Electricity - tower - Electricity by biomass and waste', 'Water Consumption Blue - Electricity - tower - Electricity by solar photovoltaic', 'Water Consumption Blue - Electricity - tower - Electricity by solar thermal', 'Water Consumption Blue - Electricity - tower - Electricity by tide, wave, ocean', 'Water Consumption Blue - Electricity - tower - Electricity by Geothermal', 'Water Consumption Blue - Electricity - tower - Electricity nec', 'Water Consumption Blue - Electricity - once-through - Electricity by coal', 'Water Consumption Blue - Electricity - once-through - Electricity by gas', 'Water Consumption Blue - Electricity - once-through - Electricity by nuclear', 'Water Consumption Blue - Electricity - once-through - Electricity by hydro', 'Water Consumption Blue - Electricity - once-through - Electricity by wind', 'Water Consumption Blue - Electricity - once-through - Electricity by petroleum and other oil derivatives', 'Water Consumption Blue - Electricity - once-through - Electricity by biomass and waste', 'Water Consumption Blue - Electricity - once-through - Electricity by solar photovoltaic', 'Water Consumption Blue - Electricity - once-through - Electricity by solar thermal', 'Water Consumption Blue - Electricity - once-through - Electricity by tide, wave, ocean', 'Water Consumption Blue - Electricity - once-through - Electricity by Geothermal', 'Water Consumption Blue - Electricity - once-through - Electricity nec', 'Water Consumption Blue - Domestic - domestic Water Consumption Blue']
+  ✓ India sectors: 163
+  ✓ Total economy water intensity: 595,720.4 m³/crore  |  Non-zero: 65/163
+
+  Top 10 by Water_2015_m3_per_crore:
+  Rank  Sector_Name                                   Water_2015_m3_per_crore        %
+  ────────────────────────────────────────────────────────────────────────────────
+  1     Wheat                                                    149,409 m³/cr    25.1%
+  2     Paddy rice                                               147,228 m³/cr    24.7%
+  3     Sugar cane                                                93,507 m³/cr    15.7%
+  4     Crops nec                                                 73,788 m³/cr    12.4%
+  5     Vegetables/fruit                                          53,410 m³/cr     9.0%
+  6     Oil seeds                                                 42,307 m³/cr     7.1%
+  7     Cereal grains nec                                         11,956 m³/cr     2.0%
+  8     Meat animals nec                                           4,292 m³/cr     0.7%
+  9     Cattle                                                     3,285 m³/cr     0.6%
+  10    Liquefied Refinery Gas                                     2,484 m³/cr     0.4%
+  ✓ Saved Raw extraction 2015  (163 rows)
+
+  Top 10 by Water_2015_m3_per_crore:
+  Rank  Category_Name                                 Water_2015_m3_per_crore        %
+  ────────────────────────────────────────────────────────────────────────────────
+  1     Wheat                                                    149,409 m³/cr    25.1%
+  2     Paddy                                                    147,228 m³/cr    24.7%
+  3     Sugarcane                                                 93,507 m³/cr    15.7%
+  4     Other Crops                                               73,788 m³/cr    12.4%
+  5     Fruits & Vegetables                                       53,410 m³/cr     9.0%
+  6     Oil Seeds                                                 42,307 m³/cr     7.1%
+  7     Cereals & Pulses                                          11,956 m³/cr     2.0%
+  8     Other Livestock                                            7,660 m³/cr     1.3%
+  9     Petroleum Products                                         5,160 m³/cr     0.9%
+  10    Rubber & Plastics                                          3,893 m³/cr     0.7%
+
+  ── Tourism-relevant direct water coefficients (expect 0 — all via Leontief)
+      Hotels & Restaurants                             0.00 m³/crore  ⚠ zero (correct — indirect water via L)
+      Railway Transport                                0.00 m³/crore  ⚠ zero (correct — indirect water via L)
+      Road Transport                                   0.00 m³/crore  ⚠ zero (correct — indirect water via L)
+      Air Transport                                    0.00 m³/crore  ⚠ zero (correct — indirect water via L)
+      Cultural & Rec Services                          0.00 m³/crore  ⚠ zero (correct — indirect water via L)
+      Support & Travel Agencies                        0.00 m³/crore  ⚠ zero (correct — indirect water via L)
+  ✓ SUT products: 60 with water > 0, 80 = 0 (services receive indirect water via Leontief)
+  ✓ Saved concordance 2015-16  (76 rows)
+  ✓ Saved SUT water 2015-16  (140 rows)
+
+======================================================================
+  Year: 2019-20  (water: 2019)
+======================================================================
+
+======================================================================
+  Extracting EXIOBASE water — 2019
+======================================================================
+  ✓ F.txt loaded: 196 extensions × 7987 sectors
+  ✓ Water rows: ['Water Consumption Blue - Agriculture - rice', 'Water Consumption Blue - Agriculture - wheat', 'Water Consumption Blue - Agriculture - other cereals', 'Water Consumption Blue - Agriculture - roots and tubers', 'Water Consumption Blue - Agriculture - sugar crops', 'Water Consumption Blue - Agriculture - pulses', 'Water Consumption Blue - Agriculture - nuts', 'Water Consumption Blue - Agriculture - oil crops', 'Water Consumption Blue - Agriculture - vegetables', 'Water Consumption Blue - Agriculture - fruits', 'Water Consumption Blue - Agriculture - fibres', 'Water Consumption Blue - Agriculture - other crops', 'Water Consumption Blue - Agriculture - fodder crops', 'Water Consumption Blue - Livestock - dairy cattle', 'Water Consumption Blue - Livestock - nondairy cattle', 'Water Consumption Blue - Livestock - pigs', 'Water Consumption Blue - Livestock - sheep', 'Water Consumption Blue - Livestock - goats', 'Water Consumption Blue - Livestock - buffaloes', 'Water Consumption Blue - Livestock - camels', 'Water Consumption Blue - Livestock - horses', 'Water Consumption Blue - Livestock - chicken', 'Water Consumption Blue - Livestock - turkeys', 'Water Consumption Blue - Livestock - ducks', 'Water Consumption Blue - Livestock - geese', 'Water Consumption Blue - Manufacturing - Products of meat cattle', 'Water Consumption Blue - Manufacturing - Products of meat pigs', 'Water Consumption Blue - Manufacturing - Products of meat poultry', 'Water Consumption Blue - Manufacturing - Meat products nec', 'Water Consumption Blue - Manufacturing - products of Vegetable oils and fats', 'Water Consumption Blue - Manufacturing - Dairy products', 'Water Consumption Blue - Manufacturing - Processed rice', 'Water Consumption Blue - Manufacturing - Sugar', 'Water Consumption Blue - Manufacturing - Food products nec', 'Water Consumption Blue - Manufacturing - Beverages', 'Water Consumption Blue - Manufacturing - Fish products', 'Water Consumption Blue - Manufacturing - Tobacco products (16)', 'Water Consumption Blue - Manufacturing - Textiles (17)', 'Water Consumption Blue - Manufacturing - Wearing apparel; furs (18)', 'Water Consumption Blue - Manufacturing - Leather and leather products (19)', 'Water Consumption Blue - Manufacturing - Pulp', 'Water Consumption Blue - Manufacturing - Secondary paper for treatment, Re-processing of secondary paper into new pulp', 'Water Consumption Blue - Manufacturing - Paper and paper products', 'Water Consumption Blue - Manufacturing - Printed matter and recorded media (22)', 'Water Consumption Blue - Manufacturing - Plastics, basic', 'Water Consumption Blue - Manufacturing - Secondary plastic for treatment, Re-processing of secondary plastic into new plastic', 'Water Consumption Blue - Manufacturing - N-fertiliser', 'Water Consumption Blue - Manufacturing - P- and other fertiliser', 'Water Consumption Blue - Manufacturing - Chemicals nec', 'Water Consumption Blue - Manufacturing - Rubber and plastic products (25)', 'Water Consumption Blue - Manufacturing - Glass and glass products', 'Water Consumption Blue - Manufacturing - Secondary glass for treatment, Re-processing of secondary glass into new glass', 'Water Consumption Blue - Manufacturing - Ceramic goods', 'Water Consumption Blue - Manufacturing - Bricks, tiles and construction products, in baked clay', 'Water Consumption Blue - Manufacturing - Cement, lime and plaster', 'Water Consumption Blue - Manufacturing - Ash for treatment, Re-processing of ash into clinker', 'Water Consumption Blue - Manufacturing - Other non-metallic mineral products', 'Water Consumption Blue - Manufacturing - Basic iron and steel and of ferro-alloys and first products thereof', 'Water Consumption Blue - Manufacturing - Secondary steel for treatment, Re-processing of secondary steel into new steel', 'Water Consumption Blue - Manufacturing - Precious metals', 'Water Consumption Blue - Manufacturing - Secondary preciuos metals for treatment, Re-processing of secondary preciuos metals into new preciuos metals', 'Water Consumption Blue - Manufacturing - Aluminium and aluminium products', 'Water Consumption Blue - Manufacturing - Secondary aluminium for treatment, Re-processing of secondary aluminium into new aluminium', 'Water Consumption Blue - Manufacturing - Lead, zinc and tin and products thereof', 'Water Consumption Blue - Manufacturing - Secondary lead for treatment, Re-processing of secondary lead into new lead', 'Water Consumption Blue - Manufacturing - Copper products', 'Water Consumption Blue - Manufacturing - Secondary copper for treatment, Re-processing of secondary copper into new copper', 'Water Consumption Blue - Manufacturing - Other non-ferrous metal products', 'Water Consumption Blue - Manufacturing - Secondary other non-ferrous metals for treatment, Re-processing of secondary other non-ferrous metals into new other non-ferrous metals', 'Water Consumption Blue - Manufacturing - Fabricated metal products, except machinery and equipment (28)', 'Water Consumption Blue - Manufacturing - Machinery and equipment n.e.c. (29)', 'Water Consumption Blue - Manufacturing - Office machinery and computers (30)', 'Water Consumption Blue - Manufacturing - Electrical machinery and apparatus n.e.c. (31)', 'Water Consumption Blue - Manufacturing - Radio, television and communication equipment and apparatus (32)', 'Water Consumption Blue - Manufacturing - Medical, precision and optical instruments, watches and clocks (33)', 'Water Consumption Blue - Manufacturing - Motor vehicles, trailers and semi-trailers (34)', 'Water Consumption Blue - Manufacturing - Other transport equipment (35)', 'Water Consumption Blue - Manufacturing - Furniture; other manufactured goods n.e.c. (36)', 'Water Consumption Blue - Electricity - tower - Electricity by coal', 'Water Consumption Blue - Electricity - tower - Electricity by gas', 'Water Consumption Blue - Electricity - tower - Electricity by nuclear', 'Water Consumption Blue - Electricity - tower - Electricity by hydro', 'Water Consumption Blue - Electricity - tower - Electricity by wind', 'Water Consumption Blue - Electricity - tower - Electricity by petroleum and other oil derivatives', 'Water Consumption Blue - Electricity - tower - Electricity by biomass and waste', 'Water Consumption Blue - Electricity - tower - Electricity by solar photovoltaic', 'Water Consumption Blue - Electricity - tower - Electricity by solar thermal', 'Water Consumption Blue - Electricity - tower - Electricity by tide, wave, ocean', 'Water Consumption Blue - Electricity - tower - Electricity by Geothermal', 'Water Consumption Blue - Electricity - tower - Electricity nec', 'Water Consumption Blue - Electricity - once-through - Electricity by coal', 'Water Consumption Blue - Electricity - once-through - Electricity by gas', 'Water Consumption Blue - Electricity - once-through - Electricity by nuclear', 'Water Consumption Blue - Electricity - once-through - Electricity by hydro', 'Water Consumption Blue - Electricity - once-through - Electricity by wind', 'Water Consumption Blue - Electricity - once-through - Electricity by petroleum and other oil derivatives', 'Water Consumption Blue - Electricity - once-through - Electricity by biomass and waste', 'Water Consumption Blue - Electricity - once-through - Electricity by solar photovoltaic', 'Water Consumption Blue - Electricity - once-through - Electricity by solar thermal', 'Water Consumption Blue - Electricity - once-through - Electricity by tide, wave, ocean', 'Water Consumption Blue - Electricity - once-through - Electricity by Geothermal', 'Water Consumption Blue - Electricity - once-through - Electricity nec', 'Water Consumption Blue - Domestic - domestic Water Consumption Blue']
+  ✓ India sectors: 163
+  ✓ Total economy water intensity: 600,874.1 m³/crore  |  Non-zero: 65/163
+
+  Top 10 by Water_2019_m3_per_crore:
+  Rank  Sector_Name                                   Water_2019_m3_per_crore        %
+  ────────────────────────────────────────────────────────────────────────────────
+  1     Paddy rice                                               180,220 m³/cr    30.0%
+  2     Wheat                                                    137,923 m³/cr    23.0%
+  3     Sugar cane                                                85,956 m³/cr    14.3%
+  4     Crops nec                                                 65,189 m³/cr    10.8%
+  5     Vegetables/fruit                                          48,268 m³/cr     8.0%
+  6     Oil seeds                                                 42,147 m³/cr     7.0%
+  7     Cereal grains nec                                         14,673 m³/cr     2.4%
+  8     Cattle                                                     3,450 m³/cr     0.6%
+  9     Meat animals nec                                           3,331 m³/cr     0.6%
+  10    Liquefied Refinery Gas                                     2,887 m³/cr     0.5%
+  ✓ Saved Raw extraction 2019  (163 rows)
+
+  Top 10 by Water_2019_m3_per_crore:
+  Rank  Category_Name                                 Water_2019_m3_per_crore        %
+  ────────────────────────────────────────────────────────────────────────────────
+  1     Paddy                                                    180,220 m³/cr    30.0%
+  2     Wheat                                                    137,923 m³/cr    23.0%
+  3     Sugarcane                                                 85,956 m³/cr    14.3%
+  4     Other Crops                                               65,189 m³/cr    10.8%
+  5     Fruits & Vegetables                                       48,268 m³/cr     8.0%
+  6     Oil Seeds                                                 42,147 m³/cr     7.0%
+  7     Cereals & Pulses                                          14,673 m³/cr     2.4%
+  8     Other Livestock                                            6,891 m³/cr     1.1%
+  9     Petroleum Products                                         5,612 m³/cr     0.9%
+  10    Electricity, Heat & Energy                                 5,018 m³/cr     0.8%
+
+  ── Tourism-relevant direct water coefficients (expect 0 — all via Leontief)
+      Hotels & Restaurants                             0.00 m³/crore  ⚠ zero (correct — indirect water via L)
+      Railway Transport                                0.00 m³/crore  ⚠ zero (correct — indirect water via L)
+      Road Transport                                   0.00 m³/crore  ⚠ zero (correct — indirect water via L)
+      Air Transport                                    0.00 m³/crore  ⚠ zero (correct — indirect water via L)
+      Cultural & Rec Services                          0.00 m³/crore  ⚠ zero (correct — indirect water via L)
+      Support & Travel Agencies                        0.00 m³/crore  ⚠ zero (correct — indirect water via L)
+  ✓ SUT products: 60 with water > 0, 80 = 0 (services receive indirect water via Leontief)
+  ✓ Saved concordance 2019-20  (76 rows)
+  ✓ Saved SUT water 2019-20  (140 rows)
+
+======================================================================
+  Year: 2021-22  (water: 2022)
+======================================================================
+
+======================================================================
+  Extracting EXIOBASE water — 2022
+======================================================================
+  ✓ F.txt loaded: 196 extensions × 7987 sectors
+  ✓ Water rows: ['Water Consumption Blue - Agriculture - rice', 'Water Consumption Blue - Agriculture - wheat', 'Water Consumption Blue - Agriculture - other cereals', 'Water Consumption Blue - Agriculture - roots and tubers', 'Water Consumption Blue - Agriculture - sugar crops', 'Water Consumption Blue - Agriculture - pulses', 'Water Consumption Blue - Agriculture - nuts', 'Water Consumption Blue - Agriculture - oil crops', 'Water Consumption Blue - Agriculture - vegetables', 'Water Consumption Blue - Agriculture - fruits', 'Water Consumption Blue - Agriculture - fibres', 'Water Consumption Blue - Agriculture - other crops', 'Water Consumption Blue - Agriculture - fodder crops', 'Water Consumption Blue - Livestock - dairy cattle', 'Water Consumption Blue - Livestock - nondairy cattle', 'Water Consumption Blue - Livestock - pigs', 'Water Consumption Blue - Livestock - sheep', 'Water Consumption Blue - Livestock - goats', 'Water Consumption Blue - Livestock - buffaloes', 'Water Consumption Blue - Livestock - camels', 'Water Consumption Blue - Livestock - horses', 'Water Consumption Blue - Livestock - chicken', 'Water Consumption Blue - Livestock - turkeys', 'Water Consumption Blue - Livestock - ducks', 'Water Consumption Blue - Livestock - geese', 'Water Consumption Blue - Manufacturing - Products of meat cattle', 'Water Consumption Blue - Manufacturing - Products of meat pigs', 'Water Consumption Blue - Manufacturing - Products of meat poultry', 'Water Consumption Blue - Manufacturing - Meat products nec', 'Water Consumption Blue - Manufacturing - products of Vegetable oils and fats', 'Water Consumption Blue - Manufacturing - Dairy products', 'Water Consumption Blue - Manufacturing - Processed rice', 'Water Consumption Blue - Manufacturing - Sugar', 'Water Consumption Blue - Manufacturing - Food products nec', 'Water Consumption Blue - Manufacturing - Beverages', 'Water Consumption Blue - Manufacturing - Fish products', 'Water Consumption Blue - Manufacturing - Tobacco products (16)', 'Water Consumption Blue - Manufacturing - Textiles (17)', 'Water Consumption Blue - Manufacturing - Wearing apparel; furs (18)', 'Water Consumption Blue - Manufacturing - Leather and leather products (19)', 'Water Consumption Blue - Manufacturing - Pulp', 'Water Consumption Blue - Manufacturing - Secondary paper for treatment, Re-processing of secondary paper into new pulp', 'Water Consumption Blue - Manufacturing - Paper and paper products', 'Water Consumption Blue - Manufacturing - Printed matter and recorded media (22)', 'Water Consumption Blue - Manufacturing - Plastics, basic', 'Water Consumption Blue - Manufacturing - Secondary plastic for treatment, Re-processing of secondary plastic into new plastic', 'Water Consumption Blue - Manufacturing - N-fertiliser', 'Water Consumption Blue - Manufacturing - P- and other fertiliser', 'Water Consumption Blue - Manufacturing - Chemicals nec', 'Water Consumption Blue - Manufacturing - Rubber and plastic products (25)', 'Water Consumption Blue - Manufacturing - Glass and glass products', 'Water Consumption Blue - Manufacturing - Secondary glass for treatment, Re-processing of secondary glass into new glass', 'Water Consumption Blue - Manufacturing - Ceramic goods', 'Water Consumption Blue - Manufacturing - Bricks, tiles and construction products, in baked clay', 'Water Consumption Blue - Manufacturing - Cement, lime and plaster', 'Water Consumption Blue - Manufacturing - Ash for treatment, Re-processing of ash into clinker', 'Water Consumption Blue - Manufacturing - Other non-metallic mineral products', 'Water Consumption Blue - Manufacturing - Basic iron and steel and of ferro-alloys and first products thereof', 'Water Consumption Blue - Manufacturing - Secondary steel for treatment, Re-processing of secondary steel into new steel', 'Water Consumption Blue - Manufacturing - Precious metals', 'Water Consumption Blue - Manufacturing - Secondary preciuos metals for treatment, Re-processing of secondary preciuos metals into new preciuos metals', 'Water Consumption Blue - Manufacturing - Aluminium and aluminium products', 'Water Consumption Blue - Manufacturing - Secondary aluminium for treatment, Re-processing of secondary aluminium into new aluminium', 'Water Consumption Blue - Manufacturing - Lead, zinc and tin and products thereof', 'Water Consumption Blue - Manufacturing - Secondary lead for treatment, Re-processing of secondary lead into new lead', 'Water Consumption Blue - Manufacturing - Copper products', 'Water Consumption Blue - Manufacturing - Secondary copper for treatment, Re-processing of secondary copper into new copper', 'Water Consumption Blue - Manufacturing - Other non-ferrous metal products', 'Water Consumption Blue - Manufacturing - Secondary other non-ferrous metals for treatment, Re-processing of secondary other non-ferrous metals into new other non-ferrous metals', 'Water Consumption Blue - Manufacturing - Fabricated metal products, except machinery and equipment (28)', 'Water Consumption Blue - Manufacturing - Machinery and equipment n.e.c. (29)', 'Water Consumption Blue - Manufacturing - Office machinery and computers (30)', 'Water Consumption Blue - Manufacturing - Electrical machinery and apparatus n.e.c. (31)', 'Water Consumption Blue - Manufacturing - Radio, television and communication equipment and apparatus (32)', 'Water Consumption Blue - Manufacturing - Medical, precision and optical instruments, watches and clocks (33)', 'Water Consumption Blue - Manufacturing - Motor vehicles, trailers and semi-trailers (34)', 'Water Consumption Blue - Manufacturing - Other transport equipment (35)', 'Water Consumption Blue - Manufacturing - Furniture; other manufactured goods n.e.c. (36)', 'Water Consumption Blue - Electricity - tower - Electricity by coal', 'Water Consumption Blue - Electricity - tower - Electricity by gas', 'Water Consumption Blue - Electricity - tower - Electricity by nuclear', 'Water Consumption Blue - Electricity - tower - Electricity by hydro', 'Water Consumption Blue - Electricity - tower - Electricity by wind', 'Water Consumption Blue - Electricity - tower - Electricity by petroleum and other oil derivatives', 'Water Consumption Blue - Electricity - tower - Electricity by biomass and waste', 'Water Consumption Blue - Electricity - tower - Electricity by solar photovoltaic', 'Water Consumption Blue - Electricity - tower - Electricity by solar thermal', 'Water Consumption Blue - Electricity - tower - Electricity by tide, wave, ocean', 'Water Consumption Blue - Electricity - tower - Electricity by Geothermal', 'Water Consumption Blue - Electricity - tower - Electricity nec', 'Water Consumption Blue - Electricity - once-through - Electricity by coal', 'Water Consumption Blue - Electricity - once-through - Electricity by gas', 'Water Consumption Blue - Electricity - once-through - Electricity by nuclear', 'Water Consumption Blue - Electricity - once-through - Electricity by hydro', 'Water Consumption Blue - Electricity - once-through - Electricity by wind', 'Water Consumption Blue - Electricity - once-through - Electricity by petroleum and other oil derivatives', 'Water Consumption Blue - Electricity - once-through - Electricity by biomass and waste', 'Water Consumption Blue - Electricity - once-through - Electricity by solar photovoltaic', 'Water Consumption Blue - Electricity - once-through - Electricity by solar thermal', 'Water Consumption Blue - Electricity - once-through - Electricity by tide, wave, ocean', 'Water Consumption Blue - Electricity - once-through - Electricity by Geothermal', 'Water Consumption Blue - Electricity - once-through - Electricity nec', 'Water Consumption Blue - Domestic - domestic Water Consumption Blue']
+  ✓ India sectors: 163
+  ✓ Total economy water intensity: 557,058.7 m³/crore  |  Non-zero: 67/163
+
+  Top 10 by Water_2022_m3_per_crore:
+  Rank  Sector_Name                                   Water_2022_m3_per_crore        %
+  ────────────────────────────────────────────────────────────────────────────────
+  1     Paddy rice                                               190,706 m³/cr    34.2%
+  2     Wheat                                                    123,206 m³/cr    22.1%
+  3     Sugar cane                                                57,039 m³/cr    10.2%
+  4     Vegetables/fruit                                          56,181 m³/cr    10.1%
+  5     Crops nec                                                 46,923 m³/cr     8.4%
+  6     Oil seeds                                                 40,559 m³/cr     7.3%
+  7     Cereal grains nec                                         14,410 m³/cr     2.6%
+  8     Cattle                                                     3,524 m³/cr     0.6%
+  9     Petroleum Refinery                                         2,876 m³/cr     0.5%
+  10    Liquefied Refinery Gas                                     2,606 m³/cr     0.5%
+  ✓ Saved Raw extraction 2022  (163 rows)
+
+  Top 10 by Water_2022_m3_per_crore:
+  Rank  Category_Name                                 Water_2022_m3_per_crore        %
+  ────────────────────────────────────────────────────────────────────────────────
+  1     Paddy                                                    190,706 m³/cr    34.2%
+  2     Wheat                                                    123,206 m³/cr    22.1%
+  3     Sugarcane                                                 57,039 m³/cr    10.2%
+  4     Fruits & Vegetables                                       56,181 m³/cr    10.1%
+  5     Other Crops                                               46,923 m³/cr     8.4%
+  6     Oil Seeds                                                 40,559 m³/cr     7.3%
+  7     Cereals & Pulses                                          14,410 m³/cr     2.6%
+  8     Petroleum Products                                         7,811 m³/cr     1.4%
+  9     Rubber & Plastics                                          4,804 m³/cr     0.9%
+  10    Other Livestock                                            4,023 m³/cr     0.7%
+
+  ── Tourism-relevant direct water coefficients (expect 0 — all via Leontief)
+      Hotels & Restaurants                             0.00 m³/crore  ⚠ zero (correct — indirect water via L)
+      Railway Transport                                0.00 m³/crore  ⚠ zero (correct — indirect water via L)
+      Road Transport                                   0.00 m³/crore  ⚠ zero (correct — indirect water via L)
+      Air Transport                                    0.00 m³/crore  ⚠ zero (correct — indirect water via L)
+      Cultural & Rec Services                          0.00 m³/crore  ⚠ zero (correct — indirect water via L)
+      Support & Travel Agencies                        0.00 m³/crore  ⚠ zero (correct — indirect water via L)
+  ✓ SUT products: 60 with water > 0, 80 = 0 (services receive indirect water via Leontief)
+  ✓ Saved concordance 2021-22  (76 rows)
+  ✓ Saved SUT water 2021-22  (140 rows)
+
+======================================================================
+  Cross-Year Water Intensity Comparison
+======================================================================
+
+  Economy-wide water intensity (m³/crore)
+  Year               Value       Abs_Chg     Pct_Chg          CAGR
+  ──────────────────────────────────────────────────────────────
+  2015         595720.3768        (base)
+  2019         600874.1126  ↑ 5153.7358       +0.9%       +0.2%/yr
+  2022         557058.6988  ↓38661.6780       -6.5%       -1.0%/yr
+
+  📉 Best improving sectors (2015→2022, intensity ↓):
+     Other liquid biofuels                     -100.0%
+     Municipal wastes (renew)                  -99.0%
+     Refinery Feedstocks                       -98.3%
+     Other liquid biofuels (2)                 -90.5%
+     Meat animals nec                          -89.4%
+
+  📈 Worst sectors — intensity increased (2015→2022):
+     Processed rice                            +3821.5%
+     Dairy products                            +2575.4%
+     Meat nec                                  +1724.8%
+     Non-spec Petroleum                        +1378.1%
+     Meat poultry                              +955.4%
+  ✓ Saved Year comparison  (163 rows)
+
+  Total water intensity (m³/crore)
+  Year               Value       Abs_Chg     Pct_Chg          CAGR
+  ──────────────────────────────────────────────────────────────
+  2015         595720.3800 m³/cr        (base)
+  2019         600874.1100 m³/cr  ↑ 5153.7300       +0.9%       +0.2%/yr
+  2022         557058.7000 m³/cr  ↓38661.6800       -6.5%       -1.0%/yr
+  ✓ Saved Intensity trend  (3 rows)
+  ✓ Done in 0.9s

@@ -1,0 +1,40 @@
+# Log started: 2026-02-21T07:50:21.344950
+
+======================================================================
+  CROSS-YEAR TWF COMPARISON
+======================================================================
+
+  Indirect TWF (bn m³)
+  Year               Value       Abs_Chg     Pct_Chg          CAGR
+  ──────────────────────────────────────────────────────────────
+  2015              0.0000 bn m³        (base)
+  2019              0.0000 bn m³  ↓    0.0000       +nan%       +nan%/yr
+  2022              0.0000 bn m³  ↓    0.0000       +nan%       +nan%/yr
+
+  Direct TWF BASE (bn m³)
+  Year               Value       Abs_Chg     Pct_Chg          CAGR
+  ──────────────────────────────────────────────────────────────
+  2015              0.3967 bn m³        (base)
+  2019              0.6038 bn m³  ↑    0.2071      +52.2%      +11.1%/yr
+  2022              0.5017 bn m³  ↑    0.1050      +26.5%       +3.4%/yr
+
+  Total TWF (bn m³)
+  Year               Value       Abs_Chg     Pct_Chg          CAGR
+  ──────────────────────────────────────────────────────────────
+  2015              0.3967 bn m³        (base)
+  2019              0.6038 bn m³  ↑    0.2071      +52.2%      +11.1%/yr
+  2022              0.5017 bn m³  ↑    0.1050      +26.5%       +3.4%/yr
+
+  L/tourist/day (all tourists)
+  Year               Value       Abs_Chg     Pct_Chg          CAGR
+  ──────────────────────────────────────────────────────────────
+  2015            109.0000 L/day        (base)
+  2019            103.0000 L/day  ↓    6.0000       -5.5%       -1.4%/yr
+  2022            110.0000 L/day  ↑    1.0000       +0.9%       +0.1%/yr
+  ⚠ Some category files missing — sector trends incomplete
+
+  ── Type I Water Multipliers (WL diagonal)
+  ✓ Saved Total TWF  (3 rows)
+  ✓ Saved Per-tourist  (3 rows)
+  ✓ Report written: /Users/kumar.aniket/Downloads/surveydata/tourism-water-footprint/twf-calculation/3-final-results/comparison/twf_comparison_report.txt
+  ✓ Done in 0.0s

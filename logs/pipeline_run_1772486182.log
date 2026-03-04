@@ -1,0 +1,14 @@
+Run   : 2026-03-03 06:16:24
+Steps : build_io, water_coefficients, tourism_demand, indirect_twf, direct_twf, outbound_twf, sda_mc, visualise, compare
+Halt  : True  |  IgnoreDeps: False
+Time  : 2s
+
+OK: build_io
+OK: water_coefficients
+OK: tourism_demand
+OK: indirect_twf
+OK: direct_twf
+OK: outbound_twf
+OK: sda_mc
+OK: visualise
+OK: compare

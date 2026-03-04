@@ -1,0 +1,76 @@
+══════════════════════════════════════════════════════════════════════
+  Log started : 2026-03-01 13:12:39
+  Step        : visualise_results
+  Log file    : /Users/kumar.aniket/Documents/personal/research/tourism-water-footprint/twf-calculation/logs/visualise/visualise_results_20260301_131239.log
+══════════════════════════════════════════════════════════════════════
+
+══════════════════════════════════════════════════════════════════════
+  GENERATE PUBLICATION FIGURES (6 multi-panel charts)
+══════════════════════════════════════════════════════════════════════
+     Output directory: /Users/kumar.aniket/Documents/personal/research/tourism-water-footprint/twf-calculation/3-final-results/visualisation
+
+══════════════════════════════════════════════════════════════════════
+  Figure 1 — Dashboard overview (4-panel)
+══════════════════════════════════════════════════════════════════════
+  ✓  Panel (a) — TWF trend plotted
+  ✓  Panel (b) — SDA waterfall plotted
+  ✓  Panel (d) — indirect/direct stacked bars plotted
+  ✓  Saved fig1_dashboard_overview.png  (159 KB)
+
+══════════════════════════════════════════════════════════════════════
+  Figure 2 — Supply-chain alluvial flows
+══════════════════════════════════════════════════════════════════════
+  ✓  Panel 2015 — alluvial bars rendered (6 groups)
+  ✓  Panel 2019 — alluvial bars rendered (6 groups)
+  ✓  Panel 2022 — alluvial bars rendered (6 groups)
+  ✓  Saved fig2_supply_chain_alluvial.png  (80 KB)
+
+══════════════════════════════════════════════════════════════════════
+  Figure 3 — Decoupling analysis
+══════════════════════════════════════════════════════════════════════
+  ⚠  Figure 3 — Decoupling analysis (3-panel) — ERROR: list index out of range
+     Traceback (most recent call last):
+  File "/Users/kumar.aniket/Documents/personal/research/tourism-water-footprint/twf-calculation/5-scripts/visualise_results.py", line 881, in run
+    fn(log)
+    ~~^^^^^
+  File "/Users/kumar.aniket/Documents/personal/research/tourism-water-footprint/twf-calculation/5-scripts/visualise_results.py", line 523, in fig3_decoupling_analysis
+    ax_c.set_xlabel(f"Water in {years_have[0]} (M m³)")
+                                ~~~~~~~~~~^^^
+IndexError: list index out of range
+
+
+══════════════════════════════════════════════════════════════════════
+  Figure 4 — Inbound vs domestic intensity gap
+══════════════════════════════════════════════════════════════════════
+  ⚠  Intensity data missing — panel (a) skipped
+  ✓  Saved fig4_inbound_domestic_gap.png  (166 KB)
+
+══════════════════════════════════════════════════════════════════════
+  Figure 5 — Water origin heatmap
+══════════════════════════════════════════════════════════════════════
+  ✓  Saved fig5_water_origin_heatmap.png  (138 KB)
+
+══════════════════════════════════════════════════════════════════════
+  Figure 6 — Tornado uncertainty chart
+══════════════════════════════════════════════════════════════════════
+  ⚠  Sensitivity data missing — panel (b) placeholder
+  ✓  Saved fig6_tornado_uncertainty.png  (159 KB)
+
+══════════════════════════════════════════════════════════════════════
+  Figure generation summary
+══════════════════════════════════════════════════════════════════════
+  ✓  5/6 figures completed in 0.6s
+  ✓  Figure 1 — Dashboard overview (4-panel)
+  ✓  Figure 2 — Supply-chain alluvial
+  ✓  Figure 4 — Inbound vs domestic gap (3-panel)
+  ✓  Figure 5 — Water origin heatmap
+  ✓  Figure 6 — Tornado uncertainty chart (2-panel)
+  ⚠  FAILED: Figure 3 — Decoupling analysis (3-panel)
+
+──────────────────────────────────────────────────────────────────────
+  Step 'visualise_results' finished  |  elapsed: 0.6s
+  Warnings: 4  |  Errors: 0
+    ⚠  Figure 3 — Decoupling analysis (3-panel) — ERROR: list index out of range
+    ⚠  Intensity data missing — panel (a) skipped
+    ⚠  Sensitivity data missing — panel (b) placeholder
+    ⚠  FAILED: Figure 3 — Decoupling analysis (3-panel)

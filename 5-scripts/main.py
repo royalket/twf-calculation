@@ -1,8 +1,8 @@
 """
 main.py — India Tourism Water Footprint Pipeline
 =================================================
-Runs the six pipeline steps in order and coordinates logging.
-Report generation lives entirely in compare_years.py.
+Runs the pipeline steps in order and coordinates logging.
+Report generation lives in compare_years.py.
 This file contains zero business logic.
 
 Usage
@@ -16,9 +16,11 @@ Pipeline steps (in order)
 --------------------------
     build_io           Build IO tables from SUT via PTA method
     water_coefficients EXIOBASE extract + concordance + SUT-140 mapping
+                       (now extracts BOTH blue and green water)
     tourism_demand     TSA scale (NAS) + EXIOBASE demand vectors
-    indirect_twf       W * L * Y + structural decomposition + path analysis
+    indirect_twf       W × L × Y + Scarce_TWF + Multiplier_Ratio + structural decomp
     direct_twf         Activity-based operational water
+    outbound_twf       Outbound TWF + net TWF balance (India as importer/exporter)
     sda_mc             SDA + Monte Carlo + Supply-Chain Path Analysis
     visualise          All chart generation
     compare            Cross-year totals + Markdown run report
@@ -26,12 +28,16 @@ Pipeline steps (in order)
 Step dependencies
 -----------------
     indirect_twf  requires: tourism_demand, build_io, water_coefficients
+    outbound_twf  requires: indirect_twf           (needs inbound split TWF)
     sda_mc        requires: indirect_twf, direct_twf
     visualise     requires: sda_mc
     compare       requires: sda_mc, visualise
 
-FIX: All run() functions now accept **kwargs so pipeline metadata forwarding
-     from main.py never raises TypeError regardless of which step is called.
+Changes vs previous version
+----------------------------
+- Added outbound_twf step (new module: outbound_twf.py).
+  Runs after indirect_twf because it loads inbound split TWF for net balance.
+- compare step now reads Scarce_TWF and outbound balance CSVs.
 """
 
 import argparse
@@ -48,20 +54,16 @@ from config import DIRS, STUDY_YEARS
 # STEP REGISTRY
 # ══════════════════════════════════════════════════════════════════════════════
 
-# Each entry: step_key -> (human description, module_name)
-# FIX: build_tourism_demand was registered but the module did not exist.
-# If you have not yet created build_tourism_demand.py, keep it here and the
-# pipeline will error clearly on missing-module rather than silently skipping
-# downstream steps. Create the module or comment out this entry to remove it.
 STEPS = {
-    "build_io":           ("Build IO tables (SUT → PTA → L)",                        "build_io_tables"),
-    "water_coefficients": ("EXIOBASE extract + concordance + SUT-140 mapping",        "build_water_coefficients"),
-    "tourism_demand":     ("TSA scale (NAS) + EXIOBASE demand vectors",               "build_tourism_demand"),
-    "indirect_twf":       ("Indirect TWF (W·L·Y + structural decomp + path analysis)","calculate_indirect_twf"),
-    "direct_twf":         ("Direct operational water (activity-based)",               "calculate_direct_twf"),
-    "sda_mc":             ("SDA + Monte Carlo + Supply-Chain Path Analysis",          "calculate_sda_mc"),
-    "visualise":          ("All chart generation (waterfall/violin/Sankey/etc.)",     "visualise_results"),
-    "compare":            ("Cross-year comparison + run report",                      "compare_years"),
+    "build_io":           ("Build IO tables (SUT → PTA → L)",                          "build_io_tables"),
+    "water_coefficients": ("EXIOBASE extract + concordance + SUT-140 (blue + green)",   "build_water_coefficients"),
+    "tourism_demand":     ("TSA scale (NAS) + EXIOBASE demand vectors",                 "build_tourism_demand"),
+    "indirect_twf":       ("Indirect TWF (W·L·Y + Scarce_TWF + Multiplier_Ratio)",      "calculate_indirect_twf"),
+    "direct_twf":         ("Direct operational water (activity-based)",                 "calculate_direct_twf"),
+    "outbound_twf":       ("Outbound TWF + net balance (Hoekstra & Mekonnen 2012)",     "outbound_twf"),
+    "sda_mc":             ("SDA + Monte Carlo + Supply-Chain Path Analysis",            "calculate_sda_mc"),
+    "visualise":          ("All chart generation (waterfall/violin/Sankey/etc.)",       "visualise_results"),
+    "compare":            ("Cross-year comparison + Markdown run report",               "compare_years"),
 }
 
 STEP_DEPS: dict[str, list[str]] = {
@@ -70,6 +72,7 @@ STEP_DEPS: dict[str, list[str]] = {
     "tourism_demand":     [],
     "indirect_twf":       ["tourism_demand", "build_io", "water_coefficients"],
     "direct_twf":         [],
+    "outbound_twf":       ["indirect_twf"],
     "sda_mc":             ["indirect_twf", "direct_twf"],
     "visualise":          ["sda_mc"],
     "compare":            ["sda_mc", "visualise"],
@@ -85,12 +88,11 @@ PIPELINE = list(STEPS)  # ordered
 def check_deps(step: str, results: dict, ignore: bool = False) -> tuple[bool, list[str]]:
     if ignore:
         return True, []
-    missing = []
-    for dep in STEP_DEPS.get(step, []):
-        if dep not in results:
-            missing.append(f"{dep} (not run)")
-        elif not results[dep]:
-            missing.append(f"{dep} (FAILED)")
+    missing = [
+        f"{dep} ({'not run' if dep not in results else 'FAILED'})"
+        for dep in STEP_DEPS.get(step, [])
+        if dep not in results or not results[dep]
+    ]
     return len(missing) == 0, missing
 
 
@@ -99,14 +101,6 @@ def check_deps(step: str, results: dict, ignore: bool = False) -> tuple[bool, li
 # ══════════════════════════════════════════════════════════════════════════════
 
 def run_step(step_key: str, **kwargs) -> bool:
-    """
-    Import and call module.run(**kwargs) for the given step.
-    Returns True on success, False on any exception.
-
-    FIX: Every pipeline module's run() now accepts **kwargs, so passing extra
-    keys (start_ts, steps_req, etc.) never raises TypeError. The compare step
-    consumes them; all others ignore them gracefully.
-    """
     desc, module = STEPS[step_key]
     bar = "=" * 70
     print(f"\n{bar}\n  STEP: {desc}\n{bar}")
@@ -119,25 +113,17 @@ def run_step(step_key: str, **kwargs) -> bool:
     except FileNotFoundError as e:
         print(f"\n  ✗  {step_key} — missing input file: {e}")
         print("     Ensure prerequisite steps have been run.")
-        return False
     except ModuleNotFoundError as e:
-        # FIX: surface missing-module errors explicitly rather than letting
-        # them appear as generic exceptions.
         print(f"\n  ✗  {step_key} — module not found: {e}")
         print(f"     Expected module file: {module}.py")
-        print("     Create the module or remove the step from STEPS registry.")
-        return False
     except TypeError as e:
-        # FIX: if a run() function still doesn't accept **kwargs this gives
-        # a clear, actionable message instead of a cryptic traceback.
         print(f"\n  ✗  {step_key} — run() signature mismatch: {e}")
         print("     Add '**kwargs' to the run() definition in that module.")
         traceback.print_exc()
-        return False
     except Exception as e:
         print(f"\n  ✗  {step_key}: {e}")
         traceback.print_exc()
-        return False
+    return False
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -182,6 +168,7 @@ def main():
             "Examples:\n"
             "  python main.py --all\n"
             "  python main.py --step build_io water_coefficients\n"
+            "  python main.py --step indirect_twf outbound_twf\n"
             "  python main.py --step compare --ignore-deps\n"
             "  python main.py --list"
         ),
@@ -196,7 +183,6 @@ def main():
                         help="Skip dependency checks")
     args = parser.parse_args()
 
-    # ── --list ────────────────────────────────────────────────────────────────
     if args.list:
         print("\n  Steps and dependencies:")
         for key, (name, _) in STEPS.items():
@@ -206,7 +192,6 @@ def main():
         print("\n  Order:", " → ".join(PIPELINE))
         return
 
-    # ── Resolve steps to run ──────────────────────────────────────────────────
     if args.all:
         steps_to_run    = PIPELINE[:]
         halt_on_failure = not args.continue_on_failure
@@ -225,16 +210,15 @@ def main():
     if args.ignore_deps:
         print("  Deps  : checks disabled")
 
-    # ── Setup logging ─────────────────────────────────────────────────────────
     DIRS["logs"].mkdir(exist_ok=True)
     start        = time.time()
     ts           = int(start)
     pipeline_log = DIRS["logs"] / f"pipeline_run_{ts}.log"
 
-    results: dict  = {}
-    skipped: dict  = {}
+    results: dict = {}
+    timings: dict = {}
+    skipped: dict = {}
 
-    # ── Run steps ─────────────────────────────────────────────────────────────
     for step in steps_to_run:
         deps_ok, missing = check_deps(step, results, ignore=args.ignore_deps)
         if not deps_ok:
@@ -243,10 +227,6 @@ def main():
             skipped[step] = missing
             continue
 
-        # compare_years.run() accepts pipeline metadata so it can embed it in
-        # the report. All other run() functions accept **kwargs and ignore
-        # extra keys — enforced by the **kwargs signature fix applied to all
-        # modules in this pipeline.
         extra = {}
         if step == "compare":
             extra = dict(
@@ -258,8 +238,10 @@ def main():
                 pipeline_log    = pipeline_log,
             )
 
-        ok = run_step(step, **extra)
+        step_t0       = time.time()
+        ok            = run_step(step, **extra)
         results[step] = ok
+        timings[step] = time.time() - step_t0
 
         if not ok and halt_on_failure:
             print(f"\n  Pipeline halted at '{step}'.")
@@ -272,21 +254,23 @@ def main():
 
     total_time = time.time() - start
 
-    # ── Summary ───────────────────────────────────────────────────────────────
+    # Summary
     print(f"\n{'='*65}")
     print(f"  PIPELINE SUMMARY  ({total_time:.0f}s total)")
     print(f"{'='*65}")
     for step in steps_to_run:
-        name = STEPS[step][0]
+        name  = STEPS[step][0]
+        t_s   = timings.get(step, 0)
+        t_str = f"{t_s:.0f}s" if t_s < 60 else f"{t_s/60:.1f}min"
         if step in results:
             tag = "✓ OK  " if results[step] else "✗ FAIL"
-            print(f"  {tag}  {step:<24}  {name}")
+            print(f"  {tag}  {step:<24}  {t_str:>6}  {name}")
         elif step in skipped:
-            print(f"  SKIP  {step:<24}  missing: {', '.join(skipped[step])}")
+            print(f"  SKIP  {step:<24}  {'—':>6}  missing: {', '.join(skipped[step])}")
         else:
-            print(f"  ----  {step:<24}  (halted before this step)")
+            print(f"  ----  {step:<24}  {'—':>6}  (halted before this step)")
 
-    # ── Write pipeline log ────────────────────────────────────────────────────
+    # Write pipeline log
     with open(pipeline_log, "w", encoding="utf-8") as f:
         f.write(f"Run   : {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
         f.write(f"Steps : {', '.join(steps_to_run)}\n")

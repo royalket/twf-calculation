@@ -1,0 +1,70 @@
+══════════════════════════════════════════════════════════════════════
+  Log started : 2026-03-03 19:34:52
+  Step        : visualise_results
+  Log file    : /Users/kumar.aniket/Documents/personal/research/tourism-water-footprint/twf-calculation/logs/visualise/visualise_results_20260303_193452.log
+══════════════════════════════════════════════════════════════════════
+
+══════════════════════════════════════════════════════════════════════
+  GENERATE PUBLICATION FIGURES (7 redesigned charts)
+══════════════════════════════════════════════════════════════════════
+     Output directory: /Users/kumar.aniket/Documents/personal/research/tourism-water-footprint/twf-calculation/3-final-results/visualisation
+
+══════════════════════════════════════════════════════════════════════
+  Figure 1 — Double-Ended Diverging Bar
+══════════════════════════════════════════════════════════════════════
+  ✓  Panel 2015 rendered
+  ✓  Panel 2019 rendered
+  ✓  Panel 2022 rendered
+  ✓  Saved fig1_diverging_bar.png  (231 KB)
+
+══════════════════════════════════════════════════════════════════════
+  Figure 2 — Proportional Area Bar (Domestic vs Inbound)
+══════════════════════════════════════════════════════════════════════
+  ✓  Saved fig2_proportional_area.png  (122 KB)
+
+══════════════════════════════════════════════════════════════════════
+  Figure 3 — Annotated SDA Waterfall (COVID Narrative)
+══════════════════════════════════════════════════════════════════════
+  ✓  Saved fig3_sda_waterfall.png  (61 KB)
+  ⚠  SDA data missing — Figure 3 placeholder shown
+
+══════════════════════════════════════════════════════════════════════
+  Figure 4 — Nested Bar with Ghost Overlay
+══════════════════════════════════════════════════════════════════════
+  ⚠  No indirect data — Figure 4 skipped
+
+══════════════════════════════════════════════════════════════════════
+  Figure 5 — Flow Strip (Supply-Chain Sankey)
+══════════════════════════════════════════════════════════════════════
+  ✓  Panel 2015 — flow strip rendered
+  ✓  Panel 2019 — flow strip rendered
+  ✓  Panel 2022 — flow strip rendered
+  ✓  Saved fig5_flow_strip.png  (1533 KB)
+
+══════════════════════════════════════════════════════════════════════
+  Figure 6 — State-Level Pressure Map (WSI × TWF)
+══════════════════════════════════════════════════════════════════════
+  ✓  Saved fig6_state_pressure_map.png  (261 KB)
+
+══════════════════════════════════════════════════════════════════════
+  Figure 7 — Uncertainty Strip (MC + Sensitivity)
+══════════════════════════════════════════════════════════════════════
+  ✓  Saved fig7_uncertainty_strip.png  (336 KB)
+
+══════════════════════════════════════════════════════════════════════
+  Figure generation summary
+══════════════════════════════════════════════════════════════════════
+  ✓  7/7 figures completed in 1.1s
+  ✓  Figure 1 — Diverging bar (source ↔ consumption)
+  ✓  Figure 2 — Proportional area (domestic vs inbound)
+  ✓  Figure 3 — SDA waterfall (COVID narrative)
+  ✓  Figure 4 — Nested bar with ghost overlay
+  ✓  Figure 5 — Flow strip (supply-chain Sankey)
+  ✓  Figure 6 — State-level pressure map (WSI × TWF)
+  ✓  Figure 7 — Uncertainty strip (MC + sensitivity)
+
+──────────────────────────────────────────────────────────────────────
+  Step 'visualise_results' finished  |  elapsed: 1.1s
+  Warnings: 2  |  Errors: 0
+    ⚠  SDA data missing — Figure 3 placeholder shown
+    ⚠  No indirect data — Figure 4 skipped

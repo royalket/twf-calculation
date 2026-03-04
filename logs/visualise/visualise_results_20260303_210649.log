@@ -1,0 +1,90 @@
+══════════════════════════════════════════════════════════════════════
+  Log started : 2026-03-03 21:06:49
+  Step        : visualise_results
+  Log file    : /Users/kumar.aniket/Documents/personal/research/tourism-water-footprint/twf-calculation/logs/visualise/visualise_results_20260303_210649.log
+══════════════════════════════════════════════════════════════════════
+
+══════════════════════════════════════════════════════════════════════
+  GENERATE PUBLICATION FIGURES (9 redesigned charts)
+══════════════════════════════════════════════════════════════════════
+     Output directory: /Users/kumar.aniket/Documents/personal/research/tourism-water-footprint/twf-calculation/3-final-results/visualisation
+
+══════════════════════════════════════════════════════════════════════
+  Figure 1 — Double-Ended Diverging Bar
+══════════════════════════════════════════════════════════════════════
+  ✓  Panel 2015 rendered
+  ✓  Panel 2019 rendered
+  ✓  Panel 2022 rendered
+  ✓  Saved fig1_diverging_bar.png  (231 KB)
+
+══════════════════════════════════════════════════════════════════════
+  Figure 2 — Proportional Area Bar (Domestic vs Inbound)
+══════════════════════════════════════════════════════════════════════
+  ✓  Saved fig2_proportional_area.png  (147 KB)
+
+══════════════════════════════════════════════════════════════════════
+  Figure 3 — Annotated SDA Waterfall (COVID Narrative)
+══════════════════════════════════════════════════════════════════════
+  ✓  Saved fig3_sda_waterfall.png  (132 KB)
+
+══════════════════════════════════════════════════════════════════════
+  Figure 4 — Nested Bar with Ghost Overlay
+══════════════════════════════════════════════════════════════════════
+  ✓  Saved fig4_nested_bar_ghost.png  (166 KB)
+
+══════════════════════════════════════════════════════════════════════
+  Figure 5 — Flow Strip (Supply-Chain Sankey)
+══════════════════════════════════════════════════════════════════════
+  ✓  Panel 2015 — flow strip rendered
+  ✓  Panel 2019 — flow strip rendered
+  ✓  Panel 2022 — flow strip rendered
+  ✓  Saved fig5_flow_strip.png  (1533 KB)
+
+══════════════════════════════════════════════════════════════════════
+  Figure 6 — State-Level Pressure Map (WSI × TWF)
+══════════════════════════════════════════════════════════════════════
+  ✓  Saved fig6_state_pressure_map.png  (253 KB)
+
+══════════════════════════════════════════════════════════════════════
+  Figure 7 — Uncertainty Strip (MC + Sensitivity)
+══════════════════════════════════════════════════════════════════════
+  ✓  Saved fig7_uncertainty_strip.png  (344 KB)
+
+══════════════════════════════════════════════════════════════════════
+  Figure 8 — Multi-Story Dashboard
+══════════════════════════════════════════════════════════════════════
+  ✓  Saved fig8_multistory_dashboard.png  (351 KB)
+
+══════════════════════════════════════════════════════════════════════
+  Figure 9 — Blue vs Blue+Green Indirect TWF
+══════════════════════════════════════════════════════════════════════
+  ⚠  Figure 9 — Blue vs Blue+Green comparison (green disclosure) — ERROR: name 'last_yr' is not defined
+     Traceback (most recent call last):
+  File "/Users/kumar.aniket/Documents/personal/research/tourism-water-footprint/twf-calculation/5-scripts/visualise_results.py", line 1373, in run
+    fn(log)
+    ~~^^^^^
+  File "/Users/kumar.aniket/Documents/personal/research/tourism-water-footprint/twf-calculation/5-scripts/visualise_results.py", line 1294, in fig9_blue_green_comparison
+    origin_last = _load_origin(last_yr, log)
+                               ^^^^^^^
+NameError: name 'last_yr' is not defined
+
+
+══════════════════════════════════════════════════════════════════════
+  Figure generation summary
+══════════════════════════════════════════════════════════════════════
+  ✓  8/9 figures completed in 1.5s
+  ✓  Figure 1 — Diverging bar (source ↔ consumption)
+  ✓  Figure 2 — Proportional area (domestic vs inbound)
+  ✓  Figure 3 — SDA waterfall (COVID narrative)
+  ✓  Figure 4 — Nested bar with ghost overlay
+  ✓  Figure 5 — Flow strip (supply-chain Sankey)
+  ✓  Figure 6 — State-level pressure map (WSI × TWF)
+  ✓  Figure 7 — Uncertainty strip (MC + sensitivity)
+  ✓  Figure 8 — Multi-story dashboard (6-panel overview)
+  ⚠  FAILED: Figure 9 — Blue vs Blue+Green comparison (green disclosure)
+
+──────────────────────────────────────────────────────────────────────
+  Step 'visualise_results' finished  |  elapsed: 1.5s
+  Warnings: 2  |  Errors: 0
+    ⚠  Figure 9 — Blue vs Blue+Green comparison (green disclosure) — ERROR: name 'last_yr' is not defined
+    ⚠  FAILED: Figure 9 — Blue vs Blue+Green comparison (green disclosure)

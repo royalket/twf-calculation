@@ -1,0 +1,179 @@
+══════════════════════════════════════════════════════════════════════
+  Log started : 2026-03-03 19:34:49
+  Step        : build_io_tables
+  Log file    : /Users/kumar.aniket/Documents/personal/research/tourism-water-footprint/twf-calculation/logs/build_io_tables_20260303_193449.log
+══════════════════════════════════════════════════════════════════════
+
+══════════════════════════════════════════════════════════════════════
+  BUILD IO TABLES (SUT → PTA → L)
+══════════════════════════════════════════════════════════════════════
+  ✓  Years to process: ['2015-16', '2019-20', '2021-22']
+
+══════════════════════════════════════════════════════════════════════
+  Processing SUT → IO: 2015-16
+══════════════════════════════════════════════════════════════════════
+  ✓  Products: 140,  Industries: 66,  Scale: ×1.0
+  ⚠  Row mismatch — trimming to 140
+  ✓  Final demand: ₹18,560,914 cr  ($2,855,525.2M / $2855.53B)  [PFCE, GFCE, GFCF, CIS, Valuables, Export]
+  ⚠  3 A column sums >= 1.0 — scaling to 0.95 (Hawkins-Simon enforcement)
+         col  25 (Industry Wood): A_sum 1.0000 → 0.9500
+         col  80 (Synthetic fibres, resin): A_sum 1.0002 → 0.9500
+         col 117 (Trade): A_sum 1.0000 → 0.9500
+  ✓  All A column sums < 1.0 after cleaning (Hawkins-Simon satisfied)
+  ✓  V total: ₹27,764,866 cr  ($4,271,517.8M / $4271.52B) | Z: ₹42,228,935 cr  ($6,496,759.3M / $6496.76B) | x: ₹60,789,849 cr  ($9,352,284.5M / $9352.28B)
+
+  ── Validation ──
+  ✓  Output balance: 60,789,849 ≈ 60,789,849  (Δ 0.000% — PASS)
+  ⚠  Demand-side x vs supply-side q: 60,789,849 vs 27,764,866  (Δ 118.95% — CHECK)
+  ✓  A: shape=(140, 140)  non-zero=8,100  max=0.8405  neg=0  diag_mean=0.0366
+  ✓  L: shape=(140, 140)  non-zero=19,322  max=3.2042  neg=0  diag_mean=1.0711
+  ✓  Spectral radius ρ(A_2015-16) = 0.794560  < 1  ✓ Hawkins-Simon holds
+  ✓  All diagonal L ≥ 1
+  ✓  All A column sums < 1 (Hawkins-Simon satisfied)
+
+  Top 10 by Output:
+  Rank  Product                                                   Output        %
+  ────────────────────────────────────────────────────────────────────────────────
+  1     Construction and construction services                 4,336,620 cr     7.1%
+  2     Public administration and defence                      1,371,129 cr     2.3%
+  3     Petroleum products                                     1,204,740 cr     2.0%
+  4     Computer related services                              1,179,132 cr     1.9%
+  5     Motor vehicles                                         1,043,202 cr     1.7%
+  6     Ownership of dwellings                                   958,346 cr     1.6%
+  7     Land transport                                           928,958 cr     1.5%
+  8     Milk                                                     855,179 cr     1.4%
+  9     Education services                                       834,006 cr     1.4%
+  10    Cotton Yarn and Cotton Textiles                          809,769 cr     1.3%
+  ✓  Saved io_Z_2015_16  (140 rows → io_Z_2015_16.csv)
+  ✓  Saved io_A_2015_16  (140 rows → io_A_2015_16.csv)
+  ✓  Saved io_L_2015_16  (140 rows → io_L_2015_16.csv)
+  ✓  Saved output 2015-16  (140 rows → io_output_2015_16.csv)
+  ✓  Saved products 2015-16  (140 rows → io_products_2015_16.csv)
+  ✓  Saved generic product list  (140 rows → product_list.csv)
+
+══════════════════════════════════════════════════════════════════════
+  Processing SUT → IO: 2019-20
+══════════════════════════════════════════════════════════════════════
+  ✓  Products: 140,  Industries: 66,  Scale: ×1.0
+  ⚠  Row mismatch — trimming to 140
+  ✓  Final demand: ₹24,283,531 cr  ($3,469,075.9M / $3469.08B)  [PFCE, GFCE, GFCF, CIS, Valuables, Export]
+  ⚠  1 A column sums >= 1.0 — scaling to 0.95 (Hawkins-Simon enforcement)
+         col 117 (Trade): A_sum 1.0000 → 0.9500
+  ✓  All A column sums < 1.0 after cleaning (Hawkins-Simon satisfied)
+  ✓  V total: ₹36,486,545 cr  ($5,212,363.6M / $5212.36B) | Z: ₹55,251,606 cr  ($7,893,086.6M / $7893.09B) | x: ₹79,535,137 cr  ($11,362,162.4M / $11362.16B)
+
+  ── Validation ──
+  ✓  Output balance: 79,535,137 ≈ 79,535,137  (Δ 0.000% — PASS)
+  ⚠  Demand-side x vs supply-side q: 79,535,137 vs 36,486,545  (Δ 117.98% — CHECK)
+  ✓  A: shape=(140, 140)  non-zero=9,148  max=0.8485  neg=0  diag_mean=0.0340
+  ✓  L: shape=(140, 140)  non-zero=19,183  max=8.8126  neg=0  diag_mean=1.1062
+  ✓  Spectral radius ρ(A_2019-20) = 0.900528  < 1  ✓ Hawkins-Simon holds
+  ✓  All diagonal L ≥ 1
+  ✓  All A column sums < 1 (Hawkins-Simon satisfied)
+
+  ── A-matrix stability: 2015-16 → 2019-20 ──
+  ✓  Column-sum Δ: mean=5.6%  max=47.8%  n_>30.0%: 3/140
+  ⚠  3 sectors shifted >30.0% — review NAS scaling
+
+  Top 10 by Output:
+  Rank  Product                                                   Output        %
+  ────────────────────────────────────────────────────────────────────────────────
+  1     Construction and construction services                 5,739,696 cr     7.2%
+  2     Public administration and defence                      1,833,915 cr     2.3%
+  3     Petroleum products                                     1,724,252 cr     2.2%
+  4     Computer related services                              1,607,341 cr     2.0%
+  5     Motor vehicles                                         1,490,682 cr     1.9%
+  6     Education services                                     1,273,996 cr     1.6%
+  7     Land transport                                         1,246,158 cr     1.6%
+  8     Ownership of dwellings                                 1,207,229 cr     1.5%
+  9     Coal tar products                                      1,148,045 cr     1.4%
+  10    Organic chemicals                                      1,078,678 cr     1.4%
+  ✓  Saved io_Z_2019_20  (140 rows → io_Z_2019_20.csv)
+  ✓  Saved io_A_2019_20  (140 rows → io_A_2019_20.csv)
+  ✓  Saved io_L_2019_20  (140 rows → io_L_2019_20.csv)
+  ✓  Saved output 2019-20  (140 rows → io_output_2019_20.csv)
+  ✓  Saved products 2019-20  (140 rows → io_products_2019_20.csv)
+  ✓  Saved generic product list  (140 rows → product_list.csv)
+
+══════════════════════════════════════════════════════════════════════
+  Processing SUT → IO: 2021-22
+══════════════════════════════════════════════════════════════════════
+  ✓  Products: 140,  Industries: 66,  Scale: ×1.0
+  ⚠  Row mismatch — trimming to 140
+  ✓  Final demand: ₹29,129,347 cr  ($3,664,068.8M / $3664.07B)  [PFCE, GFCE, GFCF, CIS, Valuables, Export]
+  ⚠  1 products have negative total output — taking absolute value
+         product 39 (Mica): x = -1,024.0
+  ⚠  3 A column sums >= 1.0 — scaling to 0.95 (Hawkins-Simon enforcement)
+         col  22 (Wool): A_sum 1.0004 → 0.9500
+         col  32 (Crude petroleum): A_sum 1.5477 → 0.9500
+         col 125 (Storage and warehousing): A_sum 1.0000 → 0.9500
+  ✓  All A column sums < 1.0 after cleaning (Hawkins-Simon satisfied)
+  ✓  V total: ₹44,814,555 cr  ($5,637,050.9M / $5637.05B) | Z: ₹69,995,449 cr  ($8,804,459.0M / $8804.46B) | x: ₹99,126,844 cr  ($12,468,785.4M / $12468.79B)
+
+  ── Validation ──
+  ✓  Output balance: 99,126,844 ≈ 99,124,796  (Δ 0.002% — PASS)
+  ⚠  Demand-side x vs supply-side q: 99,126,844 vs 44,814,555  (Δ 121.19% — CHECK)
+  ✓  A: shape=(140, 140)  non-zero=7,787  max=0.8484  neg=0  diag_mean=0.0267
+  ✓  L: shape=(140, 140)  non-zero=18,909  max=1.5681  neg=0  diag_mean=1.0428
+  ✓  Spectral radius ρ(A_2021-22) = 0.694761  < 1  ✓ Hawkins-Simon holds
+  ✓  All diagonal L ≥ 1
+  ✓  All A column sums < 1 (Hawkins-Simon satisfied)
+
+  ── A-matrix stability: 2019-20 → 2021-22 ──
+  ✓  Column-sum Δ: mean=6.2%  max=100.0%  n_>30.0%: 3/140
+  ⚠  3 sectors shifted >30.0% — review NAS scaling
+
+  Top 10 by Output:
+  Rank  Product                                                   Output        %
+  ────────────────────────────────────────────────────────────────────────────────
+  1     Construction and construction services                 7,372,844 cr     7.4%
+  2     Petroleum products                                     2,655,474 cr     2.7%
+  3     Public administration and defence                      2,118,337 cr     2.1%
+  4     Computer related services                              1,965,331 cr     2.0%
+  5     Motor vehicles                                         1,778,310 cr     1.8%
+  6     Iron and steel casting and forging                     1,642,921 cr     1.7%
+  7     Iron and steel foundries                               1,620,215 cr     1.6%
+  8     Iron and steel Ferro alloys                            1,600,220 cr     1.6%
+  9     Coal tar products                                      1,467,311 cr     1.5%
+  10    Ownership of dwellings                                 1,416,532 cr     1.4%
+  ✓  Saved io_Z_2021_22  (140 rows → io_Z_2021_22.csv)
+  ✓  Saved io_A_2021_22  (140 rows → io_A_2021_22.csv)
+  ✓  Saved io_L_2021_22  (140 rows → io_L_2021_22.csv)
+  ✓  Saved output 2021-22  (140 rows → io_output_2021_22.csv)
+  ✓  Saved products 2021-22  (140 rows → io_products_2021_22.csv)
+  ✓  Saved generic product list  (140 rows → product_list.csv)
+
+══════════════════════════════════════════════════════════════════════
+  Cross-Year IO Summary
+══════════════════════════════════════════════════════════════════════
+
+  Real output (2015-16 ₹ crore)
+  Year               Value       Abs_Chg     Pct_Chg          CAGR
+  ──────────────────────────────────────────────────────────────
+  2015-16    60789849.0000 cr        (base)
+  2019-20    67792424.0000 cr  ↑7002575.0000      +11.5%       +2.8%/yr
+  2021-22    75464697.0000 cr  ↑14674848.0000      +24.1%       +3.7%/yr
+
+  Year              Output (cr)  Output ($M)     Intermediate      FinalDemand    FD ($M)   Bal.Err%       ρ(A)
+  ────────────────────────────────────────────────────────────────────────────────────────────────────
+  2015-16            60,789,849    9,352,284       42,228,935       18,560,914  2,855,525      0.000   0.794560
+  2019-20            79,535,137   11,362,162       55,251,606       24,283,531  3,469,076      0.000   0.900528
+  2021-22            99,126,844   12,468,785       69,995,449       29,129,347  3,664,069      0.028   0.694761
+  ✓  Saved IO summary all years  (3 rows → io_summary_all_years.csv)
+  ✓  Done in 0.2s
+
+──────────────────────────────────────────────────────────────────────
+  Step 'build_io_tables' finished  |  elapsed: 0.2s
+  Warnings: 12  |  Errors: 0
+    ⚠  Row mismatch — trimming to 140
+    ⚠  3 A column sums >= 1.0 — scaling to 0.95 (Hawkins-Simon enforcement)
+    ⚠  Demand-side x vs supply-side q: 60,789,849 vs 27,764,866  (Δ 118.95% — CHECK)
+    ⚠  Row mismatch — trimming to 140
+    ⚠  1 A column sums >= 1.0 — scaling to 0.95 (Hawkins-Simon enforcement)
+    ⚠  Demand-side x vs supply-side q: 79,535,137 vs 36,486,545  (Δ 117.98% — CHECK)
+    ⚠  3 sectors shifted >30.0% — review NAS scaling
+    ⚠  Row mismatch — trimming to 140
+    ⚠  1 products have negative total output — taking absolute value
+    ⚠  3 A column sums >= 1.0 — scaling to 0.95 (Hawkins-Simon enforcement)
+    ⚠  Demand-side x vs supply-side q: 99,126,844 vs 44,814,555  (Δ 121.19% — CHECK)
+    ⚠  3 sectors shifted >30.0% — review NAS scaling

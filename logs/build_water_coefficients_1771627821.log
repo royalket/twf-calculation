@@ -1,0 +1,7 @@
+# Log started: 2026-02-21T07:50:21.318223
+
+======================================================================
+  BUILD WATER COEFFICIENTS  (EXIOBASE → concordance → SUT 140)
+======================================================================
+  ✗ Duplicate: IN.112 in ['MISC_M02', 'SERV_008']
+  ✗ Concordance self-check failed — aborting

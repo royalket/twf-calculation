@@ -14,64 +14,64 @@ Each row is a source→destination pair in the IO table.
 
 | Rank | Source Sector | Source Group | Destination Sector | Dest Group | Water (m³) | Share % |
 |---|---|---|---|---|---|---|
-| 1 | Wheat | Agriculture | Wheat | Agriculture | 19,532,109,294 | 40.816% |
-| 2 | Paddy | Agriculture | Paddy | Agriculture | 12,637,426,729 | 26.408% |
-| 3 | Rapeseed and mustard | Agriculture | Rapeseed and mustard | Agriculture | 1,019,731,218 | 2.131% |
-| 4 | Paddy | Agriculture | Coarse cereals | Agriculture | 816,779,128 | 1.707% |
-| 5 | Wheat | Agriculture | Coarse cereals | Agriculture | 705,394,176 | 1.474% |
-| 6 | Coconut | Agriculture | Coconut | Agriculture | 651,953,419 | 1.362% |
-| 7 | Groundnut | Agriculture | Groundnut | Agriculture | 610,948,785 | 1.277% |
-| 8 | Coarse cereals | Agriculture | Coarse cereals | Agriculture | 607,885,603 | 1.270% |
-| 9 | Paddy | Agriculture | Wheat | Agriculture | 470,074,671 | 0.982% |
-| 10 | Other food crops | Agriculture | Coarse cereals | Agriculture | 432,257,515 | 0.903% |
-| 11 | Paddy | Agriculture | Other pulses | Agriculture | 400,145,604 | 0.836% |
-| 12 | Wheat | Agriculture | Other pulses | Agriculture | 345,577,365 | 0.722% |
-| 13 | Paddy | Agriculture | Rapeseed and mustard | Agriculture | 328,241,853 | 0.686% |
-| 14 | Tobacco | Agriculture | Tobacco | Agriculture | 311,806,348 | 0.652% |
-| 15 | Paddy | Agriculture | Gram | Agriculture | 296,975,321 | 0.621% |
-| 16 | Wheat | Agriculture | Rapeseed and mustard | Agriculture | 283,479,197 | 0.592% |
-| 17 | Tea | Agriculture | Tea | Agriculture | 280,921,578 | 0.587% |
-| 18 | Other pulses | Agriculture | Other pulses | Agriculture | 272,770,667 | 0.570% |
-| 19 | Wheat | Agriculture | Gram | Agriculture | 256,476,512 | 0.536% |
-| 20 | Other food crops | Agriculture | Wheat | Agriculture | 248,773,875 | 0.520% |
-| 21 | Sugarcane | Agriculture | Coarse cereals | Agriculture | 246,103,818 | 0.514% |
-| 22 | Wheat | Agriculture | Paddy | Agriculture | 240,319,224 | 0.502% |
-| 23 | Other oil seeds | Agriculture | Other oil seeds | Agriculture | 231,879,009 | 0.484% |
-| 24 | Gram | Agriculture | Gram | Agriculture | 216,228,768 | 0.452% |
-| 25 | Other food crops | Agriculture | Other pulses | Agriculture | 211,765,872 | 0.443% |
-| 26 | Sugarcane | Agriculture | Sugarcane | Agriculture | 205,403,624 | 0.429% |
-| 27 | Paddy | Agriculture | Groundnut | Agriculture | 184,684,054 | 0.386% |
-| 28 | Other food crops | Agriculture | Rapeseed and mustard | Agriculture | 173,712,822 | 0.363% |
-| 29 | Paddy | Agriculture | Coconut | Agriculture | 162,757,108 | 0.340% |
-| 30 | Wheat | Agriculture | Groundnut | Agriculture | 159,498,513 | 0.333% |
-| 31 | Other food crops | Agriculture | Gram | Agriculture | 157,165,885 | 0.328% |
-| 32 | Other food crops | Agriculture | Paddy | Agriculture | 147,264,882 | 0.308% |
-| 33 | Sugarcane | Agriculture | Wheat | Agriculture | 141,638,256 | 0.296% |
-| 34 | Wheat | Agriculture | Coconut | Agriculture | 140,561,766 | 0.294% |
-| 35 | Coffee | Agriculture | Coffee | Agriculture | 139,005,296 | 0.290% |
-| 36 | Sugarcane | Agriculture | Other pulses | Agriculture | 120,567,920 | 0.252% |
-| 37 | Fruits | Agriculture | Fruits | Agriculture | 106,337,615 | 0.222% |
-| 38 | Electricity | Electricity | Coarse cereals | Agriculture | 103,122,468 | 0.215% |
-| 39 | Sugarcane | Agriculture | Rapeseed and mustard | Agriculture | 98,902,592 | 0.207% |
-| 40 | Other food crops | Agriculture | Groundnut | Agriculture | 97,738,871 | 0.204% |
-| 41 | Vegetables | Agriculture | Vegetables | Agriculture | 96,957,257 | 0.203% |
-| 42 | Paddy | Agriculture | Tobacco | Agriculture | 95,406,175 | 0.199% |
-| 43 | Sugarcane | Agriculture | Gram | Agriculture | 89,481,670 | 0.187% |
-| 44 | Other food crops | Agriculture | Other food crops | Agriculture | 88,568,246 | 0.185% |
-| 45 | Paddy | Agriculture | Tea | Agriculture | 88,534,276 | 0.185% |
-| 46 | Petroleum products | Manufacturing | Coarse cereals | Agriculture | 87,953,991 | 0.184% |
-| 47 | Paddy | Agriculture | kapas | Agriculture | 86,169,332 | 0.180% |
-| 48 | Other food crops | Agriculture | Coconut | Agriculture | 86,134,648 | 0.180% |
-| 49 | Sugarcane | Agriculture | Paddy | Agriculture | 83,844,580 | 0.175% |
-| 50 | Wheat | Agriculture | Tobacco | Agriculture | 82,395,544 | 0.172% |
+| 1 | Sugarcane | Agriculture | Processed fruits & Processed Vegetables | Manufacturing | 1,401,464,890 | 27.195% |
+| 2 | Paddy | Agriculture | Processed fruits & Processed Vegetables | Manufacturing | 343,162,398 | 6.659% |
+| 3 | Wheat | Agriculture | Processed fruits & Processed Vegetables | Manufacturing | 224,013,574 | 4.347% |
+| 4 | Other food crops | Agriculture | Processed fruits & Processed Vegetables | Manufacturing | 135,474,032 | 2.629% |
+| 5 | Wheat | Agriculture | Hotels & Restaurant | Services | 116,621,249 | 2.263% |
+| 6 | Petroleum products | Petroleum | Railway Transport | Services | 106,258,168 | 2.062% |
+| 7 | Petroleum products | Petroleum | Repair & Maintenance of Motor Vehicle | Services | 105,922,954 | 2.055% |
+| 8 | Electricity | Electricity | Railway Transport | Services | 101,578,102 | 1.971% |
+| 9 | Paddy | Agriculture | Hotels & Restaurant | Services | 97,995,817 | 1.902% |
+| 10 | Sugarcane | Agriculture | Non alcoholic beverages | Manufacturing | 77,109,508 | 1.496% |
+| 11 | Wheat | Agriculture | Repair & Maintenance of Motor Vehicle | Services | 75,647,174 | 1.468% |
+| 12 | Wheat | Agriculture | Public administration and defence | Services | 70,639,545 | 1.371% |
+| 13 | Paddy | Agriculture | Repair & Maintenance of Motor Vehicle | Services | 69,250,694 | 1.344% |
+| 14 | Electricity | Electricity | Repair & Maintenance of Motor Vehicle | Services | 67,570,438 | 1.311% |
+| 15 | Paddy | Agriculture | Grain Mill products, starch and starch products | Manufacturing | 64,674,106 | 1.255% |
+| 16 | Other oil seeds | Agriculture | Processed fruits & Processed Vegetables | Manufacturing | 56,503,085 | 1.096% |
+| 17 | Sugarcane | Agriculture | Bread & Bakery products | Manufacturing | 55,225,442 | 1.072% |
+| 18 | Sugarcane | Agriculture | Alcoholic beverages | Manufacturing | 52,584,227 | 1.020% |
+| 19 | Petroleum products | Petroleum | Air transport | Services | 51,358,035 | 0.997% |
+| 20 | Paddy | Agriculture | Railway Transport | Services | 51,153,901 | 0.993% |
+| 21 | Paddy | Agriculture | Ready made garments | Manufacturing | 50,860,052 | 0.987% |
+| 22 | Wheat | Agriculture | Railway Transport | Services | 48,670,863 | 0.944% |
+| 23 | Tea | Agriculture | Processed fruits & Processed Vegetables | Manufacturing | 44,092,585 | 0.856% |
+| 24 | Fruits | Agriculture | Processed fruits & Processed Vegetables | Manufacturing | 43,516,025 | 0.844% |
+| 25 | Paddy | Agriculture | Non alcoholic beverages | Manufacturing | 43,313,319 | 0.841% |
+| 26 | Wheat | Agriculture | Ready made garments | Manufacturing | 43,268,076 | 0.840% |
+| 27 | Rapeseed and mustard | Agriculture | Processed fruits & Processed Vegetables | Manufacturing | 37,261,952 | 0.723% |
+| 28 | Paddy | Agriculture | Public administration and defence | Services | 33,969,435 | 0.659% |
+| 29 | Petroleum products | Petroleum | Research & Development Services | Services | 32,015,053 | 0.621% |
+| 30 | Sugarcane | Agriculture | Hotels & Restaurant | Services | 31,835,007 | 0.618% |
+| 31 | Electricity | Electricity | Processed fruits & Processed Vegetables | Manufacturing | 30,911,565 | 0.600% |
+| 32 | Electricity | Electricity | Research & Development Services | Services | 30,731,845 | 0.596% |
+| 33 | Other food crops | Agriculture | Ready made garments | Manufacturing | 30,438,905 | 0.591% |
+| 34 | Paddy | Agriculture | Alcoholic beverages | Manufacturing | 29,249,486 | 0.568% |
+| 35 | Wheat | Agriculture | Grain Mill products, starch and starch products | Manufacturing | 29,171,699 | 0.566% |
+| 36 | Petroleum products | Petroleum | Processed fruits & Processed Vegetables | Manufacturing | 26,408,622 | 0.512% |
+| 37 | Other food crops | Agriculture | Railway Transport | Services | 26,051,399 | 0.505% |
+| 38 | Sugarcane | Agriculture | Repair & Maintenance of Motor Vehicle | Services | 25,949,427 | 0.503% |
+| 39 | Wheat | Agriculture | Non alcoholic beverages | Manufacturing | 25,575,290 | 0.496% |
+| 40 | Vegetables | Agriculture | Processed fruits & Processed Vegetables | Manufacturing | 24,884,418 | 0.483% |
+| 41 | Electricity | Electricity | Air transport | Services | 24,788,340 | 0.481% |
+| 42 | Other food crops | Agriculture | Repair & Maintenance of Motor Vehicle | Services | 23,825,841 | 0.462% |
+| 43 | Petroleum products | Petroleum | Communication services | Services | 22,049,084 | 0.428% |
+| 44 | Other food crops | Agriculture | Hotels & Restaurant | Services | 21,275,926 | 0.413% |
+| 45 | Wheat | Agriculture | Research & Development Services | Services | 20,979,409 | 0.407% |
+| 46 | Paddy | Agriculture | Research & Development Services | Services | 20,752,395 | 0.403% |
+| 47 | Sugarcane | Agriculture | Railway Transport | Services | 20,137,567 | 0.391% |
+| 48 | Electricity | Electricity | Ready made garments | Manufacturing | 20,061,428 | 0.389% |
+| 49 | Coffee | Agriculture | Processed fruits & Processed Vegetables | Manufacturing | 19,323,897 | 0.375% |
+| 50 | Vegetables | Agriculture | Hotels & Restaurant | Services | 18,237,105 | 0.354% |
 
 ### By Source Group (top-50 paths)
 
 | Source Group | Water (m³) | Share % |
 |---|---|---|
-| Agriculture | 44,488,756,481 | 99.6% |
-| Electricity | 103,122,468 | 0.2% |
-| Manufacturing | 87,953,991 | 0.2% |
+| Agriculture | 3,604,159,720 | 85.3% |
+| Petroleum | 344,011,916 | 8.1% |
+| Electricity | 275,641,718 | 6.5% |
 
 ---
 
@@ -83,36 +83,36 @@ Higher = more dependent on tourism demand.
 
 | Rank | Sector | Group | Dependency Index % | Water Coeff (m³/cr) | Tourism Water (m³) |
 |---|---|---|---|---|---|
-| 1 | Crude petroleum | Mining | 14.020% | 0.0 | 0 |
-| 2 | Fertilizers | Manufacturing | 6.934% | 5.4 | 1,588,474 |
-| 3 | Organic chemicals | Manufacturing | 6.337% | 0.1 | 20,484 |
-| 4 | Financial services | Services | 5.453% | 0.0 | 0 |
-| 5 | Coarse cereals | Agriculture | 4.848% | 2,988.9 | 616,861,056 |
-| 6 | Petroleum products | Manufacturing | 3.674% | 2,580.2 | 403,517,447 |
-| 7 | Wheat | Agriculture | 3.490% | 149,409.0 | 22,197,833,679 |
-| 8 | Other food crops | Agriculture | 3.316% | 14,757.5 | 2,083,275,730 |
-| 9 | Recreation, entertainment and radio & TV broadcasting  and other services | Services | 2.920% | 0.0 | 0 |
-| 10 | Electricity | Electricity | 2.880% | 3,755.3 | 460,351,930 |
-| 11 | Paddy | Agriculture | 2.542% | 147,227.5 | 15,936,120,989 |
-| 12 | Inorganic chemicals | Manufacturing | 2.284% | 0.1 | 7,385 |
-| 13 | Other pulses | Agriculture | 2.259% | 2,988.9 | 287,508,260 |
-| 14 | Gram | Agriculture | 1.950% | 2,988.9 | 248,077,929 |
-| 15 | Other non metallic minerals | Mining | 1.888% | 0.0 | 0 |
-| 16 | Other chemicals and chemical products | Manufacturing | 1.744% | 0.1 | 5,639 |
-| 17 | Rapeseed and mustard | Agriculture | 1.740% | 14,102.3 | 1,044,495,585 |
-| 18 | Coal and Lignite | Mining | 1.705% | 0.0 | 0 |
-| 19 | Repair & Maintenance of Motor Vehicle | Services | 1.543% | 0.0 | 0 |
-| 20 | Pesticides | Manufacturing | 1.429% | 0.1 | 4,618 |
-| 21 | Other Business services | Services | 1.224% | 0.0 | 0 |
-| 22 | Groundnut | Agriculture | 1.188% | 14,102.3 | 712,944,011 |
-| 23 | Construction and construction services | Manufacturing | 1.179% | 0.0 | 0 |
-| 24 | Natural Gas | Mining | 1.118% | 0.0 | 0 |
-| 25 | Coconut | Agriculture | 0.867% | 17,803.4 | 657,108,104 |
-| 26 | Miscellaneous manufacturing | Manufacturing | 0.794% | 0.0 | 0 |
-| 27 | Communication services | Services | 0.733% | 0.0 | 0 |
-| 28 | Land transport | Services | 0.731% | 0.0 | 0 |
-| 29 | Other oil seeds | Agriculture | 0.690% | 14,102.3 | 414,504,319 |
-| 30 | kapas | Agriculture | 0.688% | 234.2 | 6,860,463 |
+| 1 | Crude petroleum | Mining | 13.679% | 0.0 | 0 |
+| 2 | Railway Transport | Services | 6.466% | 0.0 | 0 |
+| 3 | Petroleum products | Petroleum | 5.101% | 2,580.2 | 427,065,700 |
+| 4 | Repair & Maintenance of Motor Vehicle | Services | 4.846% | 0.0 | 0 |
+| 5 | Financial services | Services | 4.305% | 0.0 | 0 |
+| 6 | Organic chemicals | Petroleum | 3.847% | 0.1 | 9,477 |
+| 7 | Communication services | Services | 3.007% | 0.0 | 0 |
+| 8 | Electricity | Electricity | 2.996% | 3,755.3 | 365,019,722 |
+| 9 | Research & Development Services | Services | 2.817% | 0.0 | 0 |
+| 10 | Processed fruits & Processed Vegetables | Manufacturing | 2.670% | 159.9 | 13,847,649 |
+| 11 | Air transport | Services | 2.582% | 0.0 | 0 |
+| 12 | Construction and construction services | Manufacturing | 2.574% | 0.0 | 0 |
+| 13 | Ready made garments | Manufacturing | 2.534% | 160.9 | 13,226,871 |
+| 14 | Other Business services | Services | 2.336% | 0.0 | 0 |
+| 15 | Coal and Lignite | Mining | 1.909% | 0.0 | 0 |
+| 16 | Other chemicals and chemical products | Manufacturing | 1.757% | 0.1 | 4,328 |
+| 17 | Hotels & Restaurant | Services | 1.480% | 0.0 | 0 |
+| 18 | Inorganic chemicals | Petroleum | 1.398% | 0.1 | 3,444 |
+| 19 | Paper, Paper products and newsprint | Manufacturing | 1.383% | 1,135.8 | 50,951,616 |
+| 20 | Fertilizers | Petroleum | 1.344% | 5.4 | 234,620 |
+| 21 | Other non metallic minerals | Mining | 1.273% | 0.0 | 0 |
+| 22 | Miscellaneous manufacturing | Manufacturing | 1.204% | 0.0 | 0 |
+| 23 | Education services | Services | 0.821% | 0.0 | 0 |
+| 24 | Publishing, printing and allied activities | Manufacturing | 0.802% | 565.4 | 14,717,702 |
+| 25 | Plastic products | Manufacturing | 0.793% | 1,946.3 | 50,054,746 |
+| 26 | Misc. textile products | Manufacturing | 0.776% | 65.7 | 1,653,626 |
+| 27 | Land transport | Services | 0.761% | 0.0 | 0 |
+| 28 | Edible Oils and Fats | Manufacturing | 0.757% | 72.2 | 1,773,343 |
+| 29 | Industry Wood | Agriculture | 0.720% | 0.0 | 0 |
+| 30 | Natural Gas | Mining | 0.718% | 0.0 | 0 |
 
 ---
 

@@ -1,0 +1,89 @@
+# Log started: 2026-02-22T15:26:33.553746
+
+======================================================================
+  CROSS-YEAR TWF COMPARISON
+======================================================================
+
+  Indirect TWF (bn m³)
+  Year               Value       Abs_Chg     Pct_Chg          CAGR
+  ──────────────────────────────────────────────────────────────
+  2015            133.2165 bn m³        (base)
+  2019             60.8690 bn m³  ↓   72.3475      -54.3%      -17.8%/yr
+  2022             54.4535 bn m³  ↓   78.7630      -59.1%      -12.0%/yr
+
+  Direct TWF BASE (bn m³)
+  Year               Value       Abs_Chg     Pct_Chg          CAGR
+  ──────────────────────────────────────────────────────────────
+  2015              1.2101 bn m³        (base)
+  2019              2.3245 bn m³  ↑    1.1144      +92.1%      +17.7%/yr
+  2022              2.1576 bn m³  ↑    0.9475      +78.3%       +8.6%/yr
+
+  Total TWF (bn m³)
+  Year               Value       Abs_Chg     Pct_Chg          CAGR
+  ──────────────────────────────────────────────────────────────
+  2015            134.4265 bn m³        (base)
+  2019             63.1935 bn m³  ↓   71.2330      -53.0%      -17.2%/yr
+  2022             56.6111 bn m³  ↓   77.8154      -57.9%      -11.6%/yr
+
+  L/tourist/day (all tourists)
+  Year               Value       Abs_Chg     Pct_Chg          CAGR
+  ──────────────────────────────────────────────────────────────
+  2015           9278.0000 L/day        (base)
+  2019           2249.0000 L/day  ↓ 7029.0000      -75.8%      -29.8%/yr
+  2022           2242.0000 L/day  ↓ 7036.0000      -75.8%      -18.4%/yr
+
+======================================================================
+  DATA QUALITY FLAGS
+======================================================================
+
+  ── Check 1 — Per-tourist intensity year-on-year change
+    2015 → 2019: intensity 9,278 → 2,249 L/day  (-75.8%)
+    ⚠ WARNING: intensity drop of -75.8% exceeds 30% threshold.
+    Decomposition:
+      Total TWF change:    -53.0%  (134.43 → 63.19 bn m³)
+      Tourist-days change: +93.9%  (14488M → 28092M days)
+    If tourist-days grew much faster than TWF, the likely cause is
+    a methodology change in domestic tourist counting between survey
+    rounds — NOT a genuine efficiency improvement.
+    ACTION: Verify domestic_tourists_M definitions are comparable
+    across years in reference_data.md § ACTIVITY_DATA.
+    2019 → 2022: intensity 2,249 → 2,242 L/day  (-0.3%)
+    ✓ Change within ±30% — plausible year-on-year variation.
+
+  ── Check 2 — Total TWF numerator consistency (indirect + direct)
+    ✓ 2015: indirect + direct = total  (133.216 + 1.210 = 134.427 bn m³)
+    ✓ 2019: indirect + direct = total  (60.869 + 2.325 = 63.193 bn m³)
+    ✓ 2022: indirect + direct = total  (54.454 + 2.158 = 56.611 bn m³)
+
+  ── Check 3 — Domestic vs inbound tourist-days ratio
+    ✓ 2015: dom 1432M × 10.0d = 14320M days  |  inb 8.03M × 21.0d = 169M days  |  ratio 85:1
+    ✓ 2019: dom 2321M × 12.0d = 27852M days  |  inb 10.93M × 22.0d = 240M days  |  ratio 116:1
+    ✓ 2022: dom 1731M × 14.5d = 25100M days  |  inb 8.58M × 17.5d = 150M days  |  ratio 167:1
+
+  ── Check 4 — avg_stay_days data source and values
+    ✓ AVG_STAY_DAYS contains non-default values.
+    2015: domestic=10.0d  inbound=21.0d
+    2019: domestic=12.0d  inbound=22.0d
+    2022: domestic=14.5d  inbound=17.5d
+
+  Indirect TWF by category — sector trends (2015 → 2022)
+  Top 5 improved (fell most):
+    Public Administration                          -95.8%
+    Pipeline/Water Transport                       -93.3%
+    Cultural & Rec Services                        -88.7%
+    Financial Services                             -87.2%
+    Health & Social Work                           -82.5%
+  Top 5 worsened (rose most):
+    Other Services                                 -14.7%
+    Grain Mill & Bakery                            -25.9%
+    Processed Fruit/Veg                            -28.7%
+    Electricity, Heat & Energy                     -43.0%
+    Hotels & Restaurants                           -48.1%
+
+  ── Type I Water Multipliers (WL diagonal)
+  ✓ Saved Total TWF  (3 rows)
+  ✓ Saved Per-tourist  (3 rows)
+  ✓ Saved Sector trends  (76 rows)
+  ✓ Report written: /Users/kumar.aniket/Downloads/surveydata/tourism-water-footprint/twf-calculation/3-final-results/comparison/twf_comparison_report.txt
+  ✓ Report written: /Users/kumar.aniket/Downloads/surveydata/tourism-water-footprint/twf-calculation/3-final-results/comparison/run_report_1771741591.md
+  ✓ Done in 0.1s

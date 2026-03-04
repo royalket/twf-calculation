@@ -1,0 +1,82 @@
+# Log started: 2026-02-23T08:34:54.811641
+
+======================================================================
+  CROSS-YEAR TWF COMPARISON
+======================================================================
+
+  Indirect TWF (bn m³)
+  Year               Value       Abs_Chg     Pct_Chg          CAGR
+  ──────────────────────────────────────────────────────────────
+  2015              1.4297 bn m³        (base)
+  2019             33.6651 bn m³  ↑   32.2354    +2254.7%     +120.3%/yr
+  2022             29.0966 bn m³  ↑   27.6669    +1935.2%      +53.8%/yr
+
+  Direct TWF BASE (bn m³)
+  Year               Value       Abs_Chg     Pct_Chg          CAGR
+  ──────────────────────────────────────────────────────────────
+  2015              1.2101 bn m³        (base)
+  2019              2.3245 bn m³  ↑    1.1144      +92.1%      +17.7%/yr
+  2022              2.1576 bn m³  ↑    0.9475      +78.3%       +8.6%/yr
+
+  Total TWF (bn m³)
+  Year               Value       Abs_Chg     Pct_Chg          CAGR
+  ──────────────────────────────────────────────────────────────
+  2015              2.6398 bn m³        (base)
+  2019             35.9896 bn m³  ↑   33.3498    +1263.3%      +92.2%/yr
+  2022             31.2542 bn m³  ↑   28.6144    +1084.0%      +42.3%/yr
+
+  L/tourist/day (all tourists)
+  Year               Value       Abs_Chg     Pct_Chg          CAGR
+  ──────────────────────────────────────────────────────────────
+  2015            182.0000 L/day        (base)
+  2019           1281.0000 L/day  ↑ 1099.0000     +603.8%      +62.9%/yr
+  2022           1238.0000 L/day  ↑ 1056.0000     +580.2%      +31.5%/yr
+
+======================================================================
+  DATA QUALITY FLAGS
+======================================================================
+
+  ── Check 1 — Per-tourist intensity year-on-year change
+    2015 → 2019: intensity 182 → 1,281 L/day  (+603.8%)
+    ⚠ WARNING: intensity RISE of 603.8% exceeds 30% threshold.
+    Check whether tourist volumes dropped due to COVID or data revision.
+    2019 → 2022: intensity 1,281 → 1,238 L/day  (-3.4%)
+    ✓ Change within ±30% — plausible year-on-year variation.
+
+  ── Check 2 — Total TWF numerator consistency (indirect + direct)
+    ✓ 2015: indirect + direct = total  (1.430 + 1.210 = 2.640 bn m³)
+    ✓ 2019: indirect + direct = total  (33.665 + 2.325 = 35.990 bn m³)
+    ✓ 2022: indirect + direct = total  (29.097 + 2.158 = 31.254 bn m³)
+
+  ── Check 3 — Domestic vs inbound tourist-days ratio
+    ✓ 2015: dom 1432M × 10.0d = 14320M days  |  inb 8.03M × 21.0d = 169M days  |  ratio 85:1
+    ✓ 2019: dom 2321M × 12.0d = 27852M days  |  inb 10.93M × 22.0d = 240M days  |  ratio 116:1
+    ✓ 2022: dom 1731M × 14.5d = 25100M days  |  inb 8.58M × 17.5d = 150M days  |  ratio 167:1
+
+  ── Check 4 — avg_stay_days data source and values
+    ✓ AVG_STAY_DAYS contains non-default values.
+    2015: domestic=10.0d  inbound=21.0d
+    2019: domestic=12.0d  inbound=22.0d
+    2022: domestic=14.5d  inbound=17.5d
+
+  Indirect TWF by category — sector trends (2015 → 2022)
+  Top 5 improved (fell most):
+    Electricity, Heat & Energy                     +18.4%
+    Paper Products                                +169.6%
+    Beverages                                     +178.0%
+    Printing/Publishing                           +483.7%
+    Ready Made Garments                           +881.1%
+  Top 5 worsened (rose most):
+    Tobacco Products                            +261122.9%
+    Processed Fruit/Veg                          +8590.7%
+    Leather Footwear                             +6413.8%
+    Other Chemicals                              +2135.0%
+    Textiles                                     +1708.0%
+
+  ── Type I Water Multipliers (WL diagonal)
+  ✓ Saved Total TWF  (3 rows)
+  ✓ Saved Per-tourist  (3 rows)
+  ✓ Saved Sector trends  (76 rows)
+  ✓ Report written: /Users/kumar.aniket/Downloads/surveydata/tourism-water-footprint/twf-calculation/3-final-results/comparison/twf_comparison_report.txt
+  ✓ Report written: /Users/kumar.aniket/Downloads/surveydata/tourism-water-footprint/twf-calculation/3-final-results/comparison/run_report_1771803291.md
+  ✓ Done in 0.1s

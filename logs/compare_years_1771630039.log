@@ -1,0 +1,67 @@
+# Log started: 2026-02-21T08:27:19.679825
+
+======================================================================
+  CROSS-YEAR TWF COMPARISON
+======================================================================
+
+  Indirect TWF (bn m³)
+  Year               Value       Abs_Chg     Pct_Chg          CAGR
+  ──────────────────────────────────────────────────────────────
+  2015             55.2542 bn m³        (base)
+  2019             33.7506 bn m³  ↓   21.5036      -38.9%      -11.6%/yr
+  2022             31.2127 bn m³  ↓   24.0415      -43.5%       -7.8%/yr
+
+  Direct TWF BASE (bn m³)
+  Year               Value       Abs_Chg     Pct_Chg          CAGR
+  ──────────────────────────────────────────────────────────────
+  2015              0.3967 bn m³        (base)
+  2019              0.6038 bn m³  ↑    0.2071      +52.2%      +11.1%/yr
+  2022              0.5017 bn m³  ↑    0.1050      +26.5%       +3.4%/yr
+
+  Total TWF (bn m³)
+  Year               Value       Abs_Chg     Pct_Chg          CAGR
+  ──────────────────────────────────────────────────────────────
+  2015             55.6509 bn m³        (base)
+  2019             34.3544 bn m³  ↓   21.2965      -38.3%      -11.4%/yr
+  2022             31.7144 bn m³  ↓   23.9365      -43.0%       -7.7%/yr
+
+  L/tourist/day (all tourists)
+  Year               Value       Abs_Chg     Pct_Chg          CAGR
+  ──────────────────────────────────────────────────────────────
+  2015          15271.0000 L/day        (base)
+  2019           5833.0000 L/day  ↓ 9438.0000      -61.8%      -21.4%/yr
+  2022           6968.0000 L/day  ↓ 8303.0000      -54.4%      -10.6%/yr
+
+  Indirect TWF by category — sector trends (2015 → 2022)
+  Top 5 improved (fell most):
+    Public Administration                          -93.1%
+    Pipeline/Water Transport                       -87.6%
+    Cultural & Rec Services                        -79.9%
+    Financial Services                             -76.5%
+    Leather Footwear                               -69.0%
+  Top 5 worsened (rose most):
+    Other Services                                 +26.8%
+    Electricity, Heat & Energy                     +12.7%
+    Grain Mill & Bakery                             +5.8%
+    Processed Fruit/Veg                             -6.7%
+    Printing/Publishing                             -8.7%
+
+  ── Type I Water Multipliers (WL diagonal)
+  Best multiplier improvement (2015→2022):
+    Product 39: -100.0%
+    Product 130: -96.3%
+    Product 123: -94.2%
+    Product 139: -91.1%
+    Product 135: -89.2%
+  Worst multiplier deterioration:
+    Product 1: +20.0%
+    Product 19: -19.7%
+    Product 47: -20.3%
+    Product 18: -21.2%
+    Product 136: -24.8%
+  ✓ Saved Total TWF  (3 rows)
+  ✓ Saved Per-tourist  (3 rows)
+  ✓ Saved Sector trends  (76 rows)
+  ✓ Saved Type I multipliers  (140 rows)
+  ✓ Report written: /Users/kumar.aniket/Downloads/surveydata/tourism-water-footprint/twf-calculation/3-final-results/comparison/twf_comparison_report.txt
+  ✓ Done in 0.0s

@@ -1,0 +1,122 @@
+══════════════════════════════════════════════════════════════════════
+  Log started : 2026-03-03 10:36:06
+  Step        : calculate_sda_mc
+  Log file    : /Users/kumar.aniket/Documents/personal/research/tourism-water-footprint/twf-calculation/logs/calculate_sda_mc_20260303_103606.log
+══════════════════════════════════════════════════════════════════════
+
+══════════════════════════════════════════════════════════════════════
+  SDA + MONTE CARLO + SUPPLY-CHAIN ANALYSIS
+══════════════════════════════════════════════════════════════════════
+
+══════════════════════════════════════════════════════════════════════
+  STRUCTURAL DECOMPOSITION ANALYSIS (SDA)
+══════════════════════════════════════════════════════════════════════
+  ✓  W 2015 (blue, col='Water_2015_Blue_m3_per_crore'): shape=(140,)  non-zero=60
+  ✓  L 2015: shape=(140, 140)  diag_mean=1.0711
+  ✓  Y 2015 (from sut results, sorted by Product_ID): ₹929,805 cr  ($143,047M)  non-zero=39
+  ✓  W 2019 (blue, col='Water_2019_Blue_m3_per_crore'): shape=(140,)  non-zero=60
+  ✓  L 2019: shape=(140, 140)  diag_mean=1.1062
+  ✓  Y 2019 (from sut results, sorted by Product_ID): ₹1,405,015 cr  ($200,716M)  non-zero=39
+  ✓  W 2022 (blue, col='Water_2022_Blue_m3_per_crore'): shape=(140,)  non-zero=63
+  ✓  L 2022: shape=(140, 140)  diag_mean=1.0428
+  ✓  Y 2022 (from sut results, sorted by Product_ID): ₹1,499,192 cr  ($188,578M)  non-zero=39
+
+  ── SDA: 2015 → 2019 ──
+  ✓  TWF: 5.1534 → 5.7608 bn m³  (Δ +0.6074 bn m³)
+  ✓    W effect (technology):     +0.2689 bn m³  (+44.3% of |ΔTWF|)
+  ✓    L effect (structure):      -1.9814 bn m³  (-326.2% of |ΔTWF|)
+  ✓    Y effect (demand):         +2.3199 bn m³  (+381.9% of |ΔTWF|)
+  ✓    Residual (should be ~0):   -0.000000 bn m³  (-0.000%)  [six-polar: ~0 by construction]
+  ✓  Saved SDA 2015→2019  (1 rows → sda_decomposition_2015_2019.csv)
+  ✓  Summary: sda_2015_2019_summary.txt
+
+  ── SDA: 2019 → 2022 ──
+  ✓  TWF: 5.7608 → 5.3846 bn m³  (Δ -0.3762 bn m³)
+  ✓    W effect (technology):     -0.0138 bn m³  (-3.7% of |ΔTWF|)
+  ✓    L effect (structure):      -0.6364 bn m³  (-169.1% of |ΔTWF|)
+  ✓    Y effect (demand):         +0.2740 bn m³  (+72.8% of |ΔTWF|)
+  ✓    Residual (should be ~0):   -0.000000 bn m³  (-0.000%)  [six-polar: ~0 by construction]
+  ✓  Saved SDA 2019→2022  (1 rows → sda_decomposition_2019_2022.csv)
+  ✓  Summary: sda_2019_2022_summary.txt
+  ✓  Saved SDA all periods  (2 rows → sda_summary_all_periods.csv)
+
+══════════════════════════════════════════════════════════════════════
+  MONTE CARLO SENSITIVITY ANALYSIS
+══════════════════════════════════════════════════════════════════════
+
+  ── Monte Carlo — 2015  (n=10,000) ──
+  ✓  W 2015 (blue, col='Water_2015_Blue_m3_per_crore'): shape=(140,)  non-zero=60
+  ✓  L 2015: shape=(140, 140)  diag_mean=1.0711
+  ✓  Y 2015 (from sut results, sorted by Product_ID): ₹929,805 cr  ($143,047M)  non-zero=39
+  ✓    BASE:    5.6762 bn m³
+  ✓    Median:  5.6618 bn m³
+  ✓    5th–95th: 4.0189 – 8.3635 bn m³  (range ±47.7%)
+  ✓  Saved MC results 2015  (10,000 rows → mc_results_2015.csv)
+
+  ── Top variance contributors — 2015 ──
+  ✓    agr_water_mult                  r=+0.998  share=99.6%
+  ✓    rest_coeff_mult                 r=+0.043  share=0.2%
+  ✓    dom_tourist_mult                r=+0.024  share=0.1%
+  ✓    rail_coeff_mult                 r=+0.006  share=0.0%
+  ✓    hotel_coeff_mult                r=-0.005  share=0.0%
+  ✓  Summary: mc_2015_summary.txt
+
+  ── Monte Carlo — 2019  (n=10,000) ──
+  ✓  W 2019 (blue, col='Water_2019_Blue_m3_per_crore'): shape=(140,)  non-zero=60
+  ✓  L 2019: shape=(140, 140)  diag_mean=1.1062
+  ✓  Y 2019 (from sut results, sorted by Product_ID): ₹1,405,015 cr  ($200,716M)  non-zero=39
+  ✓    BASE:    6.6911 bn m³
+  ✓    Median:  6.6576 bn m³
+  ✓    5th–95th: 5.0560 – 9.2722 bn m³  (range ±39.3%)
+  ✓  Saved MC results 2019  (10,000 rows → mc_results_2019.csv)
+
+  ── Top variance contributors — 2019 ──
+  ✓    agr_water_mult                  r=+0.993  share=98.6%
+  ✓    rest_coeff_mult                 r=+0.089  share=0.8%
+  ✓    dom_tourist_mult                r=+0.057  share=0.3%
+  ✓    rail_coeff_mult                 r=+0.024  share=0.1%
+  ✓    air_coeff_mult                  r=+0.008  share=0.0%
+  ✓  Summary: mc_2019_summary.txt
+
+  ── Monte Carlo — 2022  (n=10,000) ──
+  ✓  W 2022 (blue, col='Water_2022_Blue_m3_per_crore'): shape=(140,)  non-zero=63
+  ✓  L 2022: shape=(140, 140)  diag_mean=1.0428
+  ✓  Y 2022 (from sut results, sorted by Product_ID): ₹1,499,192 cr  ($188,578M)  non-zero=39
+  ✓    BASE:    6.2407 bn m³
+  ✓    Median:  6.2406 bn m³
+  ✓    5th–95th: 4.7248 – 8.6717 bn m³  (range ±39.0%)
+  ✓  Saved MC results 2022  (10,000 rows → mc_results_2022.csv)
+
+  ── Top variance contributors — 2022 ──
+  ✓    agr_water_mult                  r=+0.994  share=98.7%
+  ✓    rest_coeff_mult                 r=+0.081  share=0.7%
+  ✓    dom_tourist_mult                r=+0.034  share=0.1%
+  ✓    rail_coeff_mult                 r=+0.022  share=0.1%
+  ✓    hotel_coeff_mult                r=+0.015  share=0.0%
+  ✓  Summary: mc_2022_summary.txt
+  ✓  Saved MC summary all years  (3 rows → mc_summary_all_years.csv)
+  ✓  Saved MC variance decomposition  (21 rows → mc_variance_decomposition.csv)
+
+══════════════════════════════════════════════════════════════════════
+  SUPPLY-CHAIN PATH ANALYSIS + HEM
+══════════════════════════════════════════════════════════════════════
+
+  ── Year: 2015 ──
+  ✓  W 2015 (blue, col='Water_2015_Blue_m3_per_crore'): shape=(140,)  non-zero=60
+  ✓  L 2015: shape=(140, 140)  diag_mean=1.0711
+  ✓  Y 2015 (from sut results, sorted by Product_ID): ₹929,805 cr  ($143,047M)  non-zero=39
+  ✗  Exception: name '_safe_csv' is not defined
+Traceback (most recent call last):
+  File "/Users/kumar.aniket/Documents/personal/research/tourism-water-footprint/twf-calculation/5-scripts/calculate_sda_mc.py", line 927, in run
+    sc_results  = run_supply_chain(log)
+  File "/Users/kumar.aniket/Documents/personal/research/tourism-water-footprint/twf-calculation/5-scripts/calculate_sda_mc.py", line 794, in run_supply_chain
+    names       = load_product_names(year)
+  File "/Users/kumar.aniket/Documents/personal/research/tourism-water-footprint/twf-calculation/5-scripts/calculate_sda_mc.py", line 175, in load_product_names
+    df = _safe_csv(path)
+         ^^^^^^^^^
+NameError: name '_safe_csv' is not defined. Did you mean: 'safe_csv'?
+
+
+──────────────────────────────────────────────────────────────────────
+  Step 'calculate_sda_mc' finished  |  elapsed: 0.3s
+  Warnings: 0  |  Errors: 1

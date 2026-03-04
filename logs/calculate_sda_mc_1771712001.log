@@ -1,0 +1,31 @@
+# Log started: 2026-02-22T07:13:21.605394
+
+======================================================================
+  SDA + MONTE CARLO + SUPPLY-CHAIN ANALYSIS
+======================================================================
+
+======================================================================
+  STRUCTURAL DECOMPOSITION ANALYSIS (SDA)
+======================================================================
+  ✓ W 2015: shape=(141,)  non-zero=60
+  ✓ L 2015: shape=(141, 141)  diag_mean=1.0769
+  ✓ Y 2015 (from sut results): ₹928,841 cr  non-zero=38
+  ✓ W 2019: shape=(142,)  non-zero=60
+  ✓ L 2019: shape=(142, 142)  diag_mean=1.1047
+  ✓ Y 2019 (from sut results): ₹1,403,742 cr  non-zero=38
+  ✓ W 2022: shape=(142,)  non-zero=60
+  ✓ L 2022: shape=(142, 142)  diag_mean=1.0441
+  ✓ Y 2022 (from sut results): ₹1,497,873 cr  non-zero=38
+
+  ── SDA: 2015 → 2019
+  ✗ Exception: operands could not be broadcast together with shapes (142,) (141,) 
+Traceback (most recent call last):
+  File "/Users/kumar.aniket/Downloads/surveydata/tourism-water-footprint/twf-calculation/5-scripts/calculate_sda_mc.py", line 840, in run
+    sda_results = run_sda(log)
+  File "/Users/kumar.aniket/Downloads/surveydata/tourism-water-footprint/twf-calculation/5-scripts/calculate_sda_mc.py", line 221, in run_sda
+    res = two_polar_decomposition(W0, L0, Y0, W1, L1, Y1)
+  File "/Users/kumar.aniket/Downloads/surveydata/tourism-water-footprint/twf-calculation/5-scripts/calculate_sda_mc.py", line 162, in two_polar_decomposition
+    dW = W1 - W0
+         ~~~^~~~
+ValueError: operands could not be broadcast together with shapes (142,) (141,) 
+
