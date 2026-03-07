@@ -284,3 +284,34 @@ temp/
 # Text files (for exiobase)
 # ====================
 *.txt
+
+# ====================
+# Node / Vite / tooling
+# ====================
+# Node modules and npm/Yarn logs
+node_modules/
+**/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Local bin folders
+.bin/
+**/.bin/
+
+# Vite / build artifacts
+.vite/
+**/.vite/
+dist/
+build/
+
+# caches
+.cache/
+.parcel-cache/
+
+# pnpm
+pnpm-lock.yaml
+
+# Optional: hide local env files
+.env.local
+.env.*.local

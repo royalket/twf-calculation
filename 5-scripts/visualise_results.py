@@ -3,49 +3,58 @@ visualise_results.py — Publication-Quality Figures
 India Tourism Water Footprint Pipeline
 =============================================================================
 
-FIGURES PRODUCED (9 redesigned high-information-density publication charts):
+FIGURES PRODUCED (10 publication-quality charts):
 
-  Fig 1  fig1_diverging_bar.png        Double-ended diverging bar: water SOURCE
-                                        (left) ↔ tourism CONSUMPTION (right).
-                                        Same total, opposite perspectives —
-                                        the EEIO methodology in one visual.
+  Fig 1  fig1_methodology_framework.png  Two-column analytical framework diagram.
+                                          6 horizontal rows (Data Sources → Data
+                                          Preparation → EEIO Core → Analytical
+                                          Extensions → Validation → Outputs).
+                                          Each row: narrow phase label on left,
+                                          detail boxes on right. Pure matplotlib —
+                                          no external dependencies. Journal-ready.
 
-  Fig 2  fig2_proportional_area.png    Area-encoded domestic/inbound intensity.
-                                        Width = tourist-days, height = L/tourist/day,
-                                        AREA = total TWF. All 3 years side-by-side.
+  Fig 2  fig2_diverging_bar.png          Double-ended diverging bar: water SOURCE
+                                          (left) ↔ tourism CONSUMPTION (right).
+                                          Same total, opposite perspectives —
+                                          the EEIO methodology in one visual.
 
-  Fig 3  fig3_sda_waterfall.png        Annotated SDA waterfall (W / L / Y effects)
-                                        with COVID narrative labels and baseline→total
-                                        flow. Guard: graceful placeholder if no data.
+  Fig 3  fig3_proportional_area.png      Area-encoded domestic/inbound intensity.
+                                          Width = tourist-days, height = L/tourist/day,
+                                          AREA = total TWF. All 3 years side-by-side.
 
-  Fig 4  fig4_nested_bar_ghost.png     3 years nested stacked bars. Ghost outline of
-                                        2015 sits behind 2019 and 2022. Intensity
-                                        dots on secondary axis.
+  Fig 4  fig4_sda_waterfall.png          Annotated SDA waterfall (W / L / Y effects)
+                                          with COVID narrative labels and baseline→total
+                                          flow. Guard: graceful placeholder if no data.
 
-  Fig 5  fig5_flow_strip.png           3-column supply-chain Sankey strip:
-                                        Water source group → Sector → Tourism demand.
+  Fig 5  fig5_nested_bar_ghost.png       3 years nested stacked bars. Ghost outline of
+                                          2015 sits behind 2019 and 2022. Intensity
+                                          dots on secondary axis.
 
-  Fig 6  fig6_state_pressure_map.png   India state bubble chart (or map if geopandas
-                                        present): circle size = TWF volume,
-                                        colour = WRI Aqueduct 4.0 WSI stress.
+  Fig 6  fig6_flow_strip.png             3-column supply-chain Sankey strip:
+                                          Water source group → Sector → Tourism demand.
 
-  Fig 7  fig7_uncertainty_strip.png    Stacked KDE density strips per year with
-                                        LOW / BASE / HIGH scenario markers and
-                                        90% CI bracket annotation.
+  Fig 7  fig7_state_pressure_map.png     India state bubble chart (or map if geopandas
+                                          present): circle size = TWF volume,
+                                          colour = WRI Aqueduct 4.0 WSI stress.
 
-  Fig 8  fig8_multistory_dashboard.png 6-panel overview dashboard: total TWF trend,
-                                        per-tourist intensity lines, upstream origin
-                                        doughnut, scarce TWF bars, inbound/domestic
-                                        ratio, and MC whisker chart.
+  Fig 8  fig8_uncertainty_strip.png      Stacked KDE density strips per year with
+                                          LOW / BASE / HIGH scenario markers and
+                                          90% CI bracket annotation.
 
-  Fig 9  fig9_blue_green_comparison.png Blue vs Blue+Green indirect TWF grouped bars
-                                        (full hydrological disclosure). Guard:
-                                        placeholder if green column absent.
+  Fig 9  fig9_multistory_dashboard.png   6-panel overview dashboard: total TWF trend,
+                                          per-tourist intensity lines, upstream origin
+                                          doughnut, scarce TWF bars, inbound/domestic
+                                          ratio, and MC whisker chart.
+
+  Fig 10 fig10_blue_green_comparison.png Blue vs Blue+Green indirect TWF grouped bars
+                                          (full hydrological disclosure). Guard:
+                                          placeholder if green column absent.
 
 All figures saved to: outputs/visualisation/
 """
 
 import sys
+import textwrap
 import warnings
 from pathlib import Path
 
@@ -216,17 +225,451 @@ def _src_val_cols(df: pd.DataFrame):
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# FIGURE 1 — DOUBLE-ENDED DIVERGING BAR  (SOURCE ↔ CONSUMPTION)
+# FIGURE 1 — ANALYTICAL FRAMEWORK (methodology diagram)
 # ══════════════════════════════════════════════════════════════════════════════
 
-def fig1_diverging_bar(log=None):
+def fig1_methodology_framework(log=None, target_width_in=14.0, dpi=300):
+    """
+    Fully responsive methodology framework diagram.
+
+    Like a browser CSS layout engine:
+      1. Builds a scratch figure at the target output width
+      2. Uses the renderer to measure every string's ACTUAL pixel width
+      3. Wraps text word-by-word so nothing ever overflows its box
+      4. Computes row heights from the real wrapped line counts
+      5. Sizes the figure height to fit all content exactly
+
+    Change `target_width_in` to reflow the whole diagram — like resizing a browser.
+    """
+    section("Figure 1 — Analytical Framework (Methodology Diagram)", log=log)
+
+    # ── Content data ─────────────────────────────────────────────────────────
+    ROWS = [
+        {
+            "phase": "① DATA SOURCES",
+            "gist":  ["Raw inputs", "6 data streams", "Multi-source"],
+            "boxes": [
+                ("TSA 2015–16",      ["MoT India", "25 categories", "Inbound · Domestic", "₹ crore base"]),
+                ("NAS Stmt 6.1",     ["MoSPI 2024", "Real GVA growth", "2011-12 prices", "12 sector keys"]),
+                ("India SUT Tables", ["MoSPI · 3 years", "140×140 matrix", "2015-16·19-20·21-22", "Nominal ₹ crore"]),
+                ("EXIOBASE v3.8",    ["163-sector MRIO", "Blue water W (m³/₹)", "Green water", "India concordance"]),
+                ("CPI · USD/INR",    ["MoSPI · RBI", "Year deflators", "Nominal → real", "Cross-currency"]),
+                ("WRI Aqueduct 4.0", ["Kuzma et al. 2023", "Sector WSI weights", "Agr=0.827  Ind=0.814", "Services=0.000"]),
+            ],
+            "c_bg": "#D6EAF8", "c_brd": "#1A5276", "c_row": "#EBF5FB",
+        },
+        {
+            "phase": "② DATA PREPARATION",
+            "gist":  ["Pre-processing", "3 operations", "Temurshoev 2011"],
+            "boxes": [
+                ("TSA Extrapolation",        ["nom_factor = GVA_growth × CPI(t)/CPI₀", "→ TSA₂₀₁₅  TSA₂₀₁₉  TSA₂₀₂₂", "Nominal + real ₹ crore"]),
+                ("IO Table Construction",    ["SUT → Product Tech. Assumption", "L = (I − A)⁻¹  per study year", "Balance error < 1.0% verified"]),
+                ("Tourism Demand Vectors Y", ["25 TSA cats → 163 EXIOBASE codes", "Y_total · Y_inbound · Y_domestic", "163 sectors × 3 years = 489 vectors"]),
+            ],
+            "c_bg": "#D5F5E3", "c_brd": "#1E8449", "c_row": "#EAFAF1",
+        },
+        {
+            "phase": "③ EEIO CORE MODEL",
+            "gist":  ["Core equations", "W · L · Y", "Blue + Scarce"],
+            "boxes": [
+                ("Water Vector (W)",      ["EXIOBASE → SUT-140 concordance", "m³ per ₹ crore  [shape: 163]", "Green water: parallel disclosure"]),
+                ("Indirect TWF",          ["TWF = W · L · Y", "Inbound = W·L·Y_inbound", "Domestic = W·L·Y_domestic"]),
+                ("Scarce TWF",            ["Scarce = TWF × WSI_sector", "Aqueduct 4.0 sector-level weights", "Sector vs. country WSI (advance)"]),
+                ("Direct TWF",            ["Activity-based bottom-up", "Tourist-days × sector coeff.", "Hotel · Restaurant · Transport"]),
+                ("Water Multiplier Ratio",["MR[j] = WL[j] / WL̄_economy", "MR > 1 → water-intensive", "Policy hotspot identification"]),
+            ],
+            "c_bg": "#FDEBD0", "c_brd": "#A04000", "c_row": "#FEF9E7",
+        },
+        {
+            "phase": "④ ANALYTICAL EXTENSIONS",
+            "gist":  ["Novel contributions", "★ Not in", "Lee et al. 2021"],
+            "boxes": [
+                ("Structural Decomp. (SDA)",  ["ΔTWF = ΔW·eff + ΔL·eff + ΔY·eff", "Six-polar · residual < 0.1%", "2015→19  ·  2019→22"]),
+                ("Monte Carlo  n=10,000",      ["Inputs: W_agr · W_hotel · volumes", "Output: P5–P95 bounds per year", "Rank-corr. variance decomp."]),
+                ("Supply-Chain Path (HEM)",    ["pull[i,j] = W[i]·L[i,j]·Y[j]", "Top-50 pathways ranked", "Tourism-dependency index/sector"]),
+                ("Outbound TWF & Net Balance", ["TWF = N×days×WF_local/365×1.5", "Net = Outbound − Inbound TWF", "India: net importer or exporter?"]),
+            ],
+            "c_bg": "#E8DAEF", "c_brd": "#6C3483", "c_row": "#F5EEF8",
+        },
+        {
+            "phase": "⑤ VALIDATION",
+            "gist":  ["9 assertions", "Sensitivity ±20%", "Error < 1%"],
+            "boxes": [
+                ("① Scarce/Blue ∈ [0.30–0.95]", ["Physical plausibility check"]),
+                ("② Sensitivity: LOW<BASE<HIGH",  ["Monotonicity of ±20% bounds"]),
+                ("③ Inbound > Domestic",          ["L/tourist-day ordering check"]),
+                ("④⑤ Ratios & Green/Blue bounds", ["Inb/Dom ∈[5,30]  G/B ∈[0,10]"]),
+                ("⑥ YoY Δ ∈[−60,+30%]",          ["Catches data/scaling errors"]),
+                ("⑦⑧⑨ IO · SDA · W+L+Y",         ["<1%  <0.1%  Sum≈ΔTWF"]),
+            ],
+            "c_bg": "#FADBD8", "c_brd": "#922B21", "c_row": "#FDEDEC",
+        },
+        {
+            "phase": "⑥ OUTPUTS",
+            "gist":  ["5 result sets", "Policy-ready", "Journal figures"],
+            "boxes": [
+                ("TWF Totals",            ["bn m³ · L/tourist/day", "Blue + Scarce + Green", "Inbound vs. Domestic"]),
+                ("Sector Hotspots",       ["Top-N indirect sectors", "Water multiplier ratios", "HEM dependency index"]),
+                ("Temporal & SDA Drivers",["ΔW · ΔL · ΔY effects", "COVID structural break", "Technology efficiency Δ"]),
+                ("Net Water Balance",     ["Outbound TWF total", "Virtual water transfer", "India net position"]),
+                ("Uncertainty Bounds",    ["MC P5–P95 range", "Sensitivity half-range", "Dominant inputs ranked"]),
+            ],
+            "c_bg": "#D0ECE7", "c_brd": "#0E6655", "c_row": "#E8F8F5",
+        },
+    ]
+
+    KEY_EQS = [
+        "TWF = W · L · Y",
+        "Scarce = TWF × WSI",
+        "L = (I − A)⁻¹",
+        "ΔTWF = ΔW + ΔL + ΔY",
+        "MR[j] = WL[j] / WL̄",
+    ]
+
+    # ── Layout constants (in "data units" where canvas = 100 wide) ───────────
+    # These are STRUCTURAL proportions, not font sizes — they scale with width.
+    MARGIN      = 0.8    # outer margin
+    LBL_FRAC    = 0.135  # label column as fraction of total width (auto scales)
+    GAP_LR      = 0.008  # gap between label col and boxes, as fraction
+    BOX_GAP_F   = 0.005  # gap between boxes, as fraction
+    BOX_PAD_F   = 0.006  # horizontal text padding inside box, as fraction
+
+    PHASE_HDR_F = 0.028  # phase header strip height, fraction of width
+    BOX_HDR_F   = 0.020  # box title strip height, fraction of width
+    BOX_PAD_T_F = 0.004
+    BOX_PAD_B_F = 0.003
+    BOX_VPAD_F  = 0.005
+    ROW_VPAD_F  = 0.004
+    H_ARR_F     = 0.022
+    H_TITLE_F   = 0.046
+    H_LEG_F     = 0.032
+    LINE_H_F    = 0.016  # line height as fraction of width
+
+    # Font sizes scale with width: fs = base_fs * (target_width_in / reference_width)
+    REF_WIDTH   = 14.0
+    FS_SCALE    = target_width_in / REF_WIDTH
+
+    FS_TITLE  = max(7.0,  8.5  * FS_SCALE)
+    FS_SUB    = max(5.5,  6.2  * FS_SCALE)
+    FS_PHASE  = max(6.0,  7.0  * FS_SCALE)
+    FS_BODY   = max(5.5,  6.5  * FS_SCALE)
+    FS_BTITLE = max(5.5,  6.8  * FS_SCALE)
+    FS_EQ     = max(5.0,  6.2  * FS_SCALE)
+
+    # Convert fractions → data units (canvas = 100 wide)
+    W = 100.0
+    def f(frac): return frac * W
+
+    LBL_W    = f(LBL_FRAC)
+    BOX_X0   = MARGIN + LBL_W + f(GAP_LR)
+    BOX_X1   = W - MARGIN
+    BOX_GAP  = f(BOX_GAP_F)
+    BOX_PAD  = f(BOX_PAD_F)
+
+    PHASE_HDR = f(PHASE_HDR_F)
+    BOX_HDR_H = f(BOX_HDR_F)
+    BOX_PAD_T = f(BOX_PAD_T_F)
+    BOX_PAD_B = f(BOX_PAD_B_F)
+    BOX_VPAD  = f(BOX_VPAD_F)
+    ROW_VPAD  = f(ROW_VPAD_F)
+    H_ARR     = f(H_ARR_F)
+    H_TITLE   = f(H_TITLE_F)
+    H_LEG     = f(H_LEG_F)
+    LINE_H    = f(LINE_H_F)
+
+    def box_width(n_boxes):
+        avail = BOX_X1 - BOX_X0 - (n_boxes - 1) * BOX_GAP
+        return avail / n_boxes
+
+    def is_eq(s):
+        return any(c in s for c in
+                   ("·","=","×","→","⁻","Δ","∈","≈","<",">",
+                    "TWF","WL[","MR[","pull","nom_","GVA"))
+
+    # ── Step 1: scratch figure for renderer-based measurement ────────────────
+    _sf, _sa = plt.subplots(figsize=(target_width_in, target_width_in * 0.5))
+    _sa.set_xlim(0, W); _sa.set_ylim(0, W * 0.5)
+    _sa.axis("off")
+    _sf.canvas.draw()
+    _rend = _sf.canvas.get_renderer()
+
+    def _tw(s, fs, ff="DejaVu Sans"):
+        """Measure text width in data-units on the scratch axes."""
+        t = _sa.text(W/2, W*0.25, s, fontsize=fs,
+                     fontfamily=ff, ha="center", va="center")
+        _sf.canvas.draw()
+        bb = t.get_window_extent(renderer=_rend)
+        inv = _sa.transData.inverted()
+        x0, _ = inv.transform((bb.x0, bb.y0))
+        x1, _ = inv.transform((bb.x1, bb.y0))
+        t.remove()
+        return abs(x1 - x0)
+
+    def _fit_font(s, max_w, fs_start, ff):
+        """Find largest font size ≤ fs_start where s fits within max_w."""
+        fs = fs_start
+        while fs > 4.5 and _tw(s, fs, ff) > max_w:
+            fs -= 0.3
+        return fs
+
+    def smart_wrap(s, max_w, fs, ff):
+        """Split s into lines that each fit within max_w data-units."""
+        if _tw(s, fs, ff) <= max_w:
+            return [s]
+        words = s.split(" ")
+        lines, cur = [], ""
+        for word in words:
+            cand = (cur + " " + word).strip()
+            if _tw(cand, fs, ff) <= max_w:
+                cur = cand
+            else:
+                if cur:
+                    lines.append(cur)
+                # single word wider than box — force-break at midpoint
+                if _tw(word, fs, ff) > max_w:
+                    mid = max(1, len(word) // 2)
+                    lines.append(word[:mid] + "-")
+                    cur = word[mid:]
+                else:
+                    cur = word
+        if cur:
+            lines.append(cur)
+        return lines or [s]
+
+    # ── Step 2: pre-compute all wrapped lines ────────────────────────────────
+    row_wrapped = []   # row → box → [(sub_line, is_equation)]
+    row_title_fs = []  # row → box → fitted font size for box title
+
+    for row in ROWS:
+        n_b   = len(row["boxes"])
+        bw    = box_width(n_b)
+        inner = bw - 2 * BOX_PAD
+
+        boxes_lines = []
+        boxes_tfs   = []
+        for (btitle, blines) in row["boxes"]:
+            # title font: shrink until it fits the header strip width
+            tfs = _fit_font(btitle, inner, FS_BTITLE, "DejaVu Sans")
+            boxes_tfs.append(tfs)
+
+            expanded = []
+            for line in blines:
+                eq  = is_eq(line)
+                fs  = FS_EQ if eq else FS_BODY
+                ff  = "monospace" if eq else "DejaVu Sans"
+                for sub in smart_wrap(line, inner, fs, ff):
+                    expanded.append((sub, eq))
+            boxes_lines.append(expanded)
+
+        row_wrapped.append(boxes_lines)
+        row_title_fs.append(boxes_tfs)
+
+    # Pre-compute label-column phase name fitting
+    lbl_inner = LBL_W - 2 * BOX_PAD
+    phase_fits = []   # list of (lines, font_size) per row
+    for row in ROWS:
+        pfs = _fit_font(row["phase"], lbl_inner, FS_PHASE, "DejaVu Sans")
+        if _tw(row["phase"], pfs, "DejaVu Sans") <= lbl_inner:
+            phase_fits.append(([row["phase"]], pfs))
+        else:
+            # wrap to two lines: circled number + rest
+            parts = row["phase"].split(" ", 1)
+            phase_fits.append((parts, max(pfs - 0.5, 4.5)))
+
+    plt.close(_sf)
+
+    # ── Step 3: compute row heights from wrapped line counts ─────────────────
+    def row_height(ri):
+        max_lines = max(len(box) for box in row_wrapped[ri])
+        body_h = max_lines * LINE_H
+        return PHASE_HDR + BOX_PAD_T + body_h + BOX_PAD_B + 2*BOX_VPAD + 2*ROW_VPAD
+
+    N = len(ROWS)
+    row_heights = [row_height(i) for i in range(N)]
+    TOTAL_H = H_TITLE + sum(row_heights) + (N - 1) * H_ARR + H_LEG + f(0.01)
+
+    # ── Step 4: build the final figure at correct height ─────────────────────
+    fig_h_in = target_width_in * (TOTAL_H / W)
+    fig, ax = plt.subplots(figsize=(target_width_in, fig_h_in))
+    ax.set_xlim(0, W)
+    ax.set_ylim(0, TOTAL_H)
+    ax.set_aspect("auto")
+    ax.axis("off")
+    fig.patch.set_facecolor("white")
+    ax.set_facecolor("white")
+
+    def rrect(x, y, w, h, fc, ec, lw=1.2, z=2, r=None):
+        r = r if r is not None else f(0.004)
+        ax.add_patch(mpatches.FancyBboxPatch(
+            (x, y), w, h,
+            boxstyle=f"round,pad=0,rounding_size={r}",
+            linewidth=lw, edgecolor=ec, facecolor=fc,
+            zorder=z, clip_on=False))
+
+    def frect(x, y, w, h, fc, z=3):
+        ax.add_patch(plt.Polygon(
+            [[x,y],[x+w,y],[x+w,y+h],[x,y+h]],
+            closed=True, facecolor=fc, edgecolor="none", linewidth=0,
+            zorder=z, clip_on=True))
+
+    def T(x, y, s, fs=6.5, fw="normal", fc="#2c3e50",
+          ha="center", va="center", fi="normal", ff=None, z=5):
+        kw = dict(ha=ha, va=va, fontsize=fs, fontweight=fw,
+                  color=fc, fontstyle=fi, zorder=z, clip_on=True)
+        if ff: kw["fontfamily"] = ff
+        ax.text(x, y, s, **kw)
+
+    def yft(offset):
+        return TOTAL_H - offset
+
+    # ── Title block ───────────────────────────────────────────────────────────
+    T(W/2, yft(f(0.009)),
+      "Fig. 1.  Analytical framework for estimating India's tourism water footprint (TWF) across three study years",
+      fs=FS_TITLE, fw="bold", fc="#1a2638")
+    T(W/2, yft(f(0.022)),
+      "2015–16 · 2019–20 · 2021–22   |   EEIO = Environmentally Extended IO   |   "
+      "SDA = Structural Decomposition Analysis   |   HEM = Hypothetical Extraction   |   WSI = Water Stress Index",
+      fs=FS_SUB, fc="#5a6a7a", fi="italic")
+
+    y_off = H_TITLE
+
+    # ── Phase rows ────────────────────────────────────────────────────────────
+    for ri, row in enumerate(ROWS):
+        rh    = row_heights[ri]
+        c_bg  = row["c_bg"]
+        c_brd = row["c_brd"]
+        c_row = row["c_row"]
+        boxes = row["boxes"]
+        n_b   = len(boxes)
+
+        r_top = yft(y_off)
+        r_bot = r_top - rh
+
+        # Row background
+        rrect(MARGIN, r_bot + ROW_VPAD, W - 2*MARGIN, rh - 2*ROW_VPAD,
+              fc=c_row, ec=c_brd, lw=1.8, z=1, r=f(0.005))
+
+        # Label column box
+        lx  = MARGIN + f(0.002)
+        lw_ = LBL_W - f(0.002)
+        rrect(lx, r_bot + ROW_VPAD + f(0.001), lw_, rh - 2*ROW_VPAD - f(0.002),
+              fc=c_bg, ec=c_brd, lw=1.4, z=2, r=f(0.004))
+
+        # Phase header strip
+        strip_top = r_top - ROW_VPAD - f(0.001)
+        frect(lx, strip_top - PHASE_HDR, lw_, PHASE_HDR, fc=c_brd, z=3)
+
+        # Phase name — potentially two lines
+        p_lines, p_fs = phase_fits[ri]
+        mid_strip = strip_top - PHASE_HDR / 2
+        if len(p_lines) == 1:
+            T(lx + lw_/2, mid_strip, p_lines[0],
+              fs=p_fs, fw="bold", fc="white", z=6)
+        else:
+            step = p_fs * f(0.0012) * 1.1
+            for pi, pl in enumerate(p_lines):
+                T(lx + lw_/2, mid_strip + step*(0.5 - pi),
+                  pl, fs=p_fs, fw="bold", fc="white", z=6)
+
+        # Gist lines in label column body
+        gist = row["gist"]
+        col_body_top = strip_top - PHASE_HDR
+        col_body_bot = r_bot + ROW_VPAD + f(0.001)
+        body_mid = (col_body_top + col_body_bot) / 2
+        g_step   = LINE_H * 1.05
+        g_start  = body_mid + (len(gist) - 1) * g_step / 2
+        for gi, gl in enumerate(gist):
+            T(lx + lw_/2, g_start - gi * g_step, gl,
+              fs=FS_BODY + (0.4 if gi==0 else 0),
+              fw="bold" if gi==0 else "normal",
+              fc=c_brd if gi==0 else "#666",
+              fi="italic" if gi>0 else "normal", z=5)
+
+        # Detail boxes
+        bw    = box_width(n_b)
+        b_bot = r_bot + ROW_VPAD + BOX_VPAD
+        b_top = r_top - ROW_VPAD - BOX_VPAD
+        bh    = b_top - b_bot
+
+        for bi, (btitle, _) in enumerate(boxes):
+            bx = BOX_X0 + bi * (bw + BOX_GAP)
+
+            rrect(bx, b_bot, bw, bh, fc="white", ec=c_brd, lw=0.9, z=3, r=f(0.003))
+            frect(bx, b_top - BOX_HDR_H, bw, BOX_HDR_H, fc=c_bg, z=4)
+            ax.plot([bx + BOX_PAD, bx + bw - BOX_PAD],
+                    [b_top - BOX_HDR_H, b_top - BOX_HDR_H],
+                    color=c_brd + "55", lw=0.6, zorder=4)
+
+            tfs = row_title_fs[ri][bi]
+            T(bx + bw/2, b_top - BOX_HDR_H/2,
+              btitle, fs=tfs, fw="bold", fc=c_brd, z=6)
+
+            expanded = row_wrapped[ri][bi]
+            n_lines  = len(expanded)
+            body_top = b_top - BOX_HDR_H - BOX_PAD_T
+            body_bot = b_bot + BOX_PAD_B
+            actual_h = body_top - body_bot
+            step     = actual_h / max(n_lines, 1)
+
+            for li, (sub, eq) in enumerate(expanded):
+                T(bx + bw/2,
+                  body_top - (li + 0.5) * step,
+                  sub,
+                  fs=FS_EQ if eq else FS_BODY,
+                  fw="semibold" if eq else "normal",
+                  fc="#1a3a5c" if eq else "#2c3e50",
+                  ff="monospace" if eq else None,
+                  z=6)
+
+        y_off += rh
+
+        # Arrow between rows
+        if ri < N - 1:
+            arr_top_y = yft(y_off)
+            arr_bot_y = arr_top_y - H_ARR
+            ax.annotate("",
+                xy=(lx + lw_/2, arr_bot_y + f(0.004)),
+                xytext=(lx + lw_/2, arr_top_y - f(0.003)),
+                arrowprops=dict(
+                    arrowstyle="->, head_width=0.38, head_length=0.55",
+                    color="#5d7a8c", lw=1.5,
+                ), zorder=8)
+            y_off += H_ARR
+
+    # ── Legend / key equations strip ─────────────────────────────────────────
+    leg_top = yft(y_off + f(0.002))
+    leg_bot = leg_top - H_LEG
+    rrect(MARGIN, leg_bot, W - 2*MARGIN, H_LEG,
+          fc="#f8f9fa", ec="#dce3ea", lw=0.9, z=1, r=f(0.004))
+
+    T(MARGIN + f(0.015), (leg_top + leg_bot)/2,
+      "KEY EQUATIONS:", fs=FS_BODY, fw="bold", fc="#333", ha="left", z=5)
+
+    eq_x0  = MARGIN + f(0.150)
+    slot_w = (W - 2*MARGIN - f(0.155)) / len(KEY_EQS)
+    for ei, eq in enumerate(KEY_EQS):
+        cx = eq_x0 + (ei + 0.5) * slot_w
+        ax.text(cx, (leg_top + leg_bot)/2, eq,
+                ha="center", va="center", fontsize=FS_EQ,
+                fontweight="bold", color="#1a3a5c",
+                fontfamily="monospace", zorder=6,
+                bbox=dict(boxstyle="round,pad=0.28",
+                          facecolor="#e8f0f8", edgecolor="#b8ccde", linewidth=0.7))
+
+    plt.savefig(_VIS_DIR / "fig1_methodology_framework.png",
+                dpi=dpi, bbox_inches="tight", facecolor="white")
+    plt.close(fig)
+    ok("Saved fig1_methodology_framework.png", log)
+
+
+def fig2_diverging_bar(log=None):
     """
     The EEIO paradox made visual.
     LEFT  = where water physically originates (sum rows of pull matrix = source view).
     RIGHT = what tourists consumed (sum columns = demand-destination view).
     Same total, opposite reading direction.  One panel per study year.
     """
-    section("Figure 1 — Double-Ended Diverging Bar", log=log)
+    section("Figure 2 — Double-Ended Diverging Bar", log=log)
 
     n = len(STUDY_YEARS)
     fig, axes = plt.subplots(n, 1, figsize=(11, 3.2 * n))
@@ -301,18 +744,18 @@ def fig1_diverging_bar(log=None):
     fig.text(0.75, 0.01, "What tourism types consume →", ha="center",
              fontsize=8, color="dimgrey")
     fig.suptitle(
-        "Figure 1 | EEIO Source vs Consumption View — Same Total Water, Opposite Perspectives",
+        "Figure 2 | EEIO Source vs Consumption View — Same Total Water, Opposite Perspectives",
         fontsize=10, fontweight="bold",
     )
     plt.tight_layout(rect=[0, 0.04, 1, 0.96])
-    _save(fig, "fig1_diverging_bar.png", log)
+    _save(fig, "fig2_diverging_bar.png", log)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# FIGURE 2 — PROPORTIONAL AREA BAR  (DOMESTIC vs INBOUND INTENSITY)
+# FIGURE 3 — PROPORTIONAL AREA BAR  (DOMESTIC vs INBOUND INTENSITY)  [was Fig 2]
 # ══════════════════════════════════════════════════════════════════════════════
 
-def fig2_proportional_area(log=None):
+def fig3_proportional_area(log=None):
     """
     Bar width  = tourist-days (volume proxy for how many people).
     Bar height = L / tourist / day (intensity).
@@ -320,7 +763,7 @@ def fig2_proportional_area(log=None):
     Domestic: wide + short.   Inbound: narrow + tall.
     3 year groups side-by-side.
     """
-    section("Figure 2 — Proportional Area Bar (Domestic vs Inbound)", log=log)
+    section("Figure 3 — Proportional Area Bar (Domestic vs Inbound)", log=log)
 
     intensity_df = _load_intensity(log)
 
@@ -398,25 +841,25 @@ def fig2_proportional_area(log=None):
             bbox=dict(boxstyle="round,pad=0.3", facecolor="lightyellow", alpha=0.75))
 
     fig.suptitle(
-        "Figure 2 | Domestic vs Inbound Water Intensity — Area Encodes Total Volume",
+        "Figure 3 | Domestic vs Inbound Water Intensity — Area Encodes Total Volume",
         fontsize=10, fontweight="bold",
     )
     plt.tight_layout()
-    _save(fig, "fig2_proportional_area.png", log)
+    _save(fig, "fig3_proportional_area.png", log)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# FIGURE 3 — ANNOTATED SDA WATERFALL  (COVID NARRATIVE)
+# FIGURE 4 — ANNOTATED SDA WATERFALL  (COVID NARRATIVE)  [was Fig 3]
 # ══════════════════════════════════════════════════════════════════════════════
 
-def fig3_sda_waterfall(log=None):
+def fig4_sda_waterfall(log=None):
     """
     SDA decomposition as a floating-bar waterfall readable by non-specialists.
     Baseline 2015 → W-effect (technology) → L-effect (structure) → Y-effect (demand)
     per period → lands at 2022 total.  COVID crash in dark-red.
     Guard: if SDA data is missing / years_have is empty, shows placeholder.
     """
-    section("Figure 3 — Annotated SDA Waterfall (COVID Narrative)", log=log)
+    section("Figure 4 — Annotated SDA Waterfall (COVID Narrative)", log=log)
 
     sda      = _load_sda(log)
     indirect = _load_indirect_totals(log)
@@ -428,10 +871,10 @@ def fig3_sda_waterfall(log=None):
     years_have = [yr for yr in STUDY_YEARS if yr in indirect]
     if not sda or len(years_have) < 2:
         _ph(ax, "SDA data not available\n(run sda_mc step first)")
-        fig.suptitle("Figure 3 | SDA Waterfall — Data Unavailable", fontsize=10)
+        fig.suptitle("Figure 4 | SDA Waterfall — Data Unavailable", fontsize=10)
         plt.tight_layout()
-        _save(fig, "fig3_sda_waterfall.png", log)
-        warn("SDA data missing — Figure 3 placeholder shown", log)
+        _save(fig, "fig4_sda_waterfall.png", log)
+        warn("SDA data missing — Figure 4 placeholder shown", log)
         return
 
     first_yr = years_have[0]
@@ -529,24 +972,24 @@ def fig3_sda_waterfall(log=None):
     ax.legend(handles=legend_handles, fontsize=7.5, loc="upper right")
 
     fig.suptitle(
-        "Figure 3 | SDA Decomposition — W / L / Y Effects with COVID Narrative",
+        "Figure 4 | SDA Decomposition — W / L / Y Effects with COVID Narrative",
         fontsize=10, fontweight="bold",
     )
     plt.tight_layout()
-    _save(fig, "fig3_sda_waterfall.png", log)
+    _save(fig, "fig4_sda_waterfall.png", log)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# FIGURE 4 — NESTED BAR WITH GHOST OVERLAY
+# FIGURE 5 — NESTED BAR WITH GHOST OVERLAY  [was Fig 4]
 # ══════════════════════════════════════════════════════════════════════════════
 
-def fig4_nested_bar_ghost(log=None):
+def fig5_nested_bar_ghost(log=None):
     """
     Stacked bars for each study year, with a ghost (dashed outline) of the
     2015 bar sitting behind 2019 and 2022 — change is instantly visible.
     Sector composition inside bars.  Intensity dots on secondary y-axis.
     """
-    section("Figure 4 — Nested Bar with Ghost Overlay", log=log)
+    section("Figure 5 — Nested Bar with Ghost Overlay", log=log)
 
     indirect = _load_indirect_totals(log)
     direct   = _load_direct_totals(log)
@@ -645,18 +1088,18 @@ def fig4_nested_bar_ghost(log=None):
     ax.legend(handles=handles, fontsize=7, loc="upper right", ncol=2)
 
     fig.suptitle(
-        "Figure 4 | Cross-Year TWF Volume: Sector Composition + 2015 Ghost + Intensity Dots",
+        "Figure 5 | Cross-Year TWF Volume: Sector Composition + 2015 Ghost + Intensity Dots",
         fontsize=10, fontweight="bold",
     )
     plt.tight_layout()
-    _save(fig, "fig4_nested_bar_ghost.png", log)
+    _save(fig, "fig5_nested_bar_ghost.png", log)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# FIGURE 5 — FLOW STRIP (3-STAGE SANKEY)
+# FIGURE 6 — FLOW STRIP (3-STAGE SANKEY)  [was Fig 5]
 # ══════════════════════════════════════════════════════════════════════════════
 
-def fig5_flow_strip(log=None):
+def fig6_flow_strip(log=None):
     """
     3-column supply-chain reading left-to-right:
       Col 1 (x=0.0): Water source groups (stacked blocks)
@@ -664,7 +1107,7 @@ def fig5_flow_strip(log=None):
     Bezier ribbons connect source to destination proportionally.
     One panel per study year.
     """
-    section("Figure 5 — Flow Strip (Supply-Chain Sankey)", log=log)
+    section("Figure 6 — Flow Strip (Supply-Chain Sankey)", log=log)
 
     fig, axes = plt.subplots(1, len(STUDY_YEARS),
                               figsize=(5 * len(STUDY_YEARS), 7))
@@ -763,15 +1206,15 @@ def fig5_flow_strip(log=None):
         ok(f"Panel {year} — flow strip rendered", log)
 
     fig.suptitle(
-        "Figure 5 | Supply-Chain Water Flow: Source Group → Tourism Demand Category",
+        "Figure 6 | Supply-Chain Water Flow: Source Group → Tourism Demand Category",
         fontsize=10, fontweight="bold",
     )
     plt.tight_layout()
-    _save(fig, "fig5_flow_strip.png", log)
+    _save(fig, "fig6_flow_strip.png", log)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# FIGURE 6 — STATE-LEVEL PRESSURE MAP  (WSI × TWF)
+# FIGURE 7 — STATE-LEVEL PRESSURE MAP  (WSI × TWF)
 # ══════════════════════════════════════════════════════════════════════════════
 
 # Placeholder state data — replace with actual MoT ITS 2022 + Aqueduct 4.0 state WSI
@@ -800,13 +1243,13 @@ _STATE_COORDS = {
 }
 
 
-def fig6_state_pressure_map(log=None):
+def fig7_state_pressure_map(log=None):
     """
     State bubble chart (or geopandas map if shapefile present).
     Circle/bar size = TWF volume triggered by state's tourist share.
     Colour       = WRI Aqueduct 4.0 WSI water-stress score.
     """
-    section("Figure 6 — State-Level Pressure Map (WSI × TWF)", log=log)
+    section("Figure 7 — State-Level Pressure Map (WSI × TWF)", log=log)
 
     indirect = _load_indirect_totals(log)
     direct   = _load_direct_totals(log)
@@ -893,19 +1336,19 @@ def fig6_state_pressure_map(log=None):
 
 def _finish_state_fig(fig, last_yr, log, use_map=False):
     fig.suptitle(
-        f"Figure 6 | State Water-Stress × Tourism TWF Pressure — {_YEAR_LABELS.get(last_yr, last_yr)}\n"
+        f"Figure 7 | State Water-Stress × Tourism TWF Pressure — {_YEAR_LABELS.get(last_yr, last_yr)}\n"
         "(colour = WRI Aqueduct 4.0 WSI; size/height = TWF volume)",
         fontsize=10, fontweight="bold",
     )
     plt.tight_layout()
-    _save(fig, "fig6_state_pressure_map.png", log)
+    _save(fig, "fig7_state_pressure_map.png", log)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
 # FIGURE 7 — UNCERTAINTY STRIP  (MC + SENSITIVITY)
 # ══════════════════════════════════════════════════════════════════════════════
 
-def fig7_uncertainty_strip(log=None):
+def fig8_uncertainty_strip(log=None):
     """
     Stacked KDE density strips (one per study year).
     Each strip: filled KDE curve of MC totals + 90% CI shading.
@@ -913,7 +1356,7 @@ def fig7_uncertainty_strip(log=None):
     Width of distribution visually encodes year-specific uncertainty.
     Guard: falls back to spike plot if scipy/MC data unavailable.
     """
-    section("Figure 7 — Uncertainty Strip (MC + Sensitivity)", log=log)
+    section("Figure 8 — Uncertainty Strip (MC + Sensitivity)", log=log)
 
     indirect = _load_indirect_totals(log)
     direct   = _load_direct_totals(log)
@@ -1001,18 +1444,18 @@ def fig7_uncertainty_strip(log=None):
         ax.legend(fontsize=7, loc="upper left")
 
     fig.suptitle(
-        "Figure 7 | Monte Carlo Distribution with Sensitivity Scenario Markers",
+        "Figure 8 | Monte Carlo Distribution with Sensitivity Scenario Markers",
         fontsize=10, fontweight="bold",
     )
     plt.tight_layout()
-    _save(fig, "fig7_uncertainty_strip.png", log)
+    _save(fig, "fig8_uncertainty_strip.png", log)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
 # FIGURE 8 — MULTI-STORY DASHBOARD  (6-panel overview)
 # ══════════════════════════════════════════════════════════════════════════════
 
-def fig8_multistory_dashboard(log=None):
+def fig9_multistory_dashboard(log=None):
     """
     6-panel publication dashboard summarising all key results in one figure:
       A (top-left)    Total TWF trend (indirect + direct stacked bars, all years)
@@ -1025,7 +1468,7 @@ def fig8_multistory_dashboard(log=None):
     Each sub-panel has a _ph() guard that shows a grey placeholder if the
     required data file is absent, so the dashboard never crashes mid-pipeline.
     """
-    section("Figure 8 — Multi-Story Dashboard", log=log)
+    section("Figure 9 — Multi-Story Dashboard", log=log)
 
     indirect  = _load_indirect_totals(log)
     direct    = _load_direct_totals(log)
@@ -1185,17 +1628,17 @@ def fig8_multistory_dashboard(log=None):
         axF.set_title("(F) MC uncertainty", fontsize=9, fontweight="bold")
 
     fig.suptitle(
-        "Figure 8 | India Tourism Water Footprint — Key Results Dashboard",
+        "Figure 9 | India Tourism Water Footprint — Key Results Dashboard",
         fontsize=11, fontweight="bold", y=1.01,
     )
-    _save(fig, "fig8_multistory_dashboard.png", log)
+    _save(fig, "fig9_multistory_dashboard.png", log)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
 # FIGURE 9 — BLUE vs BLUE + GREEN COMPARISON
 # ══════════════════════════════════════════════════════════════════════════════
 
-def fig9_blue_green_comparison(log=None):
+def fig10_blue_green_comparison(log=None):
     """
     Side-by-side grouped bars comparing:
       - Blue indirect TWF  (EEIO W×L×Y, surface + groundwater)
@@ -1209,7 +1652,7 @@ def fig9_blue_green_comparison(log=None):
     (old pipeline run without the fix), shows a clear placeholder message
     directing user to re-run calculate_indirect_twf.py.
     """
-    section("Figure 9 — Blue vs Blue+Green Indirect TWF", log=log)
+    section("Figure 10 — Blue vs Blue+Green Indirect TWF", log=log)
 
     all_yrs_df = _load(DIRS["indirect"] / "indirect_twf_all_years.csv", log)
     last_yr    = STUDY_YEARS[-1]
@@ -1235,9 +1678,9 @@ def fig9_blue_green_comparison(log=None):
     if not years_have or all_yrs_df.empty:
         _ph(ax1, "indirect_twf_all_years.csv missing\nRun indirect_twf step first")
         _ph(ax2, "Data unavailable")
-        fig.suptitle("Figure 9 | Blue vs Blue+Green — Data Unavailable", fontsize=10)
+        fig.suptitle("Figure 10 | Blue vs Blue+Green — Data Unavailable", fontsize=10)
         plt.tight_layout()
-        _save(fig, "fig9_blue_green_comparison.png", log)
+        _save(fig, "fig10_blue_green_comparison.png", log)
         return
 
     if not has_green:
@@ -1248,10 +1691,10 @@ def fig9_blue_green_comparison(log=None):
         _ph(ax2,
             "Green water data unavailable.\n"
             "Blue-only TWF shown in Fig 4.")
-        warn("Figure 9: Green_TWF_billion_m3 absent — showing placeholder", log)
-        fig.suptitle("Figure 9 | Blue vs Blue+Green — Green Data Unavailable", fontsize=10)
+        warn("Figure 10: Green_TWF_billion_m3 absent — showing placeholder", log)
+        fig.suptitle("Figure 10 | Blue vs Blue+Green — Green Data Unavailable", fontsize=10)
         plt.tight_layout()
-        _save(fig, "fig9_blue_green_comparison.png", log)
+        _save(fig, "fig10_blue_green_comparison.png", log)
         return
 
     blue_vals   = []
@@ -1337,11 +1780,11 @@ def fig9_blue_green_comparison(log=None):
         ax2.set_title("Blue vs Green by Source Group", fontsize=9, fontweight="bold")
 
     fig.suptitle(
-        "Figure 9 | Blue vs Blue+Green Indirect TWF — Full Hydrological Disclosure",
+        "Figure 10 | Blue vs Blue+Green Indirect TWF — Full Hydrological Disclosure",
         fontsize=10, fontweight="bold",
     )
     plt.tight_layout()
-    _save(fig, "fig9_blue_green_comparison.png", log)
+    _save(fig, "fig10_blue_green_comparison.png", log)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -1352,20 +1795,21 @@ def run(**kwargs):
     log_dir = DIRS["logs"] / "visualise"
     with Logger("visualise_results", log_dir) as log:
         t = Timer()
-        log.section("GENERATE PUBLICATION FIGURES (9 redesigned charts)")
+        log.section("GENERATE PUBLICATION FIGURES (10 charts: Fig 1 = methodology framework)")
         log.info(f"Output directory: {_VIS_DIR}")
         _VIS_DIR.mkdir(parents=True, exist_ok=True)
 
         figures = [
-            ("Figure 1 — Diverging bar (source ↔ consumption)",         fig1_diverging_bar),
-            ("Figure 2 — Proportional area (domestic vs inbound)",       fig2_proportional_area),
-            ("Figure 3 — SDA waterfall (COVID narrative)",               fig3_sda_waterfall),
-            ("Figure 4 — Nested bar with ghost overlay",                 fig4_nested_bar_ghost),
-            ("Figure 5 — Flow strip (supply-chain Sankey)",              fig5_flow_strip),
-            ("Figure 6 — State-level pressure map (WSI × TWF)",          fig6_state_pressure_map),
-            ("Figure 7 — Uncertainty strip (MC + sensitivity)",          fig7_uncertainty_strip),
-            ("Figure 8 — Multi-story dashboard (6-panel overview)",      fig8_multistory_dashboard),
-            ("Figure 9 — Blue vs Blue+Green comparison (green disclosure)", fig9_blue_green_comparison),
+            ("Figure 1  — Analytical framework (methodology diagram)",      fig1_methodology_framework),
+            ("Figure 2  — Diverging bar (source ↔ consumption)",            fig2_diverging_bar),
+            ("Figure 3  — Proportional area (domestic vs inbound)",         fig3_proportional_area),
+            ("Figure 4  — SDA waterfall (COVID narrative)",                 fig4_sda_waterfall),
+            ("Figure 5  — Nested bar with ghost overlay",                   fig5_nested_bar_ghost),
+            ("Figure 6  — Flow strip (supply-chain Sankey)",                fig6_flow_strip),
+            ("Figure 7  — State-level pressure map (WSI × TWF)",           fig7_state_pressure_map),
+            ("Figure 8  — Uncertainty strip (MC + sensitivity)",            fig8_uncertainty_strip),
+            ("Figure 9  — Multi-story dashboard (6-panel overview)",        fig9_multistory_dashboard),
+            ("Figure 10 — Blue vs Blue+Green comparison (green disclosure)", fig10_blue_green_comparison),
         ]
 
         success = []
