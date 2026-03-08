@@ -1818,194 +1818,107 @@ def fig7_sda_waterfall(log=None):
 # (Half-violin beeswarm + marginal tornado + scenario brackets)
 # ══════════════════════════════════════════════════════════════════════════════
 
-def fig8_uncertainty_anatomy(log=None):
+def fig8_uncertainty_strip(log=None):
     """
-    Three simultaneous uncertainty stories in one figure:
-
-    LEFT ZONE (75% width): Half-violin + beeswarm hybrid for all 3 years.
-      · Left half of each strip = KDE density (shape of uncertainty)
-      · Right half = individual MC simulation dots (beeswarm)
-      All three years share a single x-axis so year-to-year width comparison
-      is direct and visual.
-
-    BELOW x-AXIS: Scenario brackets (LOW–BASE–HIGH) per year + MC P5–P95.
-      Width comparison shows: are we scenario-limited or MC-limited?
-
-    RIGHT ZONE (25% width): Tornado chart.
-      Horizontal bars = % contribution to MC variance by input variable.
-      Longest bar = 'fix this field data to halve your uncertainty range'.
+    Stacked KDE density strips (one per study year).
+    Each strip: filled KDE curve of MC totals + 90% CI shading.
+    Vertical lines show LOW / BASE / HIGH sensitivity scenario values.
+    Width of distribution visually encodes year-specific uncertainty.
+    Guard: falls back to spike plot if scipy/MC data unavailable.
     """
-    section("Figure 8 — Uncertainty Anatomy (Half-violin + Tornado)", log=log)
+    section("Figure 8 — Uncertainty Strip (MC + Sensitivity)", log=log)
 
     indirect = _load_indirect_totals(log)
     direct   = _load_direct_totals(log)
 
-    fig = plt.figure(figsize=(14, 7))
-    fig.patch.set_facecolor("white")
-    gs = gridspec.GridSpec(1, 4, figure=fig, wspace=0.08,
-                           left=0.07, right=0.97, top=0.88, bottom=0.20)
-    ax_main = fig.add_subplot(gs[0, :3])
-    ax_torn = fig.add_subplot(gs[0, 3])
+    n   = len(STUDY_YEARS)
+    fig, axes = plt.subplots(n, 1, figsize=(10, 3.5 * n), sharex=False)
+    if n == 1:
+        axes = [axes]
 
-    # ── Main panel: half-violin / beeswarm per year ────────────────────────
-    ax_main.set_facecolor("white")
-    year_positions = {yr: i for i, yr in enumerate(STUDY_YEARS)}
-    Y_SPACING = 1.0
+    sc_styles = {
+        "LOW":  ("#D55E00", "--", "LOW"),
+        "BASE": ("#000000", "-",  "BASE"),
+        "HIGH": ("#009E73", "--", "HIGH"),
+    }
 
-    x_global_min, x_global_max = np.inf, -np.inf
+    for ax, year in zip(axes, STUDY_YEARS):
+        mc        = _load_mc(year, log)
+        base_tot  = (indirect.get(year, 0) + direct.get(year, 0)) / 1e9
+        dir_base  = direct.get(year, 0)
+        col       = _YEAR_COLORS[year]
 
-    for yr in STUDY_YEARS:
-        mc      = _load_mc(yr, log)
-        base_t  = (indirect.get(yr, 0) + direct.get(yr, 0)) / 1e9
-        y_ctr   = year_positions[yr] * Y_SPACING
-        col     = _YEAR_COLORS[yr]
-
-        if base_t == 0:
-            base_t = 1.8 if yr == "2015" else (2.3 if yr == "2019" else 2.1)
-
-        # Synthesise MC if unavailable
-        if len(mc) < 30:
-            rng  = np.random.default_rng(42 + year_positions[yr])
-            mc   = rng.lognormal(mean=np.log(base_t), sigma=0.08, size=500)
-            warn(f"{yr}: No MC data — synthetic distribution shown", log)
-
-        x_global_min = min(x_global_min, mc.min())
-        x_global_max = max(x_global_max, mc.max())
-
-        p5, p95 = np.percentile(mc, [5, 95])
-
-        # ── KDE half-violin (upper half of strip) ──────────────────────────
-        if _HAS_SCIPY:
-            from scipy.stats import gaussian_kde
-            kde    = gaussian_kde(mc, bw_method=0.12)
-            x_kde  = np.linspace(mc.min() * 0.96, mc.max() * 1.04, 300)
-            dens   = kde(x_kde)
-            dens   = dens / dens.max() * 0.38  # scale to plot coords
-
-            # Shade P5-P95 range
-            mask = (x_kde >= p5) & (x_kde <= p95)
-            ax_main.fill_between(x_kde,
-                                 y_ctr, y_ctr + np.where(mask, dens, 0),
-                                 color=col, alpha=0.65, zorder=3)
-            ax_main.fill_between(x_kde, y_ctr, y_ctr + dens,
-                                 color=col, alpha=0.20, zorder=2)
-            ax_main.plot(x_kde, y_ctr + dens, color=col,
-                         linewidth=1.2, zorder=4)
-
-        # ── Beeswarm dots (lower half of strip) ────────────────────────────
-        rng_b  = np.random.default_rng(seed=99 + year_positions[yr])
-        n_dots = min(len(mc), 300)
-        sample = rng_b.choice(mc, size=n_dots, replace=False)
-        sample.sort()
-        # Simple beeswarm: bin by x, stack vertically within bin
-        bins  = np.linspace(mc.min()*0.96, mc.max()*1.04, 60)
-        idx   = np.digitize(sample, bins)
-        DOT_R = 0.012
-        bin_counts = {}
-        dot_y = []
-        for ix in idx:
-            cnt = bin_counts.get(ix, 0)
-            dot_y.append(y_ctr - DOT_R * 1.3 - cnt * DOT_R * 1.3)
-            bin_counts[ix] = cnt + 1
-
-        ax_main.scatter(sample, dot_y, s=4, color=col, alpha=0.55,
-                        linewidths=0, zorder=3)
-
-        # Year label and median line
-        med = np.median(mc)
-        ax_main.axvline(med, ymin=(y_ctr - 0.4) / (len(STUDY_YEARS) * Y_SPACING),
-                        ymax=(y_ctr + 0.4) / (len(STUDY_YEARS) * Y_SPACING),
-                        color=col, linewidth=1.8, linestyle="-", alpha=0.9, zorder=5)
-        ax_main.text(x_global_min - 0.04, y_ctr + 0.12,
-                     f"{_YEAR_LABELS[yr]}\nmedian {med:.2f} bn m³",
-                     va="bottom", ha="right", fontsize=7.5,
-                     color=col, fontweight="bold")
-
-    # ── Below-axis scenario brackets ─────────────────────────────────────────
-    y_brk_base = -0.6
-    for yr in STUDY_YEARS:
-        y_ctr = year_positions[yr] * Y_SPACING
-        col   = _YEAR_COLORS[yr]
-        base_t = (indirect.get(yr, 0) + direct.get(yr, 0)) / 1e9
-        if base_t == 0:
-            base_t = 1.8 if yr == "2015" else (2.3 if yr == "2019" else 2.1)
-
-        sens_df = _load(DIRS["indirect"] / f"indirect_twf_{yr}_sensitivity.csv", log)
-        if not sens_df.empty and "Scenario" in sens_df.columns:
-            sc_vals = {}
+        # Sensitivity scenarios
+        sens_df  = _load(DIRS["indirect"] / f"indirect_twf_{year}_sensitivity.csv", log)
+        scenarios = {}
+        if not sens_df.empty and "Scenario" in sens_df.columns and "Total_Water_m3" in sens_df.columns:
             for sc in ("LOW", "BASE", "HIGH"):
                 r = sens_df[sens_df["Scenario"] == sc]
-                if not r.empty and "Total_Water_m3" in r.columns:
-                    sc_vals[sc] = r["Total_Water_m3"].sum() / 1e9
-            if len(sc_vals) == 3:
-                y_b = y_brk_base - year_positions[yr] * 0.22
-                ax_main.annotate("",
-                    xy=(sc_vals["HIGH"], y_b),
-                    xytext=(sc_vals["LOW"], y_b),
-                    arrowprops=dict(arrowstyle="<->", color=col, lw=1.4),
-                    annotation_clip=False)
-                ax_main.text((sc_vals["LOW"] + sc_vals["HIGH"])/2, y_b - 0.05,
-                             f"Scenario range ±{100*(sc_vals['HIGH']-sc_vals['LOW'])/(2*base_t):.0f}%",
-                             ha="center", va="top", fontsize=6, color=col,
-                             annotation_clip=False)
+                if not r.empty:
+                    scenarios[sc] = (r["Total_Water_m3"].sum() + dir_base) / 1e9
+        if "BASE" not in scenarios:
+            scenarios["BASE"] = base_tot
 
-        mc2 = _load_mc(yr, log)
-        if len(mc2) >= 30:
-            p5, p95 = np.percentile(mc2, [5, 95])
-            y_b2 = y_brk_base - year_positions[yr] * 0.22 - 0.15
-            ax_main.annotate("",
-                xy=(p95, y_b2), xytext=(p5, y_b2),
-                arrowprops=dict(arrowstyle="<->", color=col, lw=1.0,
-                                linestyle="dashed"),
-                annotation_clip=False)
-            ax_main.text((p5+p95)/2, y_b2 - 0.05,
-                         f"MC 90% CI ±{100*(p95-p5)/(2*base_t):.0f}%",
-                         ha="center", va="top", fontsize=6, color=col,
-                         fontstyle="italic", annotation_clip=False)
+        # ── KDE density strip ─────────────────────────────────────────────────
+        if len(mc) >= 50 and _HAS_SCIPY:
+            from scipy.stats import gaussian_kde
+            kde     = gaussian_kde(mc, bw_method=0.15)
+            x_lo    = max(0.0, mc.min() * 0.92)
+            x_hi    = mc.max() * 1.06
+            xs_kde  = np.linspace(x_lo, x_hi, 400)
+            dens    = kde(xs_kde)
+            dens    = dens / dens.max()
 
-    ax_main.set_xlabel("Total TWF (billion m³)", fontsize=10)
-    ax_main.set_yticks([])
-    ax_main.spines["left"].set_visible(False)
-    x_pad = (x_global_max - x_global_min) * 0.08
-    ax_main.set_xlim(x_global_min - x_pad - 0.5,
-                     x_global_max + x_pad)
+            ax.fill_between(xs_kde, 0, dens,
+                             color=col, alpha=0.28, label="MC distribution")
+            ax.plot(xs_kde, dens, color=col, linewidth=1.3)
 
-    # ── Right: Tornado chart ───────────────────────────────────────────────────
-    # Illustrative variance contributions — replace with actual Sobol indices
-    TORNADO = [
-        ("Agriculture W coeff.",  68),
-        ("Hotel occupancy rate",  12),
-        ("CPI deflator",           8),
-        ("TSA base values",        7),
-        ("Avg stay days",          5),
-    ]
-    TORNADO.sort(key=lambda x: x[1])
-    t_labels = [t[0] for t in TORNADO]
-    t_vals   = [t[1] for t in TORNADO]
-    t_colors = [_WONG[0] if v == max(t_vals) else _WONG[4] for v in t_vals]
+            # 90% CI shading and bracket
+            p5, p95 = np.percentile(mc, [5, 95])
+            mask    = (xs_kde >= p5) & (xs_kde <= p95)
+            ax.fill_between(xs_kde, 0, np.where(mask, dens, 0),
+                             color=col, alpha=0.55,
+                             label=f"90% CI: {p5:.2f}–{p95:.2f} bn m³")
+            ax.annotate("", xy=(p95, -0.12), xytext=(p5, -0.12),
+                        xycoords=("data", "axes fraction"),
+                        textcoords=("data", "axes fraction"),
+                        arrowprops=dict(arrowstyle="<->", color="black", lw=1.3))
+            ax.text((p5 + p95) / 2, -0.22,
+                    f"90% CI: {p95 - p5:.2f} bn m³",
+                    ha="center", va="top", fontsize=7,
+                    transform=ax.get_xaxis_transform())
+        else:
+            # Spike fallback
+            ax.axvline(base_tot, color=col, linewidth=2.5,
+                       label=f"Base total: {base_tot:.2f} bn m³")
+            if not _HAS_SCIPY:
+                warn(f"{year}: scipy not installed — KDE unavailable, spike shown", log)
+            else:
+                warn(f"{year}: <50 MC samples — density skipped, spike shown", log)
 
-    ax_torn.barh(range(len(TORNADO)), t_vals, color=t_colors, alpha=0.85)
-    ax_torn.set_yticks(range(len(TORNADO)))
-    ax_torn.set_yticklabels(t_labels, fontsize=7)
-    ax_torn.set_xlabel("% MC variance\nexplained", fontsize=7.5)
-    ax_torn.set_title("Dominant\nuncertainty\nsources", fontsize=8,
-                      fontweight="bold")
-    ax_torn.spines["top"].set_visible(False)
-    ax_torn.spines["right"].set_visible(False)
-    ax_torn.text(0.97, 0.97,
-                 f"Agriculture W coeff.\nexplains {t_vals[-1]}% of\ntotal MC variance",
-                 transform=ax_torn.transAxes, ha="right", va="top",
-                 fontsize=6.5, color=_WONG[0], fontweight="bold",
-                 bbox=dict(boxstyle="round,pad=0.3", facecolor="lightyellow",
-                           alpha=0.85))
+        # Scenario lines
+        for sc, val in scenarios.items():
+            style_col, ls, lbl = sc_styles.get(sc, (_WONG[1], "--", sc))
+            ax.axvline(val, color=style_col, linewidth=1.8, linestyle=ls,
+                       label=f"{lbl}: {val:.2f} bn m³")
+            ax.text(val, 0.88, f"{sc}", ha="center", va="top",
+                    fontsize=7, color=style_col,
+                    transform=ax.get_xaxis_transform())
+
+        ax.set_title(f"{_YEAR_LABELS[year]}  |  median: {np.median(mc):.2f} bn m³"
+                     if len(mc) > 0 else _YEAR_LABELS[year],
+                     fontsize=9, fontweight="bold")
+        ax.set_ylabel("Relative density", fontsize=8)
+        ax.set_xlabel("Total TWF (billion m³)", fontsize=8)
+        ax.set_yticks([0, 0.5, 1.0])
+        ax.legend(fontsize=7, loc="upper left")
 
     fig.suptitle(
-        "Figure 8 | Monte Carlo Uncertainty Anatomy\n"
-        "Upper half-strip = KDE density  ·  Lower dots = individual runs  ·"
-        "  Brackets = scenario vs MC range  ·  Tornado = variance sources",
+        "Figure 8 | Monte Carlo Distribution with Sensitivity Scenario Markers",
         fontsize=10, fontweight="bold",
     )
-    _save(fig, "fig8_uncertainty_anatomy.png", log)
+    plt.tight_layout()
+    _save(fig, "fig8_uncertainty_strip.png", log)
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -2035,8 +1948,8 @@ def run(**kwargs):
              fig6_flow_strip),
             ("Figure 7 — SDA waterfall (narrative bands + running total)",
              fig7_sda_waterfall),
-            ("Figure 8 — Uncertainty anatomy (half-violin + tornado)",
-             fig8_uncertainty_anatomy),
+            ("Figure 8 — Uncertainty Strip (MC + Sensitivity)",
+             fig8_uncertainty_strip),
         ]
 
         success = []

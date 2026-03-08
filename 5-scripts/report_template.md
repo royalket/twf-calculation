@@ -1,8 +1,7 @@
 # India Tourism Water Footprint (2015–2022)
 ## Environmentally Extended Input-Output Analysis — Multi-Year Pipeline Report
 
-> **Auto-generated** · `compare_years.py` · Re-run `python main.py --all` to refresh.  
-> All values read directly from output CSVs. Nothing is hardcoded in this template.
+> **Auto-generated** · `compare_years.py` · Re-run `python main.py --all` to refresh.
 
 ---
 
@@ -162,8 +161,6 @@ The table below maps each analytical contribution to the gap it fills in the exi
 | {{NOVELTY_ROW_4}} | {{NOVELTY_PRIOR_4}} | {{NOVELTY_ADD_4}} | {{NOVELTY_REF_4}} |
 | {{NOVELTY_ROW_5}} | {{NOVELTY_PRIOR_5}} | {{NOVELTY_ADD_5}} | {{NOVELTY_REF_5}} |
 
-> **Journal submission note:** This novelty table should be condensed into the final paragraph of the Introduction in the manuscript, framed as: *"This paper advances prior work in four respects: (i)... (ii)... (iii)... (iv)..."*. The table format is for internal review only.
-
 ---
 
 ## 3. IO Table Results
@@ -250,8 +247,6 @@ The table below maps each analytical contribution to the gap it fills in the exi
 |---|---|---|---|---|---|---|
 {{SECTOR_TYPE_ROWS}}
 
-{{SECTOR_TYPE_NARRATIVE}}
-
 ### 5.4 Upstream Water Origin — Where Water Physically Comes From
 
 `pull[i,j] = W[i] × L[i,j] × Y[j]` summed over all destinations j, grouped by source sector i.
@@ -328,8 +323,6 @@ A score of 4.137 out of 5 means India's agricultural basins are in the top tier 
 |---|---|---|---|---|
 {{SCARCE_TWF_ROWS}}
 
-> **Reading this table:** The Scarce/Blue ratio tells you what fraction of blue water extraction is causing genuine basin-level damage. A ratio of ~0.53 means roughly half of all tourism-linked water extraction comes from basins already under severe stress. This is the number to cite when explaining why India's tourism water footprint is a policy-urgent finding, not just an accounting exercise.
-
 {{SCARCE_TWF_NARRATIVE}}
 
 ### 5.6 Green Water — Dual-Metric Disclosure
@@ -405,7 +398,7 @@ Hotel intensity trajectory: **{{HOTEL_2015}} → {{HOTEL_2019}} → {{HOTEL_2022
 
 ---
 
-## 7a. Total TWF — Blue + Green
+## 8. Total TWF — Blue + Green
 
 **Table 9b.** Total combined TWF (blue indirect + green indirect + direct BASE).
 
@@ -419,7 +412,7 @@ Hotel intensity trajectory: **{{HOTEL_2015}} → {{HOTEL_2019}} → {{HOTEL_2022
 
 ---
 
-## 8. Outbound TWF and Net Water Balance
+## 9. Outbound TWF and Net Water Balance
 
 ```
 Outbound_m³ = N_tourists × avg_stay_days × (national_WF_m³/yr ÷ 365) × 1.5
@@ -438,9 +431,9 @@ Tourist multiplier = 1.5: tourists consume ~50% more water/day than local reside
 
 ---
 
-## 9. Per-Tourist Water Intensity
+## 10. Per-Tourist Water Intensity
 
-### 9.1 Economy-Wide — Blue Water
+### 10.1 Economy-Wide — Blue Water
 
 **Table 10.** Blue water intensity per tourist-day — all tourists.
 
@@ -452,7 +445,7 @@ Tourist multiplier = 1.5: tourists consume ~50% more water/day than local reside
 
 {{INTENSITY_ALL_NARRATIVE}}
 
-### 9.2 Inbound vs Domestic Intensity
+### 10.2 Inbound vs Domestic Intensity
 
 **Table 11.** Per-tourist-day intensity by segment and year.
 
@@ -464,7 +457,7 @@ Tourist multiplier = 1.5: tourists consume ~50% more water/day than local reside
 
 {{INTENSITY_SPLIT_NARRATIVE}}
 
-### 9.3 Why "All Tourists" Intensity Lies Close to the Domestic Value
+### 10.3 Why "All Tourists" Intensity Lies Close to the Domestic Value
 
 The combined figure is a **demand-weighted average**, not the midpoint of domestic and inbound. With domestic tourist-days comprising ~97% of the total, the denominator pulls the combined figure close to the domestic value even though inbound tourists contribute disproportionate water per day.
 
@@ -475,9 +468,9 @@ The combined figure is a **demand-weighted average**, not the midpoint of domest
 
 ---
 
-## 10. Sector Efficiency Trends
+## 11. Sector Efficiency Trends
 
-### 10.1 Most Improved ({{FIRST_YEAR}} → {{LAST_YEAR}})
+### 11.1 Most Improved ({{FIRST_YEAR}} → {{LAST_YEAR}})
 
 **Table 12.** Top-5 categories with largest indirect blue TWF reduction.
 
@@ -485,7 +478,7 @@ The combined figure is a **demand-weighted average**, not the midpoint of domest
 |---|---|---|---|---|
 {{IMPROVED_ROWS}}
 
-### 10.2 Most Worsened
+### 11.2 Most Worsened
 
 **Table 13.** Top-5 categories with largest indirect blue TWF increase.
 
@@ -497,7 +490,7 @@ The combined figure is a **demand-weighted average**, not the midpoint of domest
 
 ---
 
-## 11. EXIOBASE Data Artefact Audit
+## 12. EXIOBASE Data Artefact Audit
 
 Products with a positive water multiplier in {{FIRST_YEAR}} that became exactly zero in {{LAST_YEAR}} represent EXIOBASE database revisions, not genuine efficiency gains.
 
@@ -523,7 +516,7 @@ Products with a positive water multiplier in {{FIRST_YEAR}} that became exactly 
 
 ---
 
-## 12. Structural Decomposition Analysis (SDA)
+## 13. Structural Decomposition Analysis (SDA)
 
 `ΔTWF = W_effect + L_effect + Y_effect` · Two-polar Dietzenbacher–Los (1998) · Residual < 0.001%.
 
@@ -534,7 +527,7 @@ Products with a positive water multiplier in {{FIRST_YEAR}} that became exactly 
 {{SDA_DECOMP_ROWS}}
 {{SDA_INSTABILITY_NOTES}}
 
-### 12.1 Effect Sign Guide
+### 13.1 Effect Sign Guide
 
 | Effect | Sign | Meaning | Policy implication |
 |---|---|---|---|
@@ -545,7 +538,7 @@ Products with a positive water multiplier in {{FIRST_YEAR}} that became exactly 
 | Y (demand) | + | Tourism demand growth added water pressure | Demand-side volume management needed |
 | \|Y\| > \|W + L\| | — | Volume growth outpaces efficiency gains | Absolute decoupling not achieved |
 
-### 12.2 The 2019→2022 Period — What the SDA Actually Shows
+### 13.2 The 2019→2022 Period — What the SDA Actually Shows
 
 {{SDA_COVID_INTERPRETATION}}
 
@@ -558,7 +551,7 @@ This result cautions against reading the period as a demand-elasticity natural e
 - Supply-chain structural change can reduce TWF substantially and quickly — the L-effect dominated over a two-year window
 - Technology/efficiency change (W-effect) was negligible over this window, consistent with the slow pace of upstream infrastructure investment
 
-### 12.3 Key Overall Finding
+### 13.3 Key Overall Finding
 
 {{SDA_KEY_FINDING}}
 
@@ -566,9 +559,9 @@ This result cautions against reading the period as a demand-elasticity natural e
 
 ---
 
-## 13. Monte Carlo Uncertainty Analysis
+## 14. Monte Carlo Uncertainty Analysis
 
-### 13.1 Distribution by Year
+### 14.1 Distribution by Year
 
 **Table 18.** Monte Carlo results (n = 10,000) — total blue TWF.
 
@@ -582,7 +575,7 @@ This result cautions against reading the period as a demand-elasticity natural e
 
 {{MC_DISTRIBUTION_NARRATIVE}}
 
-### 13.2 Variance Decomposition
+### 14.2 Variance Decomposition
 
 **Table 19.** Spearman rank correlation — input parameters vs total TWF output. Share % = corr².
 
@@ -596,7 +589,7 @@ This result cautions against reading the period as a demand-elasticity natural e
 
 ---
 
-## 14. Supply-Chain Path Analysis
+## 15. Supply-Chain Path Analysis
 
 **Table 20.** Top-10 supply-chain pathways — {{FIRST_YEAR}}.
 
@@ -632,7 +625,7 @@ This result cautions against reading the period as a demand-elasticity natural e
 
 ---
 
-## 15. Sensitivity Analysis
+## 16. Sensitivity Analysis
 
 **Table 25.** Indirect blue TWF — ±20% agricultural coefficient sensitivity.
 
@@ -658,11 +651,11 @@ This result cautions against reading the period as a demand-elasticity natural e
 
 ---
 
-## 16. Key Findings and Policy Implications
+## 17. Key Findings and Policy Implications
 
 {{KEY_FINDINGS}}
 
-### 16.1 Quantified Results
+### 17.1 Quantified Results
 
 1. **Blue TWF:** {{ABSTRACT_TWF_2015}} → {{ABSTRACT_TWF_2019}} → {{ABSTRACT_TWF_2022}} bn m³ across the three fiscal years. Total TWF {{TWF_DIRECTION}} {{TWF_CHANGE_PCT}}% from {{FIRST_YEAR}} to {{LAST_YEAR}}.
 
@@ -678,7 +671,7 @@ This result cautions against reading the period as a demand-elasticity natural e
 
 7. **Uncertainty:** MC 90% CI half-width ≈ ±{{MC_HALFWIDTH_PCT}}% (conservative upper bound; true uncertainty ~±20%). Agricultural coefficient uncertainty dominates (~99% of variance), exceeding TSA extrapolation uncertainty by a factor of ~2.
 
-### 16.2 Policy Priorities
+### 17.2 Policy Priorities
 
 | Priority | Target | Mechanism | Evidence |
 |---|---|---|---|
@@ -690,7 +683,7 @@ This result cautions against reading the period as a demand-elasticity natural e
 
 ---
 
-## 17. Data Quality Warnings
+## 18. Data Quality Warnings
 
 ```
 {{WARNINGS}}
@@ -698,7 +691,7 @@ This result cautions against reading the period as a demand-elasticity natural e
 
 ---
 
-## 18. Configuration Reference
+## 19. Configuration Reference
 
 **Table 28.** Technical configuration summary.
 
@@ -719,7 +712,7 @@ This result cautions against reading the period as a demand-elasticity natural e
 | Scarce water | WRI Aqueduct 4.0 (Kuzma et al. 2023); agr WSI = 0.827, industry = 0.814 |
 | Pipeline version | `{{PIPELINE_VERSION}}` |
 
-### 18.1 Data Sources
+### 19.1 Data Sources
 
 | Dataset | Source | Version / FY | Access |
 |---|---|---|---|
@@ -739,13 +732,13 @@ This result cautions against reading the period as a demand-elasticity natural e
 
 ---
 
-## 19. Journal Positioning and Submission Strategy
+## 20. Journal Positioning and Submission Strategy
 
 > **Internal use only — remove before journal submission.**
 
 {{JOURNAL_POSITIONING_NARRATIVE}}
 
-### 19.1 Target Journals
+### 20.1 Target Journals
 
 | Journal | Impact Factor | Scope fit | Key novelty to foreground | Likely reviewer concern |
 |---|---|---|---|---|
@@ -754,7 +747,7 @@ This result cautions against reading the period as a demand-elasticity natural e
 | {{JOURNAL_3_NAME}} | {{JOURNAL_3_IF}} | {{JOURNAL_3_FIT}} | {{JOURNAL_3_NOVELTY}} | {{JOURNAL_3_CONCERN}} |
 | {{JOURNAL_4_NAME}} | {{JOURNAL_4_IF}} | {{JOURNAL_4_FIT}} | {{JOURNAL_4_NOVELTY}} | {{JOURNAL_4_CONCERN}} |
 
-### 19.2 Preemptive Reviewer Responses
+### 20.2 Preemptive Reviewer Responses
 
 The following table maps likely reviewer objections to sections in this report that provide the answer. Use these in a cover letter or author response letter.
 
@@ -767,23 +760,15 @@ The following table maps likely reviewer objections to sections in this report t
 | {{REVIEWER_Q_5}} | {{REVIEWER_A_5}} | {{REVIEWER_STRENGTH_5}} |
 | {{REVIEWER_Q_6}} | {{REVIEWER_A_6}} | {{REVIEWER_STRENGTH_6}} |
 
-### 19.3 Figure Role in the Manuscript
+### 20.3 Figure Role in the Manuscript
 
 {{FIGURE1_MANUSCRIPT_NARRATIVE}}
 
 ---
 
-## 20. Data Quality Warnings
-
-```
-{{WARNINGS}}
-```
 
 ---
 
-## 21. Configuration Reference (Technical)
-
-*See Section 18 above — this section retained for backward compatibility with older pipeline log parsers.*
 
 ---
 
