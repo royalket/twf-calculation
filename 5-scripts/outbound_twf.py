@@ -108,7 +108,7 @@ def compute_outbound_year(year: str, log: Logger = None) -> tuple[float, list[di
             "Avg_stay_days":     avg_stay,
             "Outbound_m3":       round(outbound_m3),
             "Outbound_bn_m3":    round(outbound_m3 / 1e9, 5),
-            "Scarce_m3":         round(scarce_m3),
+            "Scarce_m3":         scarce_m3,   # raw float — rounded at aggregation stage
         })
 
     ok(
@@ -244,7 +244,7 @@ def run(**kwargs):
             inbound_m3             = load_inbound_twf(year, log)
 
             # Scarce outbound
-            outbound_scarce = sum(r["Scarce_m3"] for r in dest_rows)
+            outbound_scarce = sum(r["Scarce_m3"] for r in dest_rows)  # sum exact floats first
 
             # Top 3 destinations by outbound_m3
             if dest_rows:
@@ -278,6 +278,18 @@ def run(**kwargs):
                 "Net_bn_m3":              round(net_m3 / 1e9, 5),
                 "Tourist_Multiplier":     TOURIST_WF_MULTIPLIER,
                 "Data_Status":            "PLACEHOLDER — verify MoT destination shares",
+                # ── Methodological note ──────────────────────────────────────
+                # Outbound TWF uses a per-capita activity multiplier
+                # (Lee et al. 2021: tourists × days × local_WF/365 × 1.5).
+                # Inbound TWF uses EEIO Leontief pull (W·L·Y_inbound).
+                # These are NOT methodologically equivalent — activity-based
+                # vs supply-chain-embedded water. Net balance should be
+                # treated as indicative only, not a precise bilateral comparison.
+                "Net_Balance_Method_Note": (
+                    "Outbound=activity-based (Lee et al. 2021); "
+                    "Inbound=EEIO Leontief (W·L·Y). "
+                    "Not directly comparable — indicative balance only."
+                ),
             })
             all_dest_rows.extend(dest_rows)
 

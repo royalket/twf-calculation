@@ -94,7 +94,13 @@ def check_year(year: str):
     sens_df = _safe(DIRS["indirect"] / f"indirect_twf_{year}_sensitivity.csv")
     split_df= _safe(DIRS["indirect"] / f"indirect_twf_{year}_split.csv")
     int_df  = _safe(DIRS["comparison"]/ "twf_per_tourist_intensity.csv")
-    bal_df  = _safe(DIRS["io"]        / f"io_balance_{year}.csv" if "io" in DIRS else Path("__none__"))
+    # io_balance_{year}.csv is never written by the pipeline.
+    # The balance error lives in io_summary_all_years.csv (column: balance_error_pct).
+    _io_sum = _safe(DIRS.get("io", Path("__none__")) / "io_summary_all_years.csv")
+    _fy_map = {"2015": "2015-16", "2019": "2019-20", "2022": "2021-22"}
+    _fy     = _fy_map.get(year, year)
+    bal_df  = (_io_sum[_io_sum["year"].astype(str) == _fy].copy()
+               if not _io_sum.empty and "year" in _io_sum.columns else pd.DataFrame())
 
     indirect_m3 = cat_df["Total_Water_m3"].sum() if not cat_df.empty and "Total_Water_m3" in cat_df.columns else None
     scarce_m3   = cat_df["Scarce_m3"].sum()      if not cat_df.empty and "Scarce_m3"      in cat_df.columns else None
@@ -196,14 +202,14 @@ def check_year(year: str):
                               f"{pct_chg:+.1f}% outside expected [-60%, +30%] — check data")
 
     # ── ASSERTION 7: Balance error < 1.0% ────────────────────────────────────
-    if not bal_df.empty and "Balance_Error_Pct" in bal_df.columns:
-        err = float(bal_df["Balance_Error_Pct"].iloc[0])
+    if not bal_df.empty and "balance_error_pct" in bal_df.columns:
+        err = float(bal_df["balance_error_pct"].iloc[0])
         if err < 1.0:
             _ok(f"[7] IO balance error ({year}): {err:.4f}% < 1.0%")
         else:
             _fail(f"[7] IO balance error ({year})", f"{err:.4f}% ≥ 1.0% — check SUT scaling")
     else:
-        _warn(f"[7] IO balance error ({year})", "io_balance_{year}.csv missing")
+        _warn(f"[7] IO balance error ({year})", f"io_balance_{year}.csv missing")
 
 
 # ── SDA checks (run once across all periods) ──────────────────────────────────

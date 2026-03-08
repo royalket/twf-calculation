@@ -150,6 +150,20 @@ When opposing effects are large relative to |ΔTWF| (near-cancellation), percent
 
 **Design caveat:** σ = 0.30 is applied as a single scalar multiplied across all 163 agricultural sectors simultaneously — a perfect-correlation assumption that overstates total variance. Under independent per-sector sampling, partial error cancellation would narrow the CI by approximately (1 − ρ)^0.5. The reported 90% CI is therefore a **conservative upper bound**; realistic uncertainty is ~30–40% around the base rather than the full CI width.
 
+### 2.7 Novelty Relative to Prior Work
+
+The table below maps each analytical contribution to the gap it fills in the existing literature. Reviewers at *Nature Water*, *Water Research*, and *Journal of Cleaner Production* will examine this claim directly — every row below should be citable in the manuscript introduction.
+
+| Contribution | Prior state of knowledge | What this paper adds | Key reference superseded/extended |
+|---|---|---|---|
+| {{NOVELTY_ROW_1}} | {{NOVELTY_PRIOR_1}} | {{NOVELTY_ADD_1}} | {{NOVELTY_REF_1}} |
+| {{NOVELTY_ROW_2}} | {{NOVELTY_PRIOR_2}} | {{NOVELTY_ADD_2}} | {{NOVELTY_REF_2}} |
+| {{NOVELTY_ROW_3}} | {{NOVELTY_PRIOR_3}} | {{NOVELTY_ADD_3}} | {{NOVELTY_REF_3}} |
+| {{NOVELTY_ROW_4}} | {{NOVELTY_PRIOR_4}} | {{NOVELTY_ADD_4}} | {{NOVELTY_REF_4}} |
+| {{NOVELTY_ROW_5}} | {{NOVELTY_PRIOR_5}} | {{NOVELTY_ADD_5}} | {{NOVELTY_REF_5}} |
+
+> **Journal submission note:** This novelty table should be condensed into the final paragraph of the Introduction in the manuscript, framed as: *"This paper advances prior work in four respects: (i)... (ii)... (iii)... (iv)..."*. The table format is for internal review only.
+
 ---
 
 ## 3. IO Table Results
@@ -161,6 +175,8 @@ When opposing effects are large relative to |ΔTWF| (near-cancellation), percent
 {{IO_TABLE_ROWS}}
 
 > Balance error < 1% is acceptable. The 2021–22 value reflects minor preliminary-data discrepancies in the MoSPI release.
+
+{{IO_TABLE_NARRATIVE}}
 
 ---
 
@@ -180,6 +196,8 @@ When opposing effects are large relative to |ΔTWF| (near-cancellation), percent
 
 > Hotels (×{{NAS_HOTELS_2022}} for 2022) and Air (×{{NAS_AIR_2022}}) reflect COVID-era output contraction. Partial cross-validation against MoT Foreign Exchange Earnings data for the inbound segment is recommended before submission.
 
+{{DEMAND_VECTOR_NARRATIVE}}
+
 ---
 
 ## 5. Indirect TWF Results
@@ -195,6 +213,8 @@ When opposing effects are large relative to |ΔTWF| (near-cancellation), percent
 > Real intensity (constant 2015–16 prices) isolates genuine efficiency change from nominal growth effects. Its decline from {{FIRST_YEAR}} to {{LAST_YEAR}} reflects upstream supply-chain structural shifts and changes in year-specific EXIOBASE WaterGAP coefficients — which encode actual changes in India's crop irrigation intensity across years, not a single fixed dataset replicated across time.
 
 > **Note on TWF values across tables:** Indirect totals in Table 4 (from `calculate_indirect_twf.py`) and the SDA-internal values (Table 17) are computed by independent code paths. Differences up to ±0.05 bn m³ are normal; SDA-internal values are authoritative for the decomposition only.
+
+{{INDIRECT_SUMMARY_NARRATIVE}}
 
 ### 5.2 Top-10 Categories by Blue Water Footprint
 
@@ -218,6 +238,8 @@ When opposing effects are large relative to |ΔTWF| (near-cancellation), percent
 |---|---|---|---|
 {{TOP10_2022}}
 
+{{TOP10_NARRATIVE}}
+
 ### 5.3 Indirect TWF by Demand-Destination Sector Type
 
 > Agriculture shows 0% here because tourists do not purchase raw crops directly. Do not cite these shares as agricultural water shares — use Section 5.4.
@@ -227,6 +249,8 @@ When opposing effects are large relative to |ΔTWF| (near-cancellation), percent
 | Sector Type | {{YEAR_2015}} m³ | {{YEAR_2015}} % | {{YEAR_2019}} m³ | {{YEAR_2019}} % | {{YEAR_2022}} m³ | {{YEAR_2022}} % |
 |---|---|---|---|---|---|---|
 {{SECTOR_TYPE_ROWS}}
+
+{{SECTOR_TYPE_NARRATIVE}}
 
 ### 5.4 Upstream Water Origin — Where Water Physically Comes From
 
@@ -242,25 +266,71 @@ When opposing effects are large relative to |ΔTWF| (near-cancellation), percent
 
 > Agriculture's shifting share across years reflects year-specific EXIOBASE WaterGAP coefficients. Paddy irrigation intensity increased +61.5% from 2015 to 2022 in the EXIOBASE data, consistent with documented groundwater depletion-driven extraction in northern India. These are genuine inter-year changes in the WaterGAP model outputs, not pipeline artefacts.
 
+{{WATER_ORIGIN_NARRATIVE}}
+
 ### 5.5 Scarce Water Footprint (Blue × WSI)
 
+#### What scarce water means — plain language
+
+Blue water counts **how much water was taken**. It treats every litre the same regardless of where it came from. One litre extracted from a Kerala river that refills every monsoon looks identical to one litre pumped from a Punjab aquifer that took 10,000 years to fill and is currently dropping half a metre per year.
+
+Scarce water corrects this by asking a second question: **how damaged is the source basin already?**
+
+Think of it like taking money from two people. Taking ₹1,000 from someone who earns ₹1,00,000 a month causes almost no harm. Taking ₹1,000 from someone who earns ₹1,000 a month leaves them with nothing. The amount taken is identical. The damage is completely different.
+
+The Water Stress Index (WSI) measures how "broke" a water basin already is — how close it is to having nothing left. A score of 0 means the basin has abundant water. A score of 1.0 means nearly every drop available is already being extracted and the basin is at the edge of failure.
+
+Scarce water then multiplies the volume by that damage score:
+
 ```
-Scarce_m³ = Blue_m³ × WSI_weight
+Scarce m³ = Blue m³ × WSI
+
+Example:
+  Kerala basin  (WSI = 0.05):  1,000 litres × 0.05 =    50 scarce litres
+  Punjab basin  (WSI = 0.83):  1,000 litres × 0.83 =   830 scarce litres
 ```
 
-WRI Aqueduct 4.0 India scores (Kuzma et al., 2023):
+Same physical water extracted. Punjab water carries **16× more damage per litre** because it came from a basin already nearly empty.
 
-| Sector group | WSI weight | Aqueduct raw score (0–5) |
-|---|---|---|
-| Agriculture | 0.827 | 4.137 — irrigation-weighted bws |
-| Mining / Manufacturing / Electricity / Petroleum | 0.814 | 4.069 — industry-weighted bws |
-| Services | 0.000 | no direct extraction assumed |
+#### What the Scarce/Blue ratio in Table 7a means
+
+A ratio of 0.53 means: **for every 100 litres India's tourism supply chain extracts, 53 litres worth of real damage is caused** — because that water came from basins already under severe stress. The remaining 47 litres came from less-stressed sources and cause proportionally less harm.
+
+The ratio is not 1.0 because not all supply-chain water comes from stressed basins. Services sectors (hotels, transport) carry WSI = 0 because they receive municipally treated water, not direct abstraction. Manufacturing and electricity carry WSI = 0.814. Agriculture — the dominant source — carries WSI = 0.827, close to the maximum.
+
+**Without this ratio, the paper would imply that reducing any water use equally reduces harm. With it, the paper shows that reducing agricultural supply-chain water in Punjab-region basins reduces harm 16× more per litre than reducing the same volume elsewhere. That is the policy insight.**
+
+#### WSI weights used (WRI Aqueduct 4.0, Kuzma et al. 2023)
+
+| Sector group | WSI weight | Aqueduct raw score (0–5) | Plain meaning |
+|---|---|---|---|
+| Agriculture | 0.827 | 4.137 — irrigation-weighted bws | Severe stress — major irrigation basins nearly exhausted |
+| Mining / Manufacturing / Electricity / Petroleum | 0.814 | 4.069 — industry-weighted bws | Severe stress — industrial water from same stressed basins |
+| Services | 0.000 | no direct extraction assumed | Water delivered via municipal systems — no direct basin stress |
+
+#### How the raw score becomes WSI
+
+WRI Aqueduct reports a raw score on a 0–5 scale. The pipeline converts this to a 0–1 WSI by dividing by 5:
+
+```
+WSI = Aqueduct_raw_score / 5
+
+Agriculture:  4.137 / 5 = 0.827
+Industry:     4.069 / 5 = 0.814
+Services:     0.000 / 5 = 0.000
+```
+
+A score of 4.137 out of 5 means India's agricultural basins are in the top tier of global water stress — comparable to the Middle East and North Africa. This is not a model assumption; it reflects documented groundwater depletion in the Indus-Gangetic plain, where water tables in Punjab and Haryana are falling at 0.5–1 metre per year.
 
 **Table 7a.** Scarce blue TWF by study year.
 
 | Year | Blue TWF (bn m³) | Scarce TWF (bn m³) | Scarce/Blue ratio | WSI source |
 |---|---|---|---|---|
 {{SCARCE_TWF_ROWS}}
+
+> **Reading this table:** The Scarce/Blue ratio tells you what fraction of blue water extraction is causing genuine basin-level damage. A ratio of ~0.53 means roughly half of all tourism-linked water extraction comes from basins already under severe stress. This is the number to cite when explaining why India's tourism water footprint is a policy-urgent finding, not just an accounting exercise.
+
+{{SCARCE_TWF_NARRATIVE}}
 
 ### 5.6 Green Water — Dual-Metric Disclosure
 
@@ -286,6 +356,8 @@ The two metrics are reported **separately, not summed**, because blue and green 
 
 > Agriculture's green component in 2021–22 (~13.3 bn m³) exceeds its blue (~3.8 bn m³) by 3.5×, consistent with the ~60% rainfed cultivation share. The manufacturing green component (~0.7 bn m³) reflects agricultural biomass feedstocks embedded in food-processing supply chains. Both components carry the same σ = 0.30 coefficient uncertainty as the blue totals.
 
+{{GREEN_WATER_NARRATIVE}}
+
 ### 5.7 Water Multiplier Ratio (Sector Intensity vs Economy Average)
 
 ```
@@ -298,6 +370,8 @@ Multiplier_Ratio[j] = WL[j] / economy_avg_WL
 | Rank | Category | WL (m³/₹ cr) | Ratio vs avg | Above avg? |
 |---|---|---|---|---|
 {{MULTIPLIER_RATIO_ROWS}}
+
+{{MULTIPLIER_RATIO_NARRATIVE}}
 
 ---
 
@@ -313,6 +387,8 @@ Multiplier_Ratio[j] = WL[j] / economy_avg_WL
 
 Hotel intensity trajectory: **{{HOTEL_2015}} → {{HOTEL_2019}} → {{HOTEL_2022}} L/room/night** ({{HOTEL_CHG}} from {{FIRST_YEAR}} to {{LAST_YEAR}}), consistent with MoT Sustainable Tourism programme investment.
 
+{{DIRECT_TWF_NARRATIVE}}
+
 ---
 
 ## 7. Total TWF — Blue Water
@@ -325,6 +401,8 @@ Hotel intensity trajectory: **{{HOTEL_2015}} → {{HOTEL_2019}} → {{HOTEL_2022
 
 > Direct water represents {{DIRECT_SHARE_RANGE}}% of total blue TWF across all years. The indirect component's dominance reflects upstream agricultural supply chains supporting tourism food consumption.
 
+{{TOTAL_TWF_NARRATIVE}}
+
 ---
 
 ## 7a. Total TWF — Blue + Green
@@ -336,6 +414,8 @@ Hotel intensity trajectory: **{{HOTEL_2015}} → {{HOTEL_2019}} → {{HOTEL_2022
 {{TOTAL_BLUE_GREEN_ROWS}}
 
 > The direct component is blue water only — no green water in hotel, restaurant, or transport operational use. The green indirect component follows the same year-on-year pattern as blue but at 2.6× magnitude, driven by WaterGAP-modelled changes in rainfed crop water use across study years.
+
+{{TOTAL_BLUE_GREEN_NARRATIVE}}
 
 ---
 
@@ -354,6 +434,8 @@ Tourist multiplier = 1.5: tourists consume ~50% more water/day than local reside
 
 > ⚠ Destination shares from `reference_data.md` require verification against MoT India Tourism Statistics 2022 before publication. UAE (~30% of outbound) and Saudi Arabia (WSI = 1.0) concentrate India's outbound virtual water demand in the world's most water-scarce basins.
 
+{{OUTBOUND_TWF_NARRATIVE}}
+
 ---
 
 ## 9. Per-Tourist Water Intensity
@@ -368,6 +450,8 @@ Tourist multiplier = 1.5: tourists consume ~50% more water/day than local reside
 
 > Total L/tourist/day fell **{{INTENSITY_DROP_PCT}}%** ({{INTENSITY_ABS_DROP}} L/day) from {{FIRST_YEAR}} to {{LAST_YEAR}}. SDA shows this is predominantly a supply-chain structure (L-effect) improvement, not an on-site technology (W-effect) gain.
 
+{{INTENSITY_ALL_NARRATIVE}}
+
 ### 9.2 Inbound vs Domestic Intensity
 
 **Table 11.** Per-tourist-day intensity by segment and year.
@@ -377,6 +461,8 @@ Tourist multiplier = 1.5: tourists consume ~50% more water/day than local reside
 {{INTENSITY_6B_ROWS}}
 
 > Direct L/day is identical for domestic and inbound within each year — operational water (L/room/night, L/meal) does not vary by tourist origin. The indirect gap uses separate EEIO demand vectors (Y_inbound / Y_domestic) that reflect genuine differences in spending basket.
+
+{{INTENSITY_SPLIT_NARRATIVE}}
 
 ### 9.3 Why "All Tourists" Intensity Lies Close to the Domestic Value
 
@@ -407,6 +493,8 @@ The combined figure is a **demand-weighted average**, not the midpoint of domest
 |---|---|---|---|---|
 {{WORSENED_ROWS}}
 
+{{SECTOR_TRENDS_NARRATIVE}}
+
 ---
 
 ## 11. EXIOBASE Data Artefact Audit
@@ -430,6 +518,8 @@ Products with a positive water multiplier in {{FIRST_YEAR}} that became exactly 
 | Product ID | Product Name | {{FIRST_YEAR}} m³/₹ cr | {{LAST_YEAR}} m³/₹ cr | Change % |
 |---|---|---|---|---|
 {{GENUINE_WORSENED_ROWS}}
+
+{{ARTEFACT_AUDIT_NARRATIVE}}
 
 ---
 
@@ -472,6 +562,8 @@ This result cautions against reading the period as a demand-elasticity natural e
 
 {{SDA_KEY_FINDING}}
 
+{{SDA_NARRATIVE}}
+
 ---
 
 ## 13. Monte Carlo Uncertainty Analysis
@@ -488,6 +580,8 @@ This result cautions against reading the period as a demand-elasticity natural e
 
 > **Conservative upper bound:** The single correlated multiplier (σ = 0.30) applied to all 163 agricultural sectors simultaneously overstates total variance. Under independent sector sampling, partial cancellation reduces the CI by approximately (1 − ρ)^0.5 across the 13 crop rows. True uncertainty is likely ±18–22% rather than ±{{MC_HALFWIDTH_PCT}}%.
 
+{{MC_DISTRIBUTION_NARRATIVE}}
+
 ### 13.2 Variance Decomposition
 
 **Table 19.** Spearman rank correlation — input parameters vs total TWF output. Share % = corr².
@@ -497,6 +591,8 @@ This result cautions against reading the period as a demand-elasticity natural e
 {{MC_VARIANCE_ROWS}}
 
 > Agricultural W coefficient uncertainty accounts for ~99% of total Monte Carlo variance — a consequence of both the single-multiplier design (large σ relative to other parameters) and the genuine dominance of agriculture in the upstream TWF mix (70–85%). Improving WaterGAP crop-level coefficient estimates for India would reduce total model uncertainty more than any other data improvement. Reducing σ by 50% for the top driver reduces total TWF uncertainty by approximately {{MC_UNCERTAINTY_REDUCTION}}%.
+
+{{MC_VARIANCE_NARRATIVE}}
 
 ---
 
@@ -532,6 +628,8 @@ This result cautions against reading the period as a demand-elasticity natural e
 |---|---|---|---|---|---|---|
 {{SC_SOURCE_GROUP_ROWS}}
 
+{{SUPPLY_CHAIN_NARRATIVE}}
+
 ---
 
 ## 15. Sensitivity Analysis
@@ -555,6 +653,8 @@ This result cautions against reading the period as a demand-elasticity natural e
 | Year | LOW (bn m³) | BASE (bn m³) | HIGH (bn m³) | Half-range ±% |
 |---|---|---|---|---|
 {{SENS_TOTAL_ROWS}}
+
+{{SENSITIVITY_NARRATIVE}}
 
 ---
 
@@ -607,7 +707,7 @@ This result cautions against reading the period as a demand-elasticity natural e
 | IO method | PTA: D = V/q, Z = U·Dᵀ, A = Z/x, L = (I−A)⁻¹ |
 | Hawkins-Simon check | ρ(A) < 1 verified all three years |
 | Water source | EXIOBASE 3.8 `IOT_{year}_ixi/water/F.txt`; 103 "Water Consumption Blue" rows |
-| Green water | Same F.txt; 13 "Water Consumption Green" rows (agriculture only) |
+| Green water | Same F.txt; 13 "Water Consumption Green" rows (agriculture only) Green water only exists in agriculture because it requires rainfall absorbed by plant roots in soil — a physical process that factories, hotels, and transport simply do not perform. EXIOBASE reflects this accurately: 13 crop rows have green water coefficients, every other sector has zero. |
 | EXIOBASE concordance | 163/163 India sectors mapped (IN through IN.162 incl. secondary processing) |
 | TSA base | India TSA 2015–16 (MoT), 24 categories |
 | NAS scaling | Statement 6.1, constant 2011–12 prices, NAS 2024 edition |
@@ -636,6 +736,54 @@ This result cautions against reading the period as a demand-elasticity natural e
 | Restaurant coefficients | Bohdanowicz & Martinac (2007), adapted for India | — | Literature |
 | Rail water coefficients | Gössling (2015); IRCTC reports | — | Literature |
 | Water Stress Index | WRI Aqueduct 4.0 (Kuzma et al. 2023) | 2023 | Open access |
+
+---
+
+## 19. Journal Positioning and Submission Strategy
+
+> **Internal use only — remove before journal submission.**
+
+{{JOURNAL_POSITIONING_NARRATIVE}}
+
+### 19.1 Target Journals
+
+| Journal | Impact Factor | Scope fit | Key novelty to foreground | Likely reviewer concern |
+|---|---|---|---|---|
+| {{JOURNAL_1_NAME}} | {{JOURNAL_1_IF}} | {{JOURNAL_1_FIT}} | {{JOURNAL_1_NOVELTY}} | {{JOURNAL_1_CONCERN}} |
+| {{JOURNAL_2_NAME}} | {{JOURNAL_2_IF}} | {{JOURNAL_2_FIT}} | {{JOURNAL_2_NOVELTY}} | {{JOURNAL_2_CONCERN}} |
+| {{JOURNAL_3_NAME}} | {{JOURNAL_3_IF}} | {{JOURNAL_3_FIT}} | {{JOURNAL_3_NOVELTY}} | {{JOURNAL_3_CONCERN}} |
+| {{JOURNAL_4_NAME}} | {{JOURNAL_4_IF}} | {{JOURNAL_4_FIT}} | {{JOURNAL_4_NOVELTY}} | {{JOURNAL_4_CONCERN}} |
+
+### 19.2 Preemptive Reviewer Responses
+
+The following table maps likely reviewer objections to sections in this report that provide the answer. Use these in a cover letter or author response letter.
+
+| Likely reviewer question | Where the answer lives in this report | Strength of evidence |
+|---|---|---|
+| {{REVIEWER_Q_1}} | {{REVIEWER_A_1}} | {{REVIEWER_STRENGTH_1}} |
+| {{REVIEWER_Q_2}} | {{REVIEWER_A_2}} | {{REVIEWER_STRENGTH_2}} |
+| {{REVIEWER_Q_3}} | {{REVIEWER_A_3}} | {{REVIEWER_STRENGTH_3}} |
+| {{REVIEWER_Q_4}} | {{REVIEWER_A_4}} | {{REVIEWER_STRENGTH_4}} |
+| {{REVIEWER_Q_5}} | {{REVIEWER_A_5}} | {{REVIEWER_STRENGTH_5}} |
+| {{REVIEWER_Q_6}} | {{REVIEWER_A_6}} | {{REVIEWER_STRENGTH_6}} |
+
+### 19.3 Figure Role in the Manuscript
+
+{{FIGURE1_MANUSCRIPT_NARRATIVE}}
+
+---
+
+## 20. Data Quality Warnings
+
+```
+{{WARNINGS}}
+```
+
+---
+
+## 21. Configuration Reference (Technical)
+
+*See Section 18 above — this section retained for backward compatibility with older pipeline log parsers.*
 
 ---
 

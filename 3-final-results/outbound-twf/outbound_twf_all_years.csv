@@ -1,4 +1,4 @@
-Year,Outbound_tourists_M,Avg_stay_days,Outbound_m3,Outbound_bn_m3,Outbound_Scarce_m3,Outbound_Scarce_bn_m3,Inbound_m3,Inbound_bn_m3,Net_m3,Net_bn_m3,Tourist_Multiplier,Data_Status
-2015,20.0,7.0,1884850685,1.88485,1360059880,1.36006,1437871993,1.43787,446978692,0.44698,1.5,PLACEHOLDER — verify MoT destination shares
-2019,26.9,7.0,2535124171,2.53512,1829280539,1.82928,1669776057,1.66978,865348115,0.86535,1.5,PLACEHOLDER — verify MoT destination shares
-2022,7.0,6.5,612576473,0.61258,442019462,0.44202,1618586180,1.61859,-1006009708,-1.00601,1.5,PLACEHOLDER — verify MoT destination shares
+Year,Outbound_tourists_M,Avg_stay_days,Outbound_m3,Outbound_bn_m3,Outbound_Scarce_m3,Outbound_Scarce_bn_m3,Inbound_m3,Inbound_bn_m3,Net_m3,Net_bn_m3,Tourist_Multiplier,Data_Status,Net_Balance_Method_Note
+2015,20.0,7.0,1884850685,1.88485,1360059879,1.36006,1437871993,1.43787,446978692,0.44698,1.5,PLACEHOLDER — verify MoT destination shares,Outbound=activity-based (Lee et al. 2021); Inbound=EEIO Leontief (W·L·Y). Not directly comparable — indicative balance only.
+2019,26.9,7.0,2535124171,2.53512,1829280538,1.82928,1669776057,1.66978,865348115,0.86535,1.5,PLACEHOLDER — verify MoT destination shares,Outbound=activity-based (Lee et al. 2021); Inbound=EEIO Leontief (W·L·Y). Not directly comparable — indicative balance only.
+2022,7.0,6.5,612576473,0.61258,442019461,0.44202,1618586180,1.61859,-1006009708,-1.00601,1.5,PLACEHOLDER — verify MoT destination shares,Outbound=activity-based (Lee et al. 2021); Inbound=EEIO Leontief (W·L·Y). Not directly comparable — indicative balance only.

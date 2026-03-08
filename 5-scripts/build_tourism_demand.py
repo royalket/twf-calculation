@@ -54,6 +54,8 @@ from utils import (
 # ── IO-year helper ────────────────────────────────────────────────────────────
 
 _YEAR_TO_IO: dict = {"2015": "2015-16", "2019": "2019-20", "2022": "2021-22"}
+# Base year for real-price USD conversion — update here if base year changes
+_BASE_YEAR: str = STUDY_YEARS[0]   # "2015" — drives Real_USD_M exchange rate
 
 def _cpi_mult(year: str) -> float:
     """CPI multiplier vs 2015-16 base for a study year."""
@@ -275,7 +277,7 @@ def run(**kwargs):
                 "Nominal_crore": Y.sum(),
                 "Real_crore":    Y_real.sum(),
                 "Nominal_USD_M": round(crore_to_usd_m(Y.sum(), usd_rate), 1),
-                "Real_USD_M":    round(crore_to_usd_m(Y_real.sum(), USD_INR.get("2015", 65.0)), 1),
+                "Real_USD_M":    round(crore_to_usd_m(Y_real.sum(), USD_INR.get(_BASE_YEAR, 65.0)), 1),
                 "USD_INR_Rate":  usd_rate,
                 "NonZero_Sectors": int(np.count_nonzero(Y)),
             })

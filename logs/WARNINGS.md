@@ -136,3 +136,129 @@
 - ⚠      [ 39] Mica                                           Δ=-100.0%
 - ⚠      [ 66] Paper, Paper products and newsprint            Δ=-30.2%
 - ⚠      [101] Electronic equipment including T.V             Δ=+39.0%
+
+## build_io_tables  (2026-03-08 06:45)
+
+- ⚠  Row mismatch — trimming to 140
+- ⚠  3 A column sums >= 1.0 — scaling to 0.95 (Hawkins-Simon enforcement)
+- ⚠  Row mismatch — trimming to 140
+- ⚠  1 A column sums >= 1.0 — scaling to 0.95 (Hawkins-Simon enforcement)
+- ⚠  3 sectors shifted >30.0% — review NAS scaling
+- ⚠      [ 55] Tobacco Products                               Δ=+47.8%
+- ⚠      [ 78] Drugs and medicine                             Δ=-30.6%
+- ⚠      [133] Legal services                                 Δ=-37.7%
+- ⚠  Row mismatch — trimming to 140
+- ⚠  1 products have negative total output — taking absolute value
+- ⚠  3 A column sums >= 1.0 — scaling to 0.95 (Hawkins-Simon enforcement)
+- ⚠  3 sectors shifted >30.0% — review NAS scaling
+- ⚠      [ 39] Mica                                           Δ=-100.0%
+- ⚠      [ 66] Paper, Paper products and newsprint            Δ=-30.2%
+- ⚠      [101] Electronic equipment including T.V             Δ=+39.0%
+
+## build_io_tables  (2026-03-08 07:27)
+
+- ⚠  Row mismatch — trimming to 140
+- ⚠  3 A column sums >= 1.0 — scaling to 0.95 (Hawkins-Simon enforcement)
+- ⚠  Row mismatch — trimming to 140
+- ⚠  1 A column sums >= 1.0 — scaling to 0.95 (Hawkins-Simon enforcement)
+- ⚠  3 sectors shifted >30.0% — review NAS scaling
+- ⚠      [ 55] Tobacco Products                               Δ=+47.8%
+- ⚠      [ 78] Drugs and medicine                             Δ=-30.6%
+- ⚠      [133] Legal services                                 Δ=-37.7%
+- ⚠  Row mismatch — trimming to 140
+- ⚠  1 products have negative total output — taking absolute value
+- ⚠  3 A column sums >= 1.0 — scaling to 0.95 (Hawkins-Simon enforcement)
+- ⚠  3 sectors shifted >30.0% — review NAS scaling
+- ⚠      [ 39] Mica                                           Δ=-100.0%
+- ⚠      [ 66] Paper, Paper products and newsprint            Δ=-30.2%
+- ⚠      [101] Electronic equipment including T.V             Δ=+39.0%
+
+## build_io_tables  (2026-03-08 07:31)
+
+- ⚠  Row mismatch — trimming to 140
+- ⚠  3 A column sums >= 1.0 — scaling to 0.95 (Hawkins-Simon enforcement)
+- ⚠  Row mismatch — trimming to 140
+- ⚠  1 A column sums >= 1.0 — scaling to 0.95 (Hawkins-Simon enforcement)
+- ⚠  3 sectors shifted >30.0% — review NAS scaling
+- ⚠      [ 55] Tobacco Products                               Δ=+47.8%
+- ⚠      [ 78] Drugs and medicine                             Δ=-30.6%
+- ⚠      [133] Legal services                                 Δ=-37.7%
+- ⚠  Row mismatch — trimming to 140
+- ⚠  1 products have negative total output — taking absolute value
+- ⚠  3 A column sums >= 1.0 — scaling to 0.95 (Hawkins-Simon enforcement)
+- ⚠  3 sectors shifted >30.0% — review NAS scaling
+- ⚠      [ 39] Mica                                           Δ=-100.0%
+- ⚠      [ 66] Paper, Paper products and newsprint            Δ=-30.2%
+- ⚠      [101] Electronic equipment including T.V             Δ=+39.0%
+
+## build_io_tables  (2026-03-08 07:53)
+
+- ⚠  Row mismatch — trimming to 140
+- ⚠  3 A column sums >= 1.0 — scaling to 0.95 (Hawkins-Simon enforcement)
+- ⚠  Row mismatch — trimming to 140
+- ⚠  1 A column sums >= 1.0 — scaling to 0.95 (Hawkins-Simon enforcement)
+- ⚠  3 sectors shifted >30.0% — review NAS scaling
+- ⚠      [ 55] Tobacco Products                               Δ=+47.8%
+- ⚠      [ 78] Drugs and medicine                             Δ=-30.6%
+- ⚠      [133] Legal services                                 Δ=-37.7%
+- ⚠  Row mismatch — trimming to 140
+- ⚠  1 products have negative total output — taking absolute value
+- ⚠  3 A column sums >= 1.0 — scaling to 0.95 (Hawkins-Simon enforcement)
+- ⚠  3 sectors shifted >30.0% — review NAS scaling
+- ⚠      [ 39] Mica                                           Δ=-100.0%
+- ⚠      [ 66] Paper, Paper products and newsprint            Δ=-30.2%
+- ⚠      [101] Electronic equipment including T.V             Δ=+39.0%
+
+## build_io_tables  (2026-03-08 07:55)
+
+- ⚠  Row mismatch — trimming to 140
+- ⚠  3 A column sums >= 1.0 — scaling to 0.95 (Hawkins-Simon enforcement)
+- ⚠  Row mismatch — trimming to 140
+- ⚠  1 A column sums >= 1.0 — scaling to 0.95 (Hawkins-Simon enforcement)
+- ⚠  3 sectors shifted >30.0% — review NAS scaling
+- ⚠      [ 55] Tobacco Products                               Δ=+47.8%
+- ⚠      [ 78] Drugs and medicine                             Δ=-30.6%
+- ⚠      [133] Legal services                                 Δ=-37.7%
+- ⚠  Row mismatch — trimming to 140
+- ⚠  1 products have negative total output — taking absolute value
+- ⚠  3 A column sums >= 1.0 — scaling to 0.95 (Hawkins-Simon enforcement)
+- ⚠  3 sectors shifted >30.0% — review NAS scaling
+- ⚠      [ 39] Mica                                           Δ=-100.0%
+- ⚠      [ 66] Paper, Paper products and newsprint            Δ=-30.2%
+- ⚠      [101] Electronic equipment including T.V             Δ=+39.0%
+
+## build_io_tables  (2026-03-08 08:47)
+
+- ⚠  Row mismatch — trimming to 140
+- ⚠  3 A column sums >= 1.0 — scaling to 0.95 (Hawkins-Simon enforcement)
+- ⚠  Row mismatch — trimming to 140
+- ⚠  1 A column sums >= 1.0 — scaling to 0.95 (Hawkins-Simon enforcement)
+- ⚠  3 sectors shifted >30.0% — review NAS scaling
+- ⚠      [ 55] Tobacco Products                               Δ=+47.8%
+- ⚠      [ 78] Drugs and medicine                             Δ=-30.6%
+- ⚠      [133] Legal services                                 Δ=-37.7%
+- ⚠  Row mismatch — trimming to 140
+- ⚠  1 products have negative total output — taking absolute value
+- ⚠  3 A column sums >= 1.0 — scaling to 0.95 (Hawkins-Simon enforcement)
+- ⚠  3 sectors shifted >30.0% — review NAS scaling
+- ⚠      [ 39] Mica                                           Δ=-100.0%
+- ⚠      [ 66] Paper, Paper products and newsprint            Δ=-30.2%
+- ⚠      [101] Electronic equipment including T.V             Δ=+39.0%
+
+## build_io_tables  (2026-03-08 11:13)
+
+- ⚠  Row mismatch — trimming to 140
+- ⚠  3 A column sums >= 1.0 — scaling to 0.95 (Hawkins-Simon enforcement)
+- ⚠  Row mismatch — trimming to 140
+- ⚠  1 A column sums >= 1.0 — scaling to 0.95 (Hawkins-Simon enforcement)
+- ⚠  3 sectors shifted >30.0% — review NAS scaling
+- ⚠      [ 55] Tobacco Products                               Δ=+47.8%
+- ⚠      [ 78] Drugs and medicine                             Δ=-30.6%
+- ⚠      [133] Legal services                                 Δ=-37.7%
+- ⚠  Row mismatch — trimming to 140
+- ⚠  1 products have negative total output — taking absolute value
+- ⚠  3 A column sums >= 1.0 — scaling to 0.95 (Hawkins-Simon enforcement)
+- ⚠  3 sectors shifted >30.0% — review NAS scaling
+- ⚠      [ 39] Mica                                           Δ=-100.0%
+- ⚠      [ 66] Paper, Paper products and newsprint            Δ=-30.2%
+- ⚠      [101] Electronic equipment including T.V             Δ=+39.0%
