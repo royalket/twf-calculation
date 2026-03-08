@@ -921,6 +921,36 @@ def fill_report_template(start_ts: float, steps_req: list,
                 top_str += f"| {rank} | {row['Category_Name']} | {w:,.0f} | {100*w/tot_w:.1f}% |\n"
         text = text.replace(f"{{{{TOP10_{yr}}}}}", top_str or "| - | - | - | - |\n")
 
+    # ── Top-10 combined table (ranked by last study year total, show each year's m3 and %)
+    try:
+        last_yr = STUDY_YEARS[-1]
+        cat_last = _safe_csv(DIRS["indirect"] / f"indirect_twf_{last_yr}_by_category.csv")
+        top10_combined = ""
+        if not cat_last.empty and "Total_Water_m3" in cat_last.columns and "Category_Name" in cat_last.columns:
+            top_cats = list(cat_last.nlargest(10, "Total_Water_m3")["Category_Name"])
+            # Preload per-year dataframes and totals
+            per_year = {yr: _safe_csv(DIRS["indirect"] / f"indirect_twf_{yr}_by_category.csv") for yr in STUDY_YEARS}
+            totals = {yr: (per_year[yr]["Total_Water_m3"].sum() if not per_year[yr].empty and "Total_Water_m3" in per_year[yr].columns else 0.0)
+                      for yr in STUDY_YEARS}
+            for rank, cat in enumerate(top_cats, 1):
+                row_vals = []
+                for yr in STUDY_YEARS:
+                    df = per_year[yr]
+                    if df.empty or "Category_Name" not in df.columns or "Total_Water_m3" not in df.columns:
+                        w = 0.0
+                    else:
+                        sel = df[df["Category_Name"] == cat]
+                        w = float(sel["Total_Water_m3"].sum()) if not sel.empty else 0.0
+                    pct = 100 * w / totals[yr] if totals[yr] else 0.0
+                    row_vals.append((w, pct))
+                w15, p15 = row_vals[0]
+                w19, p19 = row_vals[1] if len(row_vals) > 1 else (0.0, 0.0)
+                w22, p22 = row_vals[-1]
+                top10_combined += (f"| {rank} | {cat} | {w15:,.0f} | {p15:.1f}% | {w19:,.0f} | {p19:.1f}% | {w22:,.0f} | {p22:.1f}% |\n")
+        text = text.replace("{{TOP10_COMBINED}}", top10_combined or "| - | - | - | - | - | - | - | - |\n")
+    except Exception:
+        text = text.replace("{{TOP10_COMBINED}}", "| - | - | - | - | - | - | - | - |\n")
+
     # ── Sector type (destination view) ──
     sect: dict = {}
     for yr in STUDY_YEARS:
