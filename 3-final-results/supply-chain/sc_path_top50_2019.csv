@@ -1,0 +1,51 @@
+Rank,Path,Source_Group,Source_Name,Category_Name,Water_m3,Scarce_m3,Share_pct
+1,Paddy → Processed Fruit/Veg,Agriculture,Paddy,Processed Fruit/Veg,572096842.0395428,473124088.36670184,9.930822146307307
+2,Other oil seeds → Processed Fruit/Veg,Agriculture,Other oil seeds,Processed Fruit/Veg,289150978.83766407,239127859.49874818,5.019267252080084
+3,Wheat → Processed Fruit/Veg,Agriculture,Wheat,Processed Fruit/Veg,279294107.6133785,230976226.99626404,4.848165389852591
+4,Paddy → Beverages,Agriculture,Paddy,Beverages,249274941.0694117,206150376.26440346,4.327073536127749
+5,Petroleum products → Hotels & Restaurants,Petroleum,Petroleum products,Hotels & Restaurants,234651612.78722632,191006412.80880222,4.073232469919922
+6,Electricity → Road Transport,Electricity,Electricity,Road Transport,232953267.96035072,189623960.11972547,4.043751516382973
+7,Rapeseed and mustard → Processed Fruit/Veg,Agriculture,Rapeseed and mustard,Processed Fruit/Veg,176749866.85833585,146172139.89184374,3.0681370061334947
+8,Paddy → Grain Mill & Bakery,Agriculture,Paddy,Grain Mill & Bakery,132642272.94042934,109695159.72173506,2.302489237586645
+9,Electricity → Hotels & Restaurants,Electricity,Electricity,Hotels & Restaurants,121771675.97801694,99122144.24610579,2.113790476948417
+10,Other food crops → Processed Fruit/Veg,Agriculture,Other food crops,Processed Fruit/Veg,114789225.251457,94930689.28295495,1.9925846404267251
+11,Paddy → Road Transport,Agriculture,Paddy,Road Transport,112661889.92093363,93171382.96461211,1.955656995908241
+12,Wheat → Road Transport,Agriculture,Wheat,Road Transport,102957741.24107213,85146052.00636666,1.7872061890877302
+13,Petroleum products → Road Transport,Petroleum,Petroleum products,Road Transport,96290036.80414362,78380089.95857291,1.6714639195600398
+14,Wheat → Beverages,Agriculture,Wheat,Beverages,96142607.8219974,79509936.66879185,1.6689047531858898
+15,Petroleum products → Air Transport,Petroleum,Petroleum products,Air Transport,95522159.78602785,77755038.06582667,1.658134620153389
+16,Paddy → Hotels & Restaurants,Agriculture,Paddy,Hotels & Restaurants,94184807.88279925,77890836.11907499,1.6349200122023266
+17,Paddy → Ready Made Garments,Agriculture,Paddy,Ready Made Garments,80393600.28973356,66485507.43960965,1.3955234280483597
+18,Wheat → Railway Transport,Agriculture,Wheat,Railway Transport,77731743.39568971,64284151.78823539,1.3493172170519276
+19,Sugarcane → Beverages,Agriculture,Sugarcane,Beverages,76163062.18851542,62986852.429902256,1.3220870473884048
+20,Sugarcane → Grain Mill & Bakery,Agriculture,Sugarcane,Grain Mill & Bakery,74795537.19061208,61855909.25663619,1.298348675600873
+21,Wheat → Other Services,Agriculture,Wheat,Other Services,74742257.7416702,61811847.15236126,1.2974238169185413
+22,Sugarcane → Processed Fruit/Veg,Agriculture,Sugarcane,Processed Fruit/Veg,72618851.83786924,60055790.46991786,1.2605643818972083
+23,Paddy → Other Services,Agriculture,Paddy,Other Services,69336478.9061295,57341268.05536909,1.2035868574509052
+24,Electricity → Health & Social Work,Electricity,Electricity,Health & Social Work,64875406.91344551,52808581.22754464,1.1261487223560165
+25,Electricity → Processed Fruit/Veg,Electricity,Electricity,Processed Fruit/Veg,63833810.12070229,51960721.43825166,1.108068020389509
+26,Vegetables → Processed Fruit/Veg,Agriculture,Vegetables,Processed Fruit/Veg,57194240.841934904,47299637.17628016,0.9928141388954956
+27,Groundnut → Processed Fruit/Veg,Agriculture,Groundnut,Processed Fruit/Veg,57099723.96733513,47221471.72098615,0.991173454657266
+28,Wheat → Hotels & Restaurants,Agriculture,Wheat,Hotels & Restaurants,52786773.51411063,43654661.69616949,0.9163065077884219
+29,Wheat → Ready Made Garments,Agriculture,Wheat,Ready Made Garments,50837886.423535764,42042932.072264075,0.8824764817202208
+30,Electricity → Air Transport,Electricity,Electricity,Air Transport,49438068.74818145,40242587.961019695,0.8581775530254873
+31,Wheat → Grain Mill & Bakery,Agriculture,Wheat,Grain Mill & Bakery,49297964.55262714,40769416.685022645,0.8557455349723179
+32,Paddy → Health & Social Work,Agriculture,Paddy,Health & Social Work,48213871.668464534,39872871.86982017,0.8369271587262348
+33,Paddy → Railway Transport,Agriculture,Paddy,Railway Transport,45552559.734895885,37671966.90075889,0.7907304075015729
+34,Other livestock products → Processed Fruit/Veg,Agriculture,Other livestock products,Processed Fruit/Veg,42723905.24825684,35332669.6403084,0.741628817428078
+35,Paddy → Air Transport,Agriculture,Paddy,Air Transport,42131196.103244536,34842499.17738323,0.7313401937701969
+36,Electricity → Ready Made Garments,Electricity,Electricity,Ready Made Garments,40679873.81463201,33113417.285110455,0.7061472151237838
+37,Petroleum products → Health & Social Work,Petroleum,Petroleum products,Health & Social Work,40440886.275726214,32918881.428441137,0.7019987168807308
+38,Other food crops → Road Transport,Agriculture,Other food crops,Road Transport,40023167.50688314,33099159.528192353,0.694747687866541
+39,Petroleum products → Processed Fruit/Veg,Petroleum,Petroleum products,Processed Fruit/Veg,39410770.32326374,32080367.043136682,0.6841173066678918
+40,Electricity → Other Chemicals,Electricity,Electricity,Other Chemicals,38346745.34700536,31214250.712462362,0.6656472819763022
+41,"Paper, Paper products and news → Health & Social Work",Manufacturing,"Paper, Paper products and newsprint",Health & Social Work,36384365.84289208,29616873.79611415,0.6315830459818641
+42,Paddy → Other Chemicals,Agriculture,Paddy,Other Chemicals,35979342.63385582,29754916.358198762,0.6245523945982165
+43,Wheat → Health & Social Work,Agriculture,Wheat,Health & Social Work,33946202.52775,28073509.49044925,0.589259850908794
+44,Fruits → Processed Fruit/Veg,Agriculture,Fruits,Processed Fruit/Veg,32830366.06282159,27150712.733953454,0.5698904493262513
+45,Electricity → Beverages,Electricity,Electricity,Beverages,28524045.31555339,23218572.886860456,0.49513858512505415
+46,Coconut → Processed Fruit/Veg,Agriculture,Coconut,Processed Fruit/Veg,26967452.487836268,22302083.207440592,0.46811825326800843
+47,Wheat → Air Transport,Agriculture,Wheat,Air Transport,24634940.428859837,20373095.734667085,0.42762902013532333
+48,Electricity → Real Estate,Electricity,Electricity,Real Estate,24634260.410647854,20052287.974267352,0.4276172159451527
+49,Processed fruits & Processed V → Processed Fruit/Veg,Manufacturing,Processed fruits & Processed Vegetables,Processed Fruit/Veg,24362823.831820037,19831338.59910151,0.42290544655532114
+50,Other food crops → Ready Made Garments,Agriculture,Other food crops,Ready Made Garments,24217564.207714967,20027925.599780276,0.42038393728272294

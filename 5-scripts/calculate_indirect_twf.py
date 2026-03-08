@@ -825,6 +825,39 @@ def _process_year(year: str, out_dir: Path, log: Logger) -> dict | None:
         save_csv(sens_df, out_dir / f"indirect_twf_{year}_sensitivity.csv",
                  f"Sensitivity {year}", log=log)
 
+        # ── Supply-chain top-50 paths (sc_path_top50_{year}.csv) ──────────────
+        # One row per source×destination pair, ranked by water volume.
+        # Used by visualise_results.py fig5 bubble matrix and compare_years.py
+        # Tables 20-22 (consolidated supply-chain path table).
+        try:
+            sc_dir = DIRS.get("supply_chain",
+                              out_dir.parent / "supply-chain")
+            sc_dir.mkdir(parents=True, exist_ok=True)
+
+            # struct_df has columns: Category_ID, Category_Name,
+            #   Source_ID, Source_Name, Source_Group, Water_m3, Scarce_m3
+            if not struct_df.empty:
+                top50 = (struct_df[struct_df["Water_m3"] > 0]
+                         .copy()
+                         .sort_values("Water_m3", ascending=False)
+                         .head(50))
+                total_w = float(struct_df["Water_m3"].sum()) or 1.0
+                top50["Rank"]      = range(1, len(top50) + 1)
+                top50["Share_pct"] = 100 * top50["Water_m3"] / total_w
+                top50["Path"]      = (top50["Source_Name"].str[:30]
+                                      + " → " + top50["Category_Name"].str[:25])
+                out_cols = ["Rank", "Path", "Source_Group", "Source_Name",
+                            "Category_Name", "Water_m3", "Scarce_m3",
+                            "Share_pct"]
+                save_csv(top50[out_cols],
+                         sc_dir / f"sc_path_top50_{year}.csv",
+                         f"SC top-50 paths {year}", log=log)
+                ok(f"sc_path_top50_{year}.csv: {len(top50)} rows written", log)
+            else:
+                warn(f"struct_df empty for {year} — sc_path_top50 not written", log)
+        except Exception as _sc_err:
+            warn(f"sc_path_top50_{year}: {_sc_err}", log)
+
         # Inbound/domestic split
         if inp["Y_inb"] is not None and inp["Y_dom"] is not None:
             split_df = compute_split_twf(W_140, L, inp["Y_inb"], inp["Y_dom"],

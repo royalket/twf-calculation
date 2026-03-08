@@ -112,3 +112,21 @@
 - ⚠  BASE direct TWF = 6.971 bn m³ — unusually high (>5 bn m³). Verify activity data coefficients.
 - ⚠  BASE direct TWF = 10.888 bn m³ — unusually high (>5 bn m³). Verify activity data coefficients.
 - ⚠  BASE direct TWF = 8.050 bn m³ — unusually high (>5 bn m³). Verify activity data coefficients.
+
+## calculate_direct_twf  (2026-03-08 12:40)
+
+- ⚠  BASE direct TWF = 6.971 bn m³ — unusually high (>5 bn m³). Verify activity data coefficients.
+- ⚠  BASE direct TWF = 10.888 bn m³ — unusually high (>5 bn m³). Verify activity data coefficients.
+- ⚠  BASE direct TWF = 8.050 bn m³ — unusually high (>5 bn m³). Verify activity data coefficients.
+
+## calculate_direct_twf  (2026-03-08 13:02)
+
+- ⚠  BASE direct TWF = 6.971 bn m³ — unusually high (>5 bn m³). Verify activity data coefficients.
+- ⚠  BASE direct TWF = 10.888 bn m³ — unusually high (>5 bn m³). Verify activity data coefficients.
+- ⚠  BASE direct TWF = 8.050 bn m³ — unusually high (>5 bn m³). Verify activity data coefficients.
+
+## calculate_direct_twf  (2026-03-08 13:26)
+
+- ⚠  BASE direct TWF = 6.971 bn m³ — unusually high (>5 bn m³). Verify activity data coefficients.
+- ⚠  BASE direct TWF = 10.888 bn m³ — unusually high (>5 bn m³). Verify activity data coefficients.
+- ⚠  BASE direct TWF = 8.050 bn m³ — unusually high (>5 bn m³). Verify activity data coefficients.

@@ -22,3 +22,23 @@
 
 - ⚠  Figure 8 — Uncertainty anatomy (half-violin + tornado) — ERROR: 'Text' object has no property 'annotation_clip'
 - ⚠  FAILED: Figure 8 — Uncertainty anatomy (half-violin + tornado)
+
+## visualise_results  (2026-03-08 12:40)
+
+- ⚠  Figure 2 — Anatomy plate (radial decomposition + sparklines) — ERROR: list index out of range
+- ⚠  Missing: sc_path_top50_2015.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2019.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2022.csv — panel will be skipped
+- ⚠  FAILED: Figure 2 — Anatomy plate (radial decomposition + sparklines)
+
+## visualise_results  (2026-03-08 13:03)
+
+- ⚠  Missing: sc_path_top50_2015.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2019.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2022.csv — panel will be skipped
+
+## visualise_results  (2026-03-08 13:26)
+
+- ⚠  Missing: sc_path_top50_2015.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2019.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2022.csv — panel will be skipped
