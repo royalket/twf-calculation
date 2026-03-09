@@ -48,3 +48,57 @@
 - ⚠  Missing: sc_path_top50_2015.csv — panel will be skipped
 - ⚠  Missing: sc_path_top50_2019.csv — panel will be skipped
 - ⚠  Missing: sc_path_top50_2022.csv — panel will be skipped
+
+## visualise_results  (2026-03-08 14:20)
+
+- ⚠  Missing: sc_path_top50_2015.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2019.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2022.csv — panel will be skipped
+
+## visualise_results  (2026-03-08 14:26)
+
+- ⚠  Missing: sc_path_top50_2015.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2019.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2022.csv — panel will be skipped
+
+## visualise_results  (2026-03-09 06:08)
+
+- ⚠  Missing: sc_path_top50_2015.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2019.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2022.csv — panel will be skipped
+
+## visualise_results  (2026-03-09 06:38)
+
+- ⚠  Missing: sc_path_top50_2015.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2019.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2022.csv — panel will be skipped
+
+## visualise_results  (2026-03-09 06:44)
+
+- ⚠  Missing: sc_path_top50_2015.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2019.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2022.csv — panel will be skipped
+
+## visualise_results  (2026-03-09 07:17)
+
+- ⚠  Missing: sc_path_top50_2015.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2019.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2022.csv — panel will be skipped
+
+## visualise_results  (2026-03-09 07:19)
+
+- ⚠  Missing: sc_path_top50_2015.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2019.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2022.csv — panel will be skipped
+
+## visualise_results  (2026-03-09 09:06)
+
+- ⚠  Missing: sc_path_top50_2015.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2019.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2022.csv — panel will be skipped
+
+## visualise_results  (2026-03-09 09:38)
+
+- ⚠  Missing: sc_path_top50_2015.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2019.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2022.csv — panel will be skipped

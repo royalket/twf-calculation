@@ -4,17 +4,17 @@ INDIA TOURISM WATER FOOTPRINT — RESULTS SUMMARY
 1. TOTAL WATER FOOTPRINT
 ────────────────────────────────────────
 Year    Total (bn m³)     Indirect     Direct   Ind%   Dir%
-2015          12.1243       5.1534     6.9709   42.5   57.5
-2019          16.6485       5.7608    10.8877   34.6   65.4 (+37.3%)
-2022          13.4343       5.3846     8.0497   40.1   59.9 (+10.8%)
+2015           6.9975       5.1534     1.8441   73.6   26.4
+2019           8.7550       5.7608     2.9942   65.8   34.2 (+25.1%)
+2022           7.6936       5.3846     2.3090   70.0   30.0 (+9.9%)
 
 2. PER-TOURIST INTENSITY
 ────────────────────────────────────────
 Year    L/day (all)     Indirect    Direct  Inb/Dom ratio
   ──────────────────────────────────────────────────────
-2015          2,340          995     1,346             5×  (base)
-2019          1,667          577     1,090             5×  -29%
-2022          1,521          610       912             8×  -35%
+2015          1,351          995       356             8×  (base)
+2019            876          577       300            10×  -35%
+2022            871          610       261            14×  -36%
 
 3. SECTOR TRENDS (2015→2022)
 ────────────────────────────────────────
@@ -33,8 +33,8 @@ Most worsened:
 
 4. KEY FINDINGS
 ────────────────────────────────────────
-• Total TWF increased 10.8% from 2015 to 2022.
+• Total TWF increased 9.9% from 2015 to 2022.
 • Agriculture dominates indirect water (>65% of upstream origin).
 • Hotel water: 1,251.0 → 818.0 L/room/night (-34.6%).
-• Indirect water avg 39% of total TWF.
+• Indirect water avg 70% of total TWF.
 • COVID-19 depressed 2022 direct water vs 2019.

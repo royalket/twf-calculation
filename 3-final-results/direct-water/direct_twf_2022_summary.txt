@@ -2,23 +2,28 @@ DIRECT TWF — FY 2022
 ============================================================
 
 Activity Data
-  Domestic tourists   : 1731.0 M
-  Inbound tourists    : 8.58 M
-  Avg stay (domestic) : 5.0 days
-  Avg stay (inbound)  : 20.5 days
-  Tourist-nights (dom): 8655.0 M
-  Tourist-nights (inb): 175.9 M
-  Tourist-nights total: 8830.9 M
+  Domestic tourists      : 1731.0 M
+  Inbound tourists       : 8.58 M
+  Avg stay (domestic)    : 5.0 days
+  Avg stay (inbound)     : 20.5 days
+  Dom hotel share        : 15%  (NSS Report 580, Table 3.14; Census 2011)
+  Inb hotel share        : 100%  (structural; MoT IPS / TSA 2015-16 Table 3)
+  Hotel-nights (dom)     : 1298.2 M
+  Hotel-nights (inb)     : 175.9 M
+  Hotel-nights total     : 1474.1 M
+  Rail modal share (dom) : 25%  (NSS Report 580, Table 3.6)
+  Avg tourist rail km    : 261 km  (MoR Annual Statistical Statement Table 2)
+  Tourist rail pkm       : 112.9B pkm
 
 BASE Scenario
-  Hotels      :   7,223,668,020 m³  (89.7%)
-  Restaurants :     706,471,200 m³  (8.8%)
-  Rail        :     118,125,000 m³  (1.5%)
-  Air         :       1,404,000 m³  (0.0%)
-  TOTAL       :   8,049,668,220 m³  = 8.0497 bn m³
+  Hotels      :   1,205,846,520 m³  (52.2%)
+  Restaurants :     706,471,200 m³  (30.6%)
+  Rail        :     395,317,125 m³  (17.1%)
+  Air         :       1,404,000 m³  (0.1%)
+  TOTAL       :   2,309,038,845 m³  = 2.3090 bn m³
 
 Sensitivity (LOW / BASE / HIGH)
-  LOW:  4.9193 bn m³
-  BASE: 8.0497 bn m³
-  HIGH: 12.1559 bn m³
-  Range: ±44.9% around BASE
+  LOW:  1.4689 bn m³
+  BASE: 2.3090 bn m³
+  HIGH: 3.3305 bn m³
+  Range: ±40.3% around BASE

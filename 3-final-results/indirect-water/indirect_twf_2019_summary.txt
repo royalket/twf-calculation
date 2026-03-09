@@ -6,7 +6,7 @@ Scarce TWF:   2,696,963,548 m³  (2.6970 billion m³)
   (Scarce = Blue × WSI; WSI from WRI Aqueduct 4.0, Kuzma et al. 2023)
   Agriculture WSI=0.827 (Irr-weighted bws); Industry WSI=0.814 (Ind-weighted)
 
-Tourism demand: ₹1,405,015 crore  ($200,716M @ ₹70.0/USD)
+Tourism demand: ₹1,405,015 crore  ($199,548M @ ₹70.41/USD)
 Blue intensity: 4100.2 m³/₹ crore
 
 Top 20 categories (blue TWF, destination view):

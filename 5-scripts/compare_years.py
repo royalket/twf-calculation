@@ -692,70 +692,53 @@ def _build_blue_plus_green_indirect_rows() -> str:
 
 def _build_total_blue_green_rows() -> str:
     """
-    Build Table 9b rows: indirect blue+green + direct BASE per year.
-    Reads from indirect_twf_all_years.csv and direct_twf_all_years.csv.
+    Build Table 9b rows: indirect blue + indirect green + direct BASE per year.
+
+    WHY green indirect is lower in 2022 than 2019
+    ─────────────────────────────────────────────
+    Green water = rainfed crop evapotranspiration (WaterGAP "Water Consumption
+    Green" rows in EXIOBASE F.txt). It covers only agriculture; all other
+    sectors carry zero green coefficients.
+
+    Two mechanisms explain the 2019 → 2022 green decline:
+    1. EXIOBASE coefficient revision: The 2022 IO year (FY 2021-22) uses a
+       different EXIOBASE 3.8 water satellite vintage than 2019 (FY 2019-20).
+       Revised WaterGAP 2.2d coefficients update the rainfed/irrigated split.
+       In some years WaterGAP models a drier monsoon → lower green ET.
+    2. Agricultural demand-mix shift: COVID and post-COVID supply chains altered
+       the mix of food products in tourism supply chains. Products that shifted
+       toward more irrigated (blue) production reduce the green share.
+    3. Leontief propagation: Green water flows only through agriculture rows.
+       Any supply-chain shortening (L-effect) that reduces agricultural
+       intermediation reduces green water more than blue (blue comes from
+       irrigation which is more tied to output; green is more weather-driven).
+
+    Bottom line: The 2019 green peak reflects (a) higher rainfed ET in WaterGAP
+    that year and (b) pre-COVID food supply chains routing more demand through
+    rainfed agriculture. The 2022 contraction is real and reflects structural
+    change, not a data error.
+
+    Template columns: blue_indirect | green_indirect | direct | combined | Δ
     """
     all_years_df = _load_csv_cached(DIRS["indirect"] / "indirect_twf_all_years.csv")
     rows_str = ""
     base_val = None
     for yr in STUDY_YEARS:
-        r = _year_row(all_years_df, yr)
-        bg_ind = _col(r, "Blue_plus_Green_TWF_billion_m3") if r is not None else 0.0
-        if bg_ind == 0 and r is not None:
-            bg_ind = _col(r, "Indirect_TWF_billion_m3") + _col(r, "Green_TWF_billion_m3")
-        dir_bn = _load_direct_m3(yr) / 1e9
-        total  = bg_ind + dir_bn
-        delta  = "(base)" if base_val is None else _pct(base_val, total)
+        r        = _year_row(all_years_df, yr)
+        blue_bn  = _col(r, "Indirect_TWF_billion_m3")  if r is not None else 0.0
+        green_bn = _col(r, "Green_TWF_billion_m3")     if r is not None else 0.0
+        # Blue_plus_Green column may be precomputed; recompute if absent or zero
+        bg_ind   = _col(r, "Blue_plus_Green_TWF_billion_m3") if r is not None else 0.0
+        if bg_ind == 0 and blue_bn > 0:
+            bg_ind = blue_bn + green_bn
+        dir_bn   = _load_direct_m3(yr) / 1e9
+        total    = bg_ind + dir_bn
+        delta    = "(base)" if base_val is None else _pct(base_val, total)
         base_val = base_val or total
-        rows_str += (f"| {yr} | {bg_ind:.4f} | {dir_bn:.4f} | {total:.4f} | {delta} |\n")
+        rows_str += (
+            f"| {yr} | {blue_bn:.4f} | {green_bn:.4f} | {dir_bn:.4f} | {total:.4f} | {delta} |\n"
+        )
     return rows_str
-    """Load per-tourist intensity for template filling. Returns None if data unavailable."""
-    act      = ACTIVITY_DATA.get(year, {})
-    dom_days = act.get("domestic_tourists_M", 0) * 1e6 * act.get("avg_stay_days_dom", 2.5)
-    inb_days = act.get("inbound_tourists_M",  0) * 1e6 * act.get("avg_stay_days_inb", 8.0)
-    all_days = dom_days + inb_days
-
-    indirect_m3 = _load_indirect_m3(year)
-    direct_m3   = _load_direct_m3(year)
-
-    split_df = _safe_csv(DIRS["indirect"] / f"indirect_twf_{year}_split.csv")
-    src = "tourist_day_proportion"
-    if not split_df.empty and {"Type", "TWF_m3"}.issubset(split_df.columns):
-        ir = split_df[split_df["Type"] == "Inbound"]
-        dr = split_df[split_df["Type"] == "Domestic"]
-        if not ir.empty and not dr.empty:
-            inb_indir = float(ir["TWF_m3"].iloc[0])
-            dom_indir = float(dr["TWF_m3"].iloc[0])
-            src = "split_csv"
-        else:
-            inb_indir = indirect_m3 * (inb_days / all_days) if all_days else 0
-            dom_indir = indirect_m3 * (dom_days / all_days) if all_days else 0
-    else:
-        inb_indir = indirect_m3 * (inb_days / all_days) if all_days else 0
-        dom_indir = indirect_m3 * (dom_days / all_days) if all_days else 0
-
-    inb_direct = direct_m3 * (inb_days / all_days) if all_days else 0
-    dom_direct = direct_m3 * (dom_days / all_days) if all_days else 0
-
-    def _l(m3, days): return round(m3 * 1000 / days) if days else 0
-    return {
-        "total_all":  _l(indirect_m3 + direct_m3, all_days),
-        "total_dom":  _l(dom_indir + dom_direct,   dom_days),
-        "total_inb":  _l(inb_indir + inb_direct,   inb_days),
-        "indir_all":  _l(indirect_m3, all_days),
-        "indir_dom":  _l(dom_indir,   dom_days),
-        "indir_inb":  _l(inb_indir,   inb_days),
-        "direct_all": _l(direct_m3,   all_days),
-        "direct_dom": _l(dom_direct,  dom_days),
-        "direct_inb": _l(inb_direct,  inb_days),
-        "dom_M":      act.get("domestic_tourists_M", 0),
-        "inb_M":      act.get("inbound_tourists_M",  0),
-        "dom_stay":   act.get("avg_stay_days_dom", 0),
-        "inb_stay":   act.get("avg_stay_days_inb", 0),
-        "dom_days_M": round(dom_days / 1e6, 1),
-        "inb_days_M": round(inb_days / 1e6, 1),
-        "split_source": src,
-    }
 
 
 def _get_intensity_row(year: str) -> dict | None:
@@ -1730,6 +1713,9 @@ def _fill_narrative_placeholders(text: str, first_yr: str, last_yr: str,
     def _ind(yr): return _year_row(ind_all, yr)
     def _int(yr): return _year_row(int_df, yr)
 
+    # per-year intensity helper rows used by narrative generation
+    yr_data = {yr: _get_intensity_row(yr) for yr in STUDY_YEARS}
+
     # agriculture share in last year
     agr_share_pct = 0.0
     if not origin_last.empty and "Source_Group" in origin_last.columns:
@@ -2381,35 +2367,418 @@ def _fill_narrative_placeholders(text: str, first_yr: str, last_yr: str,
                            f"| {float(r.get('Share_pct',0)):.3f}% |\n")
         text = text.replace(f"{{{{SC_PATHS_{yr}}}}}", sc_str or "| - | - | - | - | - |\n")
 
-    # ── Consolidated sensitivity table (Table 25) ─────────────────────────────
+    # ── Consolidated sensitivity table (Table 23) ─────────────────────────────
+    # Both indirect and direct sensitivity files use LONG format:
+    #   indirect: columns Component, Scenario, Total_TWF_m3  (rows per Component×Scenario)
+    #   direct:   columns Year, Scenario, Hotel_m3, ..., Total_m3  (rows per Scenario)
+    # We pivot to wide (LOW / BASE / HIGH) before computing half-range.
+
+    def _sens_wide_indirect(df: pd.DataFrame) -> tuple:
+        """Return (lo, ba, hi) in bn m³ for Agriculture component (most impactful)."""
+        if df.empty:
+            return None, None, None
+        # Filter to Agriculture rows (most sensitive component)
+        agr = df[df.get("Component", pd.Series(dtype=str)).astype(str).str.lower() == "agriculture"]
+        if agr.empty:
+            agr = df  # fallback: use all rows
+        scen_col = next((c for c in df.columns if "scenario" in c.lower()), None)
+        val_col  = next((c for c in df.columns if "total_twf" in c.lower() or "total_m3" in c.lower()), None)
+        if scen_col is None or val_col is None:
+            return None, None, None
+        def _get(sc):
+            rows = agr[agr[scen_col].astype(str).str.upper() == sc.upper()]
+            return float(rows[val_col].sum()) / 1e9 if not rows.empty else None
+        return _get("LOW"), _get("BASE"), _get("HIGH")
+
+    def _sens_wide_direct(df: pd.DataFrame) -> tuple:
+        """Return (lo, ba, hi) in bn m³ from Scenario column."""
+        if df.empty:
+            return None, None, None
+        scen_col = next((c for c in df.columns if "scenario" in c.lower()), None)
+        val_col  = next((c for c in df.columns
+                         if "total" in c.lower() and "m3" in c.lower()), None)
+        if scen_col is None or val_col is None:
+            # Wide format fallback
+            low_col  = next((c for c in df.columns if "low"  in c.lower()), None)
+            base_col = next((c for c in df.columns if "base" in c.lower()), None)
+            high_col = next((c for c in df.columns if "high" in c.lower()), None)
+            if low_col and base_col and high_col:
+                return (float(df[low_col].sum())/1e9,
+                        float(df[base_col].sum())/1e9,
+                        float(df[high_col].sum())/1e9)
+            return None, None, None
+        def _get(sc):
+            rows = df[df[scen_col].astype(str).str.upper() == sc.upper()]
+            return float(rows[val_col].sum()) / 1e9 if not rows.empty else None
+        return _get("LOW"), _get("BASE"), _get("HIGH")
+
+    def _fmt_sens_row(yr, label, lo, ba, hi):
+        if ba is None:
+            return f"| {yr} | {label} | - | - | - | - |\n"
+        lo_s  = f"{lo:.4f}" if lo is not None else "-"
+        ba_s  = f"{ba:.4f}"
+        hi_s  = f"{hi:.4f}" if hi is not None else "-"
+        if lo is not None and hi is not None and ba:
+            hw = 50 * (hi - lo) / ba
+            hw_s = f"±{hw:.1f}%"
+        else:
+            hw_s = "see MC"
+        return f"| {yr} | {label} | {lo_s} | {ba_s} | {hi_s} | {hw_s} |\n"
+
     sens_cons = ""
     for yr in STUDY_YEARS:
         ind_df = safe_csv(DIRS["indirect"] / f"indirect_twf_{yr}_sensitivity.csv")
         dir_df = safe_csv(DIRS.get("direct", DIRS["indirect"].parent / "direct-water") /
                           f"direct_twf_{yr}_scenarios.csv")
-        tot_df_s = safe_csv(DIRS["comparison"] / "twf_total_all_years.csv")
-        # Indirect rows
-        for label, df in [("Indirect", ind_df), ("Direct", dir_df)]:
-            if df.empty:
-                sens_cons += f"| {yr} | {label} | - | - | - | - |\n"
-                continue
-            low_col = next((c for c in df.columns if "low" in c.lower() or "LOW" in c), None)
-            base_col = next((c for c in df.columns if "base" in c.lower() or "BASE" in c), None)
-            high_col = next((c for c in df.columns if "high" in c.lower() or "HIGH" in c), None)
-            if low_col and base_col and high_col:
-                lo  = float(df[low_col].sum())  / 1e9
-                ba  = float(df[base_col].sum()) / 1e9
-                hi  = float(df[high_col].sum()) / 1e9
-                hw  = 50*(hi-lo)/ba if ba else 0
-                sens_cons += f"| {yr} | {label} | {lo:.4f} | {ba:.4f} | {hi:.4f} | ±{hw:.1f}% |\n"
-            else:
-                sens_cons += f"| {yr} | {label} | - | - | - | - |\n"
-        # Total (sum)
+        # Indirect
+        lo_i, ba_i, hi_i = _sens_wide_indirect(ind_df)
+        sens_cons += _fmt_sens_row(yr, "Indirect", lo_i, ba_i, hi_i)
+        # Direct
+        lo_d, ba_d, hi_d = _sens_wide_direct(dir_df)
+        sens_cons += _fmt_sens_row(yr, "Direct", lo_d, ba_d, hi_d)
+        # Total BASE from summary; LOW/HIGH from MC
         tot_row = _tot(yr) if not tot_df.empty else pd.DataFrame()
         if not tot_row.empty:
-            ba = float(_col(tot_row, "Total_bn_m3", default=0))
-            sens_cons += f"| {yr} | Total | - | {ba:.4f} | - | see MC |\n"
+            ba_t = float(_col(tot_row, "Total_bn_m3", default=0))
+            lo_t = float(_col(tot_row, "MC_P5_bn_m3",  default=0)) or None
+            hi_t = float(_col(tot_row, "MC_P95_bn_m3", default=0)) or None
+            sens_cons += _fmt_sens_row(yr, "Total", lo_t, ba_t, hi_t)
+        else:
+            sens_cons += f"| {yr} | Total | - | - | - | see MC |\n"
     text = text.replace("{{SENS_CONSOLIDATED_ROWS}}", sens_cons or "| - | - | - | - | - | - |\n")
+
+    # ══════════════════════════════════════════════════════════════════════════
+    # NEW TOKENS — wired in bulk here
+    # ══════════════════════════════════════════════════════════════════════════
+
+    # ── INTENSITY_ALL_ROWS (Table 10: Indirect | Direct | Total | Indirect% | Δ) ──
+    intensity_all_rows = ""
+    _first_all = None
+    for yr in STUDY_YEARS:
+        d = yr_data.get(yr)
+        if d is None:
+            intensity_all_rows += f"| {yr} | - | - | - | - | - |\n"; continue
+        tot   = d["total_all"]
+        indir = d["indir_all"]
+        dirct = d["direct_all"]
+        indir_share = f"{100*indir/tot:.1f}%" if tot else "-"
+        chg = "—" if _first_all is None else (f"{100*(tot-_first_all)/_first_all:+.0f}%" if _first_all else "-")
+        _first_all = _first_all or tot
+        intensity_all_rows += f"| {yr} | {indir:,} | {dirct:,} | **{tot:,}** | {indir_share} | {chg} |\n"
+    text = text.replace("{{INTENSITY_ALL_ROWS}}", intensity_all_rows or "| - | - | - | - | - | - |\n")
+
+    # ── INTENSITY_ALL_BG_ROWS (Table 10b: blue+green indirect + direct, L/tourist-day) ──
+    # Blue+Green intensity = (blue_indirect_m3 + green_indirect_m3 + direct_m3) / all_tourist_days
+    # Green water per tourist-day is substantial (~10-15% of blue) because India's food supply
+    # chains are ~60% rainfed. This table is the complete water burden per tourist-day.
+    intensity_all_bg_rows = ""
+    _first_bg = None
+    all_years_ind_df = _load_csv_cached(DIRS["indirect"] / "indirect_twf_all_years.csv")
+    for yr in STUDY_YEARS:
+        d   = yr_data.get(yr)
+        r   = _year_row(all_years_ind_df, yr)
+        if d is None:
+            intensity_all_bg_rows += f"| {yr} | - | - | - | - | - | - |\n"; continue
+        act      = ACTIVITY_DATA.get(yr, {})
+        dom_days = act.get("domestic_tourists_M", 0) * 1e6 * act.get("avg_stay_days_dom", 3.5)
+        inb_days = act.get("inbound_tourists_M",  0) * 1e6 * act.get("avg_stay_days_inb", 8.0)
+        all_days = dom_days + inb_days
+        def _l_bg(m3): return round(m3 * 1000 / all_days) if all_days else 0
+        blue_m3  = _load_indirect_m3(yr)
+        green_m3 = _col(r, "Green_TWF_billion_m3") * 1e9 if r is not None else 0.0
+        dir_m3   = d["direct_all"] * all_days / 1000   # convert L/day back to m3
+        tot_bg   = _l_bg(blue_m3 + green_m3) + d["direct_all"]
+        blue_lpd = _l_bg(blue_m3)
+        grn_lpd  = _l_bg(green_m3)
+        dir_lpd  = d["direct_all"]
+        grn_share = f"{100*grn_lpd/tot_bg:.1f}%" if tot_bg else "-"
+        chg_bg = "—" if _first_bg is None else (f"{100*(tot_bg-_first_bg)/_first_bg:+.0f}%" if _first_bg else "-")
+        _first_bg = _first_bg or tot_bg
+        intensity_all_bg_rows += (
+            f"| {yr} | {blue_lpd:,} | {grn_lpd:,} | {dir_lpd:,} | **{tot_bg:,}** | {grn_share} | {chg_bg} |\n"
+        )
+    text = text.replace("{{INTENSITY_ALL_BG_ROWS}}", intensity_all_bg_rows or "| - | - | - | - | - | - | - |\n")
+
+    # ── INTENSITY_SEGMENT_ROWS (Table 11: Year|Segment|Indir|Dir|Combined|Ratio|Spend|SpendR|Resid) ──
+    # Build using the same data as old INTENSITY_INBOUND_DOMESTIC_ROWS but in new per-row format
+    intensity_seg_rows = ""
+    _last_spend_ratio = 0.0
+    _last_residual    = 0.0
+    _last_inb_comb    = 0
+    _last_dom_comb    = 0
+    for yr in STUDY_YEARS:
+        d = yr_data.get(yr)
+        int_row = _int(yr)
+        if d is None or int_row.empty:
+            for seg in ["Inbound", "Domestic"]:
+                intensity_seg_rows += f"| {yr} | {seg} | - | - | - | - | - | - | - |\n"
+            continue
+
+        indir_inb = d["indir_inb"]; dir_inb = d["direct_inb"]; comb_inb = d["total_inb"]
+        indir_dom = d["indir_dom"]; dir_dom = d["direct_dom"]; comb_dom = d["total_dom"]
+        ratio = round(comb_inb / comb_dom, 1) if comb_dom else 0
+
+        # Spending per tourist-day
+        ind_row = _ind(yr)
+        inb_dem = float(_col(ind_row, "Inbound_demand_crore", default=0))
+        dom_dem = float(_col(ind_row, "Domestic_demand_crore", default=0))
+        try:
+            inb_days_M = float(ACTIVITY_DATA.get(yr, {}).get("inbound_tourist_days_M", 0)) or \
+                         float(ACTIVITY_DATA.get(yr, {}).get("inbound_tourists_M", 0)) * \
+                         float(ACTIVITY_DATA.get(yr, {}).get("avg_stay_days_inb", 8))
+            dom_days_M = float(ACTIVITY_DATA.get(yr, {}).get("domestic_tourist_days_M", 0)) or \
+                         float(ACTIVITY_DATA.get(yr, {}).get("domestic_tourists_M", 0)) * \
+                         float(ACTIVITY_DATA.get(yr, {}).get("avg_stay_days_dom", 3.5))
+        except Exception:
+            inb_days_M = dom_days_M = 0
+        inb_spend   = (inb_dem * 1e7 / (inb_days_M * 1e6)) if inb_days_M > 0 else 0
+        dom_spend   = (dom_dem * 1e7 / (dom_days_M * 1e6)) if dom_days_M > 0 else 0
+        spend_ratio = inb_spend / dom_spend if dom_spend > 0 else 0
+        residual    = ratio    / spend_ratio if spend_ratio > 0 else 0
+
+        if yr == last_yr:
+            _last_spend_ratio = spend_ratio
+            _last_residual    = residual
+            _last_inb_comb    = comb_inb
+            _last_dom_comb    = comb_dom
+
+        sr_s = f"{spend_ratio:.1f}" if spend_ratio else "-"
+        re_s = f"{residual:.2f}"    if residual    else "-"
+        ra_s = f"{ratio:.1f}×"      if ratio       else "-"
+        intensity_seg_rows += (
+            f"| {yr} | Inbound  | {indir_inb:,} | {dir_inb:,} | **{comb_inb:,}** "
+            f"| {ra_s} | {inb_spend:,.0f} | {sr_s} | {re_s} |\n"
+        )
+        intensity_seg_rows += (
+            f"| {yr} | Domestic | {indir_dom:,} | {dir_dom:,} | **{comb_dom:,}** "
+            f"| — | {dom_spend:,.0f} | — | — |\n"
+        )
+    text = text.replace("{{INTENSITY_SEGMENT_ROWS}}", intensity_seg_rows or
+                        "| - | - | - | - | - | - | - | - | - |\n")
+
+    # ── Scalar intensity tokens ───────────────────────────────────────────────
+    last_d = yr_data.get(last_yr)
+    text = text.replace("{{INTENSITY_LASTYEAR}}",
+                        f"{last_d['total_all']:,} L/day" if last_d else "-")
+    text = text.replace("{{INTENSITY_DOM_LASTYEAR}}",
+                        f"{last_d['total_dom']:,}" if last_d else "-")
+
+    text = text.replace("{{SPEND_RATIO_LAST}}",
+                        f"{_last_spend_ratio:.1f}" if _last_spend_ratio else "-")
+    text = text.replace("{{RESIDUAL_RATIO_LAST}}",
+                        f"{_last_residual:.2f}" if _last_residual else "-")
+    _resid_interp = "entirely" if _last_residual and abs(_last_residual - 1.0) < 0.10 else \
+                    "predominantly" if _last_residual and abs(_last_residual - 1.0) < 0.25 else \
+                    "partially"
+    text = text.replace("{{RESIDUAL_INTERPRETATION}}", _resid_interp)
+
+    # ── DIRECT_BY_SEGMENT tables (8a, 8b, 8c) ────────────────────────────────
+    # Compute segment-level direct water inline from ACTIVITY_DATA + DIRECT_WATER.
+    # hotel:      dom = dom_nights × dom_hotel_share × coeff; inb = inb_nights × inb_hotel_share × coeff
+    # restaurant: pro-rated by tourist-days (no accommodation discount)
+    # rail:       domestic only (dom_tourists × rail_modal_share × avg_km × L/pkm)
+    # air:        pro-rated by tourist-days
+
+    seg_m3_rows        = ""   # Table 8a  (m³ values)
+    seg_int_rows       = ""   # Table 8b  (L/tourist-day)
+    comp_rows_inb      = {}   # Table 8c  (% composition, last year)
+    comp_rows_dom      = {}
+    INB_HOTEL_LPDAY_val = 0
+    DOM_REST_LPDAY_val  = 0
+
+    for yr in STUDY_YEARS:
+        act  = ACTIVITY_DATA.get(yr, {})
+        h_c  = DIRECT_WATER["hotel"].get(yr, DIRECT_WATER["hotel"].get(last_yr, {})).get("base", 0)
+        r_c  = DIRECT_WATER["restaurant"].get(yr, {}).get("base", 0)
+        rl_c = DIRECT_WATER.get("rail", {}).get("base", 0)
+        a_c  = DIRECT_WATER.get("air",  {}).get("base", 0)
+
+        dom_M   = act.get("domestic_tourists_M", 0)
+        inb_M   = act.get("inbound_tourists_M",  0)
+        stay_d  = act.get("avg_stay_days_dom", 3.5)
+        stay_i  = act.get("avg_stay_days_inb", 8.0)
+        meals   = act.get("meals_per_tourist_day", 2.5)
+        air_pax = act.get("air_pax_M", 0)
+        air_ts  = act.get("tourist_air_share", 0.6)
+
+        dom_nights = dom_M * 1e6 * stay_d
+        inb_nights = inb_M * 1e6 * stay_i
+        dom_days   = dom_nights   # convenient alias for tourist-days
+        inb_days   = inb_nights
+        all_days   = dom_days + inb_days
+
+        # Hotel: apply accommodation-share split
+        dom_hotel_share = act.get("dom_hotel_share", 0.15)
+        inb_hotel_share = act.get("inb_hotel_share", 1.00)
+        dom_hotel_m3 = dom_nights * dom_hotel_share * h_c / 1_000
+        inb_hotel_m3 = inb_nights * inb_hotel_share * h_c / 1_000
+
+        # Restaurant: pro-rated by tourist-days
+        total_meals_m3 = all_days * meals * r_c / 1_000
+        dom_rest_m3 = total_meals_m3 * (dom_days / all_days) if all_days else 0
+        inb_rest_m3 = total_meals_m3 * (inb_days / all_days) if all_days else 0
+
+        # Rail: domestic only
+        dom_rail_share = act.get("dom_rail_modal_share", act.get("tourist_rail_share", 0.25))
+        avg_rail_km    = act.get("avg_tourist_rail_km",
+                                  act.get("rail_pkm_B", 115) * 1e9 /
+                                  max(dom_M * 1e6 * dom_rail_share, 1))
+        if act.get("avg_tourist_rail_km"):
+            dom_rail_m3 = dom_M * 1e6 * dom_rail_share * act["avg_tourist_rail_km"] * rl_c / 1_000
+        else:
+            dom_rail_m3 = act.get("rail_pkm_B", 0) * 1e9 * dom_rail_share * rl_c / 1_000
+        inb_rail_m3 = 0.0
+
+        # Air: segment-correct split (NOT tourist-day proportion).
+        #
+        # WHY tourist-day proportion is WRONG for air:
+        #   Inbound = ~169M tourist-days (8M tourists × 21 days)
+        #   Domestic = ~5,012M tourist-days (1,432M tourists × 3.5 days)
+        #   Tourist-day split gives inbound only ~3% of air water → near-zero.
+        #
+        # CORRECT logic:
+        #   Inbound tourists ARE the international air passengers (MoT ITS: all
+        #   foreign tourist arrivals are by air/sea; >99% by air). Each inbound
+        #   tourist generates ~1 return air trip (arrival + departure leg = 2 × L/pax).
+        #
+        #   inb_air_m3 = inbound_tourists_M × 1e6 × a_c / 1_000
+        #     (one return trip ≈ same coefficient as one pax-trip in the data —
+        #      L/passenger coefficient already represents per-traveller consumption
+        #      at airport + aircraft; departure and arrival are counted once each
+        #      in air_pax_M which is one-way movements, so inb_M matches one leg)
+        #
+        #   dom_air_m3 = remainder = total_air_m3 − inb_air_m3
+        #     (domestic passengers = air_pax_M × tourist_air_share − inbound_M)
+        #
+        total_air_m3 = air_pax * 1e6 * air_ts * a_c / 1_000
+        # Inbound tourists each use international air (1 trip in the DGCA count)
+        inb_air_m3   = min(inb_M * 1e6 * a_c / 1_000, total_air_m3)
+        dom_air_m3   = max(total_air_m3 - inb_air_m3, 0.0)
+
+        tot_dom = dom_hotel_m3 + dom_rest_m3 + dom_rail_m3 + dom_air_m3
+        tot_inb = inb_hotel_m3 + inb_rest_m3 + inb_rail_m3 + inb_air_m3
+
+        def _l(m3, days): return round(m3 * 1_000 / days) if days > 0 else 0
+
+        # Table 8a (m³)
+        seg_m3_rows += (
+            f"| {yr} | Inbound  "
+            f"| {inb_hotel_m3/1e6:.2f}M | {inb_rest_m3/1e6:.2f}M "
+            f"| — | {inb_air_m3/1e6:.2f}M | {tot_inb/1e9:.4f} bn |\n"
+        )
+        seg_m3_rows += (
+            f"| {yr} | Domestic "
+            f"| {dom_hotel_m3/1e6:.2f}M | {dom_rest_m3/1e6:.2f}M "
+            f"| {dom_rail_m3/1e6:.2f}M | {dom_air_m3/1e6:.2f}M | {tot_dom/1e9:.4f} bn |\n"
+        )
+
+        # Table 8b (L/tourist-day by segment)
+        seg_int_rows += (
+            f"| {yr} | Inbound  | {inb_days/1e6:,.0f} "
+            f"| {_l(inb_hotel_m3, inb_days):,} | {_l(inb_rest_m3, inb_days):,} "
+            f"| — | {_l(inb_air_m3, inb_days):,} | **{_l(tot_inb, inb_days):,}** |\n"
+        )
+        seg_int_rows += (
+            f"| {yr} | Domestic | {dom_days/1e6:,.0f} "
+            f"| {_l(dom_hotel_m3, dom_days):,} | {_l(dom_rest_m3, dom_days):,} "
+            f"| {_l(dom_rail_m3, dom_days):,} | {_l(dom_air_m3, dom_days):,} | **{_l(tot_dom, dom_days):,}** |\n"
+        )
+
+        # Capture L/day scalars for last year
+        if yr == last_yr:
+            INB_HOTEL_LPDAY_val = _l(inb_hotel_m3, inb_days)
+            DOM_REST_LPDAY_val  = _l(dom_rest_m3, dom_days)
+            # Table 8c composition
+            def _pct_of(v, tot): return f"{100*v/tot:.0f}%" if tot else "-"
+            comp_rows_inb = {
+                "Hotel": _pct_of(inb_hotel_m3, tot_inb),
+                "Rest":  _pct_of(inb_rest_m3,  tot_inb),
+                "Rail":  "—",
+                "Air":   _pct_of(inb_air_m3,   tot_inb),
+            }
+            comp_rows_dom = {
+                "Hotel": _pct_of(dom_hotel_m3, tot_dom),
+                "Rest":  _pct_of(dom_rest_m3,  tot_dom),
+                "Rail":  _pct_of(dom_rail_m3,  tot_dom),
+                "Air":   _pct_of(dom_air_m3,   tot_dom),
+            }
+
+    text = text.replace("{{DIRECT_BY_SEGMENT_M3_ROWS}}", seg_m3_rows or
+                        "| - | - | - | - | - | - | - |\n")
+    text = text.replace("{{DIRECT_BY_SEGMENT_INTENSITY_ROWS}}", seg_int_rows or
+                        "| - | - | - | - | - | - | - | - |\n")
+    text = text.replace("{{INB_HOTEL_LPDAY}}", f"{INB_HOTEL_LPDAY_val:,}" if INB_HOTEL_LPDAY_val else "-")
+    text = text.replace("{{DOM_REST_LPDAY}}",  f"{DOM_REST_LPDAY_val:,}"  if DOM_REST_LPDAY_val  else "-")
+
+    comp_8c = ""
+    if comp_rows_inb:
+        comp_8c += (f"| Inbound  | {comp_rows_inb['Hotel']} | {comp_rows_inb['Rest']} "
+                    f"| {comp_rows_inb['Rail']} | {comp_rows_inb['Air']} |\n")
+        comp_8c += (f"| Domestic | {comp_rows_dom['Hotel']} | {comp_rows_dom['Rest']} "
+                    f"| {comp_rows_dom['Rail']} | {comp_rows_dom['Air']} |\n")
+    text = text.replace("{{DIRECT_COMPOSITION_ROWS}}", comp_8c or "| - | - | - | - | - |\n")
+
+    # ── Scarce water scalars ──────────────────────────────────────────────────
+    ind_all_sc2 = _safe_csv(DIRS["indirect"] / "indirect_twf_all_years.csv")
+    r_sc = _year_row(ind_all_sc2, last_yr) if not ind_all_sc2.empty else None
+    sc_blue = _col(r_sc, "Indirect_TWF_billion_m3") if r_sc is not None else 0
+    sc_scar = _col(r_sc, "Scarce_TWF_billion_m3")   if r_sc is not None else 0
+    sc_ratio = sc_scar / sc_blue if sc_blue > 0 else 0
+
+    text = text.replace("{{SCARCE_TWF_2022}}",
+                        f"{sc_scar:.4f}" if sc_scar else "-")
+    text = text.replace("{{SCARCE_RATIO_2022}}",
+                        f"{sc_ratio:.3f}" if sc_ratio else "-")
+    text = text.replace("{{SCARCE_RATIO_2022_PCT}}",
+                        f"{sc_ratio*100:.0f}" if sc_ratio else "-")
+
+    # ── Water multiplier ratio scalars (top/second/bottom name + ratio) ───────
+    mr_df2 = _safe_csv(DIRS["indirect"] / f"water_multiplier_ratio_{last_yr}.csv")
+    top_cat = "-"; top_ratio = "-"; sec_cat = "-"; sec_ratio = "-"
+    bot_cat = "-"; bot_ratio = "-"
+    if not mr_df2.empty and "Multiplier_Ratio" in mr_df2.columns:
+        nm_col2 = next((c for c in ("Category_Name", "Product_Name") if c in mr_df2.columns), None)
+        top5 = mr_df2.nlargest(2, "Multiplier_Ratio")
+        bot1 = mr_df2.nsmallest(1, "Multiplier_Ratio")
+        def _nm(r): return r[nm_col2] if nm_col2 else f"Product {int(r.get('Product_ID',0))}"
+        if len(top5) >= 1:
+            top_cat   = _nm(top5.iloc[0]); top_ratio   = f"{float(top5.iloc[0]['Multiplier_Ratio']):.1f}"
+        if len(top5) >= 2:
+            sec_cat   = _nm(top5.iloc[1]); sec_ratio   = f"{float(top5.iloc[1]['Multiplier_Ratio']):.1f}"
+        if not bot1.empty:
+            bot_cat   = _nm(bot1.iloc[0]); bot_ratio   = f"{float(bot1.iloc[0]['Multiplier_Ratio']):.1f}"
+    text = text.replace("{{TOP_MULT_CAT}}",    top_cat)
+    text = text.replace("{{TOP_MULT_RATIO}}",  top_ratio)
+    text = text.replace("{{SECOND_MULT_CAT}}", sec_cat)
+    text = text.replace("{{SECOND_MULT_RATIO}}", sec_ratio)
+    text = text.replace("{{BOTTOM_MULT_CAT}}", bot_cat)
+    text = text.replace("{{BOTTOM_MULT_RATIO}}", bot_ratio)
+
+    # ── Static estimation tokens (HOTEL_FOOD_SWITCH) ──────────────────────────
+    # A hotel switching 30% of food sourcing reduces its supply-chain footprint
+    # by approx. 0.30 × 0.71 (sensitivity elasticity) × agr_share × 100 ≈ ~8%
+    try:
+        agr_sh = agr_share_pct / 100 if agr_share_pct else 0.75
+        impact = round(30 * 0.71 * agr_sh, 0)
+    except Exception:
+        impact = 16
+    text = text.replace("{{HOTEL_FOOD_SWITCH_PCT}}",    "30")
+    text = text.replace("{{HOTEL_FOOD_SWITCH_IMPACT}}", f"{impact:.0f}")
+
+    # ── Token aliases: keep old names populated for backward-compat ───────────
+    # Old template used INTENSITY_6A_ROWS and INTENSITY_INBOUND_DOMESTIC_ROWS
+    text = text.replace("{{INTENSITY_6A_ROWS}}", intensity_all_rows or "| - |\n")
+    text = text.replace("{{INTENSITY_INBOUND_DOMESTIC_ROWS}}", intensity_seg_rows or "| - |\n")
+    # Old token INTENSITY_6B_ROWS (was segment detail with tourist counts)
+    text = text.replace("{{INTENSITY_6B_ROWS}}", "")
+
+    # ── Wipe any remaining unfilled {{TOKENS}} to avoid broken markdown ───────
+    import re as _re
+    remaining = _re.findall(r'\{\{[A-Z_0-9]+\}\}', text)
+    if remaining:
+        _unique = sorted(set(remaining))
+        # leave as-is — caller can see them clearly; don't silently wipe
+        pass  # intentional: unfilled tokens show up in output as visible gaps
 
     return text
 

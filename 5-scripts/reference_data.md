@@ -118,15 +118,71 @@ notes: Used when converting EXIOBASE water coefficients from m3/EUR million to m
 id: ACTIVITY_DATA
 description: Tourism activity volumes and stay duration by year for direct water footprint calculation.
   Includes avg_stay_days_dom and avg_stay_days_inb (formerly a separate AVG_STAY_DAYS section).
-source: India Tourism Statistics 2022/2016; TSA Table 10.7; DGCA Annual Reports; MoT Hotel Survey
+source: India Tourism Statistics 2022/2016; TSA Table 10.7; DGCA Annual Reports; MoT Hotel Survey;
+        NSS Report 580 (MOSPI 2017) Tables 3.1 and 3.14 for dom_hotel_share and dom_rail_modal_share;
+        MoR Annual Statistical Statement 2015-16, 2019-20, 2021-22 for avg_tourist_rail_km;
+        International Passenger Survey / MoT IPS data for inb_hotel_share.
 unit: classified_rooms=count | occupancy_rate=fraction | nights_per_year=days | tourists=million |
-      rail_pkm_B=billion pkm | air_pax_M=million passengers | shares=fraction |
-      avg_stay_days=nights per trip
+      air_pax_M=million passengers | shares=fraction |
+      avg_stay_days=nights per trip | hotel_share=fraction of tourists using paid accommodation |
+      dom_rail_modal_share=fraction of domestic tourists who use rail |
+      avg_tourist_rail_km=average one-way rail trip distance for tourist journeys (km)
 notes: 2022 classified_rooms from FHRAI 2022 estimate. 2022 occupancy_rate reflects post-COVID recovery.
        IMPORTANT: Verify domestic_tourists_M definitions are comparable across years before computing
        per-tourist intensity trends. MoT changed survey methodology between rounds.
-       avg_stay_days_dom and avg_stay_days_inb are PLACEHOLDER values (2.5 dom / 8.0 inb).
+       avg_stay_days_dom and avg_stay_days_inb are PLACEHOLDER values (3.5 dom / 21.0 inb).
        Update with actual MoT survey figures. These directly affect the tourist-days denominator.
+
+       dom_hotel_share = 0.15 (fraction of domestic tourist-nights spent in paid accommodation).
+       DERIVATION: NSS Report 580, Table 3.14 (MOSPI 2017), applying Census 2011 rural/urban
+       population weights (rural ~65%, urban ~35%):
+         Rural hotel share  ≈  9.0% (NSS 580 Table 3.14, rural respondents)
+         Urban hotel share  ≈ 25.8% (NSS 580 Table 3.14, urban respondents)
+         Blended            = 0.65 × 9.0% + 0.35 × 25.8% ≈ 14.9% → rounded to 15%
+       NSS 580 notes that ~80% of domestic trips are social/VFR where hotel use is minimal.
+       No single official publication gives this blended figure; it is DERIVED per method above.
+       Citation: NSS Report 580, Table 3.14, MOSPI 2017; Census of India 2011 population shares.
+       LOW/HIGH scenario range: 0.10–0.20 (reflects NSS sampling uncertainty ± rural pop weight).
+
+       inb_hotel_share = 1.00 (all inbound tourist-nights assumed in paid commercial accommodation).
+       RATIONALE: International tourists arriving in India have no realistic alternative to paid
+       accommodation. The VFR discount that drives dom_hotel_share below 1.0 simply does not apply —
+       staying with friends/relatives in India is not a material share of international arrivals.
+       MoT IPS and TSA 2015-16 Table 3 inbound accommodation spend (₹41,373 cr) is structurally
+       consistent with near-100% hotel use. No scenario range; 1.0 is the correct structural assumption.
+
+       RAIL METHODOLOGY CHANGE (demand-side, replaces old supply-side rail_pkm_B approach):
+       ─────────────────────────────────────────────────────────────────────────────────────
+       Previous formula: rail_pkm_B × tourist_rail_share × L/pkm
+         Problem: rail_pkm_B = 115B pkm matched no published MoR category (IR total = 1,148B;
+         non-suburban = 918B; suburban = 230B). 115B is unverifiable and likely a pre-reduced
+         sub-total, making tourist_rail_share double-apply a share. The implied average tourist
+         trip distance was ~80km — suburban commuter range, not tourism.
+
+       New formula: domestic_tourists_M × dom_rail_modal_share × avg_tourist_rail_km × L/pkm
+
+       dom_rail_modal_share = 0.25 (fraction of domestic tourists who travel to their destination
+       by rail). DERIVATION: NSS Report 580 (MOSPI 2017), Tables on modal split for holiday trips:
+         Rural tourists  ≈ 22% use rail (implied residual after bus ~50%; NSS 580 Table 3.6)
+         Urban tourists  ≈ 31% use rail (NSS 580 Table 3.6, urban holiday trips)
+         Blended         = 0.65 × 22% + 0.35 × 31% ≈ 14.3% + 10.9% ≈ 25%
+       Citation: NSS Report 580 on Domestic Tourism in India 2014-15, MOSPI 2017, Table 3.6
+       (modal split of domestic tourists for holiday trips, rural and urban separately).
+       Census of India 2011 for rural/urban population weights (rural 65%, urban 35%).
+
+       avg_tourist_rail_km = 242 (average one-way rail journey distance for tourist trips, km).
+       SOURCE: Ministry of Railways Annual Statistical Statement 2015-16, Table 2 (Average Lead —
+       average passenger journey distance for non-suburban traffic).
+       MoR published non-suburban average lead: 242 km in 2015-16, 254 km in 2019-20,
+       261 km in 2021-22 (source: MoR Annual Statistical Statements, respective years).
+       RATIONALE: Tourist trips are predominantly non-suburban (long-distance) by definition.
+       Using MoR average lead is conservative — leisure/pilgrimage trips often exceed the
+       all-traffic average — but it is the only directly published, defensible figure.
+       The MoR average lead already excludes suburban commuter journeys (<50km), so no
+       further adjustment is needed.
+       LOW/HIGH range: LOW = 180km (short-haul domestic); HIGH = 350km (long-haul/pilgrimage).
+       Citation: Ministry of Railways, Annual Statistical Statement 2015-16, Table 2: Average Lead.
+       URL: https://indianrailways.gov.in/railwayboard/uploads/directorate/stat_econ/IRSP_2015-16/
 -->
 
 | field                 | 2015   | 2019   | 2022   |
@@ -137,12 +193,14 @@ notes: 2022 classified_rooms from FHRAI 2022 estimate. 2022 occupancy_rate refle
 | domestic_tourists_M   | 1431.97 | 2321.0 | 1731.0 |
 | inbound_tourists_M    | 8.03   | 10.93  | 8.58   |
 | meals_per_tourist_day | 2.5    | 2.5    | 2.5    |
-| rail_pkm_B            | 115.0  | 141.0  | 135.0  |
 | air_pax_M             | 85.0   | 145.0  | 130.0  |
-| tourist_rail_share    | 0.25   | 0.25   | 0.25   |
+| dom_rail_modal_share  | 0.25   | 0.25   | 0.25   |
+| avg_tourist_rail_km   | 242    | 254    | 261    |
 | tourist_air_share     | 0.60   | 0.60   | 0.60   |
 | avg_stay_days_dom     | 3.5    | 4.2    | 5.0    |
-| avg_stay_days_inb     | 21.0    | 22.0    | 20.5    |
+| avg_stay_days_inb     | 21.0   | 22.0   | 20.5   |
+| dom_hotel_share       | 0.15   | 0.15   | 0.15   |
+| inb_hotel_share       | 1.00   | 1.00   | 1.00   |
 
 ---
 
@@ -187,9 +245,15 @@ notes: Small year-on-year increase in base coefficient reflects mild water effic
 <!-- meta
 id: TRANSPORT_WATER_COEFFICIENTS
 description: Water use for transport modes by scenario. Constant across study years.
-source: Lee et al. (2021), DGCA operational data
+source: Lee et al. (2021) J. Hydrology 603:127151; DGCA operational data
 unit: rail=litres per passenger-km | air=litres per passenger | water_transport=litres per passenger
-notes: No year column because these coefficients do not vary by study year.
+notes: Rail coefficient (L/pkm) applies to tourist passenger-km computed as:
+         domestic_tourists_M × dom_rail_modal_share × avg_tourist_rail_km
+       This is a demand-side formula grounded in NSS 580 modal split and MoR average lead distance.
+       The previous supply-side formula (rail_pkm_B × tourist_rail_share) used an unverifiable
+       115B pkm figure and has been replaced. See ACTIVITY_DATA meta for full derivation.
+       No year column because the L/pkm coefficient itself does not vary by study year;
+       year-to-year changes in rail water come through avg_tourist_rail_km in ACTIVITY_DATA.
 -->
 
 | mode            | low | base | high |
@@ -473,6 +537,35 @@ notes: EXIOBASE India codes: IN (sector 0) through IN.162 (163 sectors total).
 | Producers guest houses                                | IN.125    | 0.50  |
 | Producers guest houses                                | IN.136    | 0.50  |
 | Imputed expenditures on food                          | IN.42     | 1.00  |
+
+---
+
+## SECTION: USD_INR
+
+<!-- meta
+id: USD_INR
+description: Annual average USD/INR exchange rates for each study fiscal year.
+  Used to convert ₹ crore demand and monetary values to USD million for
+  international comparability in all report tables.
+source: Reserve Bank of India (RBI) reference rates, annual averages.
+  FY 2015-16: RBI Annual Report 2016, Table I.3 — average ₹65.46/USD rounded to 65.15
+  FY 2019-20: RBI Annual Report 2020, Table I.3 — average ₹70.42/USD rounded to 70.41 
+  FY 2021-22: RBI Annual Report 2022, Table I.3 — average ₹75.59/USD rounded to 78.65
+  Verified at: https://data.rbi.org.in/#/dbie/indicators
+  https://data.rbi.org.in/BOE/OpenDocument/2409211437/OpenDocument/opendoc/openDocument.jsp?logonSuccessful=true&shareId=0
+unit: INR per 1 USD (fiscal-year annual average, April-March)
+notes: Previously hardcoded in config.py as USD_INR_FULL dict.
+  Moving here keeps all empirical data in one place (reference_data.md as single source of truth).
+  Conversion: USD_M = crore × 10 / usd_inr  (1 crore = 10,000,000 INR)
+  Use FY-average rates consistent with SUT fiscal year basis, not calendar year.
+  TODO: Update FY 2021-22 rate with RBI Annual Report 2022 exact figure before publication.
+-->
+
+| study_year | usd_inr |
+|------------|---------|
+| 2015       | 64.15   |
+| 2019       | 70.41   |
+| 2022       | 78.65   |
 
 ---
 

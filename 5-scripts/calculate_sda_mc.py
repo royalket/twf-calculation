@@ -404,25 +404,55 @@ def _sample_distributions(dist_specs: dict, n: int, rng: np.random.Generator) ->
 def _direct_twf_sim(year: str, hotel_mult: float, rest_mult: float,
                      dom_mult: float, inb_mult: float,
                      rail_mult: float, air_mult: float) -> float:
-    """Compute direct TWF m³ for one Monte Carlo draw."""
+    """
+    Compute direct TWF m³ for one Monte Carlo draw.
+
+    Hotel
+    -----
+    Uses tourist-nights × dom_hotel_share/inb_hotel_share, consistent with
+    calculate_direct_twf.py. The previous formula (classified_rooms × occupancy
+    × nights_per_year) was a supply-side FHRAI estimate that (a) ignored the
+    15% domestic hotel share correction, and (b) meant dom_mult/inb_mult had
+    no effect on hotel water — only on restaurants. Now both volume multipliers
+    propagate correctly into hotel too.
+
+    Rail
+    ----
+    Demand-side formula replacing the removed rail_pkm_B/tourist_rail_share fields:
+        tourist_pkm = domestic_tourists_M × dom_mult × dom_rail_modal_share × avg_tourist_rail_km
+    dom_mult captures tourist-volume uncertainty; rail_mult captures L/pkm uncertainty.
+    Sources: NSS Report 580 Table 3.6 (modal share); MoR Annual Statistical Statement
+    Table 2 (average lead distance).
+    """
     act = ACTIVITY_DATA.get(year, ACTIVITY_DATA[STUDY_YEARS[-1]])
     dw  = DIRECT_WATER
 
-    yr_key = year
+    yr_key     = year
     hotel_base = dw["hotel"].get(yr_key, dw["hotel"]["2022"])["base"]
     rest_base  = dw["restaurant"].get(yr_key, dw["restaurant"]["2022"])["base"]
     rail_base  = dw["rail"]["base"]
     air_base   = dw["air"]["base"]
 
-    hotel_m3 = (act["classified_rooms"] * act["occupancy_rate"] *
-                act["nights_per_year"] * hotel_base * hotel_mult / 1000)
+    # Hotel: tourist-nights in paid accommodation only
+    dom_hotel_share = act.get("dom_hotel_share", 0.15)   # NSS 580 blended
+    inb_hotel_share = act.get("inb_hotel_share", 1.00)   # MoT IPS; all inbound in hotels
+    dom_hotel_nights = act["domestic_tourists_M"] * 1e6 * act["avg_stay_days_dom"] * dom_hotel_share * dom_mult
+    inb_hotel_nights = act["inbound_tourists_M"]  * 1e6 * act["avg_stay_days_inb"] * inb_hotel_share * inb_mult
+    hotel_m3 = (dom_hotel_nights + inb_hotel_nights) * hotel_base * hotel_mult / 1_000
 
-    dom_days  = act["domestic_tourists_M"] * 1e6 * act["avg_stay_days_dom"] * dom_mult
-    inb_days  = act["inbound_tourists_M"]  * 1e6 * act["avg_stay_days_inb"] * inb_mult
-    rest_m3   = (dom_days + inb_days) * act["meals_per_tourist_day"] * rest_base * rest_mult / 1000
+    # Restaurant: all tourist-days × meals/day
+    dom_days = act["domestic_tourists_M"] * 1e6 * act["avg_stay_days_dom"] * dom_mult
+    inb_days = act["inbound_tourists_M"]  * 1e6 * act["avg_stay_days_inb"] * inb_mult
+    rest_m3  = (dom_days + inb_days) * act["meals_per_tourist_day"] * rest_base * rest_mult / 1_000
 
-    rail_m3   = act["rail_pkm_B"] * 1e9 * act["tourist_rail_share"] * rail_base * rail_mult / 1000
-    air_m3    = act["air_pax_M"]  * 1e6 * act["tourist_air_share"]  * air_base  * air_mult / 1000
+    # Rail: demand-side (NSS 580 modal share × MoR avg lead)
+    dom_rail_modal = act.get("dom_rail_modal_share", 0.25)   # NSS 580 Table 3.6
+    avg_rail_km    = act.get("avg_tourist_rail_km",  242)    # MoR Annual Statistical Statement Table 2
+    tourist_pkm    = act["domestic_tourists_M"] * 1e6 * dom_mult * dom_rail_modal * avg_rail_km
+    rail_m3        = tourist_pkm * rail_base * rail_mult / 1_000
+
+    # Air: unchanged
+    air_m3 = act["air_pax_M"] * 1e6 * act["tourist_air_share"] * air_base * air_mult / 1_000
 
     return hotel_m3 + rest_m3 + rail_m3 + air_m3
 

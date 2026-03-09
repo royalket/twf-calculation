@@ -123,11 +123,25 @@ EUR_INR: dict = {str(int(float(k))): float(v)
                  for k, v in _keyed("EUR_INR", "study_year", "eur_inr").items()}
 
 USD_INR_FULL: dict = {
-    "2015": 65.00, "2016": 66.50, "2017": 64.50, "2018": 69.00,
-    "2019": 70.00, "2020": 74.50, "2021": 74.00, "2022": 79.50, "2023": 82.00,
+    "2015": 64.15, "2016": 66.50, "2017": 64.50, "2018": 69.00,
+    "2019": 70.42, "2020": 74.50, "2021": 74.00, "2022": 78.58, "2023": 82.00,
 }
 
-USD_INR: dict = {yr: USD_INR_FULL[yr] for yr in ["2015", "2019", "2022"]}
+# Load study-year rates from reference_data.md § USD_INR (single source of truth).
+# Falls back to USD_INR_FULL if section is missing (backward compatibility).
+def _build_usd_inr() -> dict:
+    rows = _rows("USD_INR")
+    if rows:
+        return {str(int(float(r["study_year"]))): float(r["usd_inr"]) for r in rows}
+    import warnings
+    warnings.warn(
+        "config: USD_INR section missing from reference_data.md — using hardcoded fallback. "
+        "Add ## SECTION: USD_INR to reference_data.md.",
+        UserWarning, stacklevel=2,
+    )
+    return {yr: USD_INR_FULL[yr] for yr in ["2015", "2019", "2022"]}
+
+USD_INR: dict = _build_usd_inr()
 
 
 # ══════════════════════════════════════════════════════════════════════════════

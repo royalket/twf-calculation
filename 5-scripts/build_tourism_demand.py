@@ -43,7 +43,7 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).parent))
 from config import (
     DIRS, CPI, STUDY_YEARS, NAS_GROWTH_RATES, NAS_GVA_CONSTANT,
-    TSA_BASE, TSA_TO_NAS, TSA_TO_EXIOBASE, EXIO_IDX, EXIO_CODES, USD_INR,
+    TSA_BASE, TSA_TO_NAS, TSA_TO_EXIOBASE, EXIO_IDX, EXIO_CODES, USD_INR, YEARS,
 )
 from utils import (
     section, subsection, ok, warn, save_csv, compare_across_years,
@@ -53,7 +53,9 @@ from utils import (
 
 # ── IO-year helper ────────────────────────────────────────────────────────────
 
-_YEAR_TO_IO: dict = {"2015": "2015-16", "2019": "2019-20", "2022": "2021-22"}
+# Derive from YEARS (single source of truth in config.py).
+# Previously was a hardcoded duplicate dict: {"2015": "2015-16", ...}
+_YEAR_TO_IO: dict = {yr: info["io_year"] for yr, info in YEARS.items()}
 # Base year for real-price USD conversion — update here if base year changes
 _BASE_YEAR: str = STUDY_YEARS[0]   # "2015" — drives Real_USD_M exchange rate
 
