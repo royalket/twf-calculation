@@ -123,8 +123,8 @@ EUR_INR: dict = {str(int(float(k))): float(v)
                  for k, v in _keyed("EUR_INR", "study_year", "eur_inr").items()}
 
 USD_INR_FULL: dict = {
-    "2015": 65.00, "2016": 66.50, "2017": 64.50, "2018": 69.00,
-    "2019": 70.00, "2020": 74.50, "2021": 74.00, "2022": 75.00, "2023": 82.00,
+    "2015": 64.15, "2016": 66.50, "2017": 64.50, "2018": 69.00,
+    "2019": 70.42, "2020": 74.50, "2021": 74.00, "2022": 78.58, "2023": 82.00,
 }
 
 # Load study-year rates from reference_data.md § USD_INR (single source of truth).

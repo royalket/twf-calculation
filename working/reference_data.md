@@ -548,10 +548,11 @@ description: Annual average USD/INR exchange rates for each study fiscal year.
   Used to convert ₹ crore demand and monetary values to USD million for
   international comparability in all report tables.
 source: Reserve Bank of India (RBI) reference rates, annual averages.
-  FY 2015-16: RBI Annual Report 2016, Table I.3 — average ₹65.46/USD rounded to 65.00
-  FY 2019-20: RBI Annual Report 2020, Table I.3 — average ₹70.42/USD rounded to 70.00
-  FY 2021-22: RBI Annual Report 2022, Table I.3 — average ₹75.59/USD rounded to 75.00
-  Verify at: https://www.rbi.org.in/Scripts/AnnualReportPublications.aspx
+  FY 2015-16: RBI Annual Report 2016, Table I.3 — average ₹65.46/USD rounded to 65.15
+  FY 2019-20: RBI Annual Report 2020, Table I.3 — average ₹70.42/USD rounded to 70.41 
+  FY 2021-22: RBI Annual Report 2022, Table I.3 — average ₹75.59/USD rounded to 78.65
+  Verified at: https://data.rbi.org.in/#/dbie/indicators
+  https://data.rbi.org.in/BOE/OpenDocument/2409211437/OpenDocument/opendoc/openDocument.jsp?logonSuccessful=true&shareId=0
 unit: INR per 1 USD (fiscal-year annual average, April-March)
 notes: Previously hardcoded in config.py as USD_INR_FULL dict.
   Moving here keeps all empirical data in one place (reference_data.md as single source of truth).
@@ -567,144 +568,5 @@ notes: Previously hardcoded in config.py as USD_INR_FULL dict.
 | 2022       | 78.65   |
 
 ---
-
-*End of reference data. Add new sections above this line following the template at the top.*
----
-
-## SECTION: WATER_SHADOW_PRICES
-
-<!-- meta
-id: WATER_SHADOW_PRICES
-description: Shadow prices of water (INR per m³) for three scenarios used to compute
-  Water Cost Coverage % — the fraction of tourist spending that water alone represents.
-  Formula: Coverage_pct = (TWF_m3 × price_inr_per_m3) / (Tourism_Demand_crore × 1e7) × 100
-
-  ── LOW SCENARIO: Actual subsidised water tariff ──────────────────────────────────────
-  What water costs at the point of use in India today (heavily subsidised).
-  Answers: "Even at today's prices, what % of tourist spending goes to water?"
-  Expected result: < 1%. Shows how severely water is underpriced at source.
-  Source: Central Water Commission, Water Pricing in India: Issues and Options (2021).
-    URL: https://cwc.gov.in/sites/default/files/water-tariff-circular-2021.pdf
-  Supplementary: Ministry of Jal Shakti, National Water Policy 2020, Table on tariff ranges.
-    URL: https://jalshakti-dowr.gov.in/sites/default/files/NWP2020English.pdf
-  Agricultural water tariff: ₹0.5–2/m³. Urban supply: ₹8–15/m³.
-  Model uses ₹2/m³ (agricultural upper bound — appropriate because agriculture
-  dominates TWF origin, >70% of indirect water; weighted avg tariff across
-  sectoral water mix is ~₹2/m³).
-
-  ── BASE SCENARIO: Economic shadow price (scarcity value) ────────────────────────────
-  What water is WORTH economically — its value in the most productive alternative use,
-  accounting for basin-level scarcity. This is the headline finding price for the paper.
-  Answers: "What fraction of tourist spending is an implicit unpriced natural resource subsidy?"
-  Expected result: 5–25%. This is the main publishable claim.
-  Source 1 (primary): World Bank (2005). India's Water Economy: Bracing for a Turbulent Future.
-    Chapter 3, Table 3.2 — shadow values of water by river basin (USD/m³ → INR/m³).
-    URL: https://documents.worldbank.org/en/publication/documents-reports/documentdetail/516041468261148102
-    Basin shadow values range USD 0.02–0.60/m³; weighted India mean ≈ USD 0.35/m³ ≈ ₹28/m³ at 2019 rates.
-  Source 2 (corroboration): IWMI Research Report 94 — Amarasinghe, U.A. and Smakhtin, V. (2014).
-    Global Water Demand Projections: Past, Present and Future.
-    URL: https://www.iwmi.cgiar.org/Publications/IWMI_Research_Reports/PDF/pub156/rr156.pdf
-    India-specific scarcity value for agricultural water: USD 0.30–0.50/m³ (Table 4.3).
-  Source 3 (journal citation): Kumar, M.D. (2005). Impact of electricity prices and volumetric
-    water allocation on energy and groundwater demand management.
-    Energy Policy, 33(1), 39–51. DOI: 10.1016/j.enpol.2003.06.002
-    Shadow price of groundwater in northwestern India: ₹20–35/m³ (2005 prices → ₹28–50/m³ 2019).
-  Model uses ₹28/m³ (World Bank India mean, 2019 exchange rate).
-
-  ── HIGH SCENARIO: Full depletion / replacement cost ─────────────────────────────────
-  What it would cost India to REPLACE water once depleted — via desalination or
-  inter-basin transfer. Represents the true long-run cost of groundwater mining.
-  Answers: "If tourism is depleting stressed aquifers, what is the eventual replacement bill?"
-  Expected result: 30–80%. Upper bound; most alarming scenario.
-  Source 1 (primary): NITI Aayog (2018). Composite Water Management Index.
-    Chapter 4: Water supply augmentation scheme costs. Average inter-basin transfer
-    cost ≈ ₹80–100/m³ (Interlinking of Rivers programme cost estimates).
-    URL: https://niti.gov.in/sites/default/files/2019-08/CWMI.pdf
-  Source 2 (corroboration): Chennai Seawater Desalination Plants — operational cost reported
-    as ₹85–100/m³ (2022), covering capex amortisation + O&M.
-    Reported: India Water Portal / CMWSSB tender documents (publicly filed).
-    URL: https://www.indiawaterportal.org/articles/cost-desalination-india
-  Source 3 (academic): Ghosh, D. and Sinha, A.K. (2021). Cost analysis of desalination
-    plants in India. Desalination and Water Treatment, 218, 1–11.
-    DOI: 10.5004/dwt.2021.26803
-  Model uses ₹95/m³ (mid-range of NITI Aayog augmentation + Chennai desalination).
-
-unit: INR per cubic metre of water (₹/m³), constant 2019-20 prices
-notes: Prices apply to TOTAL blue TWF (direct + indirect).
-  For scarce-water variant: Coverage_scarce = Coverage_base × (Scarce_TWF_m3 / Blue_TWF_m3).
-  Prices held constant across study years — cross-year change in Coverage % reflects
-  TWF and spending changes only, not price variation. This is intentional: we want
-  to show how the resource burden changes with tourism activity, not with inflation.
-  All three prices and their URLs must be verified before journal submission.
-  PLACEHOLDER status: base and high prices should be confirmed from cited reports.
--->
-
-| scenario | price_inr_per_m3 | source_short                                    | direct_url                                                                                                   |
-|----------|------------------|-------------------------------------------------|--------------------------------------------------------------------------------------------------------------|
-| low      | 2.0              | CWC Water Pricing India 2021, agricultural avg  | https://cwc.gov.in/sites/default/files/water-tariff-circular-2021.pdf                                       |
-| base     | 28.0             | World Bank India Water Economy 2005, Ch.3 Tbl3.2 | https://documents.worldbank.org/en/publication/documents-reports/documentdetail/516041468261148102           |
-| high     | 95.0             | NITI Aayog CWMI 2018 Ch.4 + Chennai desal 2022  | https://niti.gov.in/sites/default/files/2019-08/CWMI.pdf                                                    |
-
----
-
-## SECTION: TOURISM_GDP_CONTRIBUTION
-
-<!-- meta
-id: TOURISM_GDP_CONTRIBUTION
-description: Tourism Direct GDP contribution to India's economy by study year.
-  Used in Water Productivity calculation:
-    Water_Productivity_inr_per_m3 = (Tourism_GDP_crore × 1e7) / TWF_total_m3
-  "Direct GDP" = GDP generated directly by tourism industries
-  (hotels, airlines, travel agents, restaurants, cultural services serving tourists).
-  Does NOT include indirect/induced effects — use direct only for comparability
-  with the TWF denominator, which is Y (direct tourism demand spending).
-
-source: Ministry of Tourism, Government of India.
-  India Tourism Statistics (ITS) Compendium — Table 7.4.1:
-  "Tourism Share in GVA and GDP", published in ITS 2024 edition.
-  URL: https://tourism.gov.in/india-tourism-statistics
-
-  Methodology: Based on Third Tourism Satellite Account (TSA) 2015-16 as base,
-  extrapolated using NAS GVA growth rates (same methodology as this pipeline's
-  demand vector scaling). GVA/GDP multiplier = 1.9236 (constant across all years,
-  as shown in Table 7.4.1 — reflects net taxes on products).
-
-  Study year mapping from Table 7.4.1:
-    2015 → "Third TSA 2015-16" column → Tourism Direct GDP = ₹3,64,668 crore
-    2019 → "2019-20" column           → Tourism Direct GDP = ₹5,41,167 crore
-    2022 → "2021-22" column           → Tourism Direct GDP = ₹2,13,653 crore
-
-  NOTE on 2022 value: 2021-22 is severely COVID-suppressed (₹2,13,653 cr vs
-  ₹5,41,167 cr in 2019-20). This is real — the Tourism Direct GDP row in
-  Table 7.4.1 confirms the collapse (GDP % fell from 2.69% to 0.91%).
-  Normal 2022-23 (R) recovery to ₹7,11,341 cr shows the sector rebounded
-  post-COVID; 2021-22 is the correct value for the FY2021-22 study year.
-
-  ALSO AVAILABLE from Table 7.4.1 (for context / robustness check):
-    Tourism Direct GVA (₹ crore):
-      2015-16: 3,46,493  |  2019-20: 5,14,197  |  2021-22: 2,03,005
-    Total GDP of India (₹ crore):
-      2015-16: 1,37,71,874  |  2019-20: 2,01,03,593  |  2021-22: 2,35,97,399
-    Tourism Direct GDP as % of total GDP:
-      2015-16: 2.70%  |  2019-20: 2.69%  |  2021-22: 0.91%
-
-  GVA vs GDP note: Use Tourism Direct GDP (not GVA) as the productivity numerator.
-  GDP = GVA + net taxes on products. The GVA/GDP multiplier 1.9236 in the table
-  refers to the ratio of Total GVA to Total GDP, not a tourism-specific ratio.
-  Tourism Direct GDP = Tourism Direct GVA × (Total GDP / Total GVA) per year.
-  This is already computed in Table 7.4.1; use the GDP row directly.
-
-unit: crore INR, current (nominal) prices — consistent with the TSA methodology
-notes: Values are FINAL — sourced directly from official GoI publication Table 7.4.1.
-  No PLACEHOLDER status. Verify if a newer ITS edition is published before submission.
-  These are nominal prices; for real-terms productivity comparison, deflate using CPI
-  to base year 2015-16 (same deflator used in demand vector scaling).
--->
-
-| study_year | tourism_gdp_direct_crore | tourism_gdp_pct_of_total | source_note                                                  |
-|------------|--------------------------|--------------------------|--------------------------------------------------------------|
-| 2015       | 364668                   | 2.70                     | MoT ITS Compendium Table 7.4.1, Third TSA 2015-16 column    |
-| 2019       | 541167                   | 2.69                     | MoT ITS Compendium Table 7.4.1, 2019-20 column              |
-| 2022       | 213653                   | 0.91                     | MoT ITS Compendium Table 7.4.1, 2021-22 column (COVID-low)  |
 
 *End of reference data. Add new sections above this line following the template at the top.*

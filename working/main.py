@@ -45,7 +45,6 @@ import sys
 import time
 import traceback
 from pathlib import Path
-import importlib
 
 sys.path.insert(0, str(Path(__file__).parent))
 from config import DIRS, STUDY_YEARS
@@ -56,15 +55,15 @@ from config import DIRS, STUDY_YEARS
 # ══════════════════════════════════════════════════════════════════════════════
 
 STEPS = {
-    "build_io":           ("Build IO tables (SUT → PTA → L)",                          "pipeline.build_io_tables"),
-    "water_coefficients": ("EXIOBASE extract + concordance + SUT-140 (blue + green)",   "pipeline.build_water_coefficients"),
-    "tourism_demand":     ("TSA scale (NAS) + EXIOBASE demand vectors",                 "pipeline.build_tourism_demand"),
-    "indirect_twf":       ("Indirect TWF (W·L·Y + Scarce_TWF + Multiplier_Ratio)",      "pipeline.calculate_indirect_twf"),
-    "direct_twf":         ("Direct operational water (activity-based)",                 "pipeline.calculate_direct_twf"),
-    "outbound_twf":       ("Outbound TWF + net balance (Hoekstra & Mekonnen 2012)",     "pipeline.outbound_twf"),
-    "sda_mc":             ("SDA + Monte Carlo + Supply-Chain Path Analysis",            "pipeline.calculate_sda_mc"),
-    "visualise":          ("All chart generation (waterfall/violin/Sankey/etc.)",       "pipeline.visualise_results"),
-    "compare":            ("Cross-year comparison + Markdown run report",               "pipeline.compare_years"),
+    "build_io":           ("Build IO tables (SUT → PTA → L)",                          "build_io_tables"),
+    "water_coefficients": ("EXIOBASE extract + concordance + SUT-140 (blue + green)",   "build_water_coefficients"),
+    "tourism_demand":     ("TSA scale (NAS) + EXIOBASE demand vectors",                 "build_tourism_demand"),
+    "indirect_twf":       ("Indirect TWF (W·L·Y + Scarce_TWF + Multiplier_Ratio)",      "calculate_indirect_twf"),
+    "direct_twf":         ("Direct operational water (activity-based)",                 "calculate_direct_twf"),
+    "outbound_twf":       ("Outbound TWF + net balance (Hoekstra & Mekonnen 2012)",     "outbound_twf"),
+    "sda_mc":             ("SDA + Monte Carlo + Supply-Chain Path Analysis",            "calculate_sda_mc"),
+    "visualise":          ("All chart generation (waterfall/violin/Sankey/etc.)",       "visualise_results"),
+    "compare":            ("Cross-year comparison + Markdown run report",               "compare_years"),
 }
 
 STEP_DEPS: dict[str, list[str]] = {
@@ -107,7 +106,7 @@ def run_step(step_key: str, **kwargs) -> bool:
     print(f"\n{bar}\n  STEP: {desc}\n{bar}")
     t0 = time.time()
     try:
-        mod = importlib.import_module(module)
+        mod = __import__(module)
         mod.run(**kwargs)
         print(f"\n  ✓  {step_key}  ({time.time()-t0:.1f}s)")
         return True

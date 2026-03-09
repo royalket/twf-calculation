@@ -102,3 +102,15 @@
 - ⚠  Missing: sc_path_top50_2015.csv — panel will be skipped
 - ⚠  Missing: sc_path_top50_2019.csv — panel will be skipped
 - ⚠  Missing: sc_path_top50_2022.csv — panel will be skipped
+
+## visualise_results  (2026-03-09 10:47)
+
+- ⚠  Missing: sc_path_top50_2015.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2019.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2022.csv — panel will be skipped
+
+## visualise_results  (2026-03-09 10:56)
+
+- ⚠  Missing: sc_path_top50_2015.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2019.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2022.csv — panel will be skipped
