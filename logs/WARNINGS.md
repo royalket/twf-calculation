@@ -3455,3 +3455,36 @@
 - ⚠  Energy coefficients not found for 2015 — run coefficients.py first
 - ⚠  Energy coefficients not found for 2019 — run coefficients.py first
 - ⚠  Energy coefficients not found for 2022 — run coefficients.py first
+
+## build_io_tables  (2026-03-11 16:15)
+
+- ⚠  Row mismatch — trimming to 140
+- ⚠  3 A column sums >= 1.0 — scaling to 0.95 (Hawkins-Simon enforcement)
+- ⚠  Row mismatch — trimming to 140
+- ⚠  1 A column sums >= 1.0 — scaling to 0.95 (Hawkins-Simon enforcement)
+- ⚠  3 sectors shifted >30.0% — review NAS scaling
+- ⚠      [ 55] Tobacco Products                               Δ=+47.8%
+- ⚠      [ 78] Drugs and medicine                             Δ=-30.6%
+- ⚠      [133] Legal services                                 Δ=-37.7%
+- ⚠  Row mismatch — trimming to 140
+- ⚠  1 products have negative total output — taking absolute value
+- ⚠  3 A column sums >= 1.0 — scaling to 0.95 (Hawkins-Simon enforcement)
+- ⚠  3 sectors shifted >30.0% — review NAS scaling
+- ⚠      [ 39] Mica                                           Δ=-100.0%
+- ⚠      [ 66] Paper, Paper products and newsprint            Δ=-30.2%
+- ⚠      [101] Electronic equipment including T.V             Δ=+39.0%
+
+## build_energy_coefficients  (2026-03-11 16:15)
+
+- ⚠  No 'Energy Carrier Net Total' rows found in F.txt — energy set to zero
+- ⚠  No 'Energy Carrier Net Fossil' rows found in F.txt — energy set to zero
+- ⚠  No 'Energy Carrier Net Total' rows found in F.txt — energy set to zero
+- ⚠  No 'Energy Carrier Net Fossil' rows found in F.txt — energy set to zero
+- ⚠  F.txt missing for 2022 — extrapolating from 2019 using NAS Electricity GVA growth ratio
+
+## pipeline  (2026-03-11 16:15)
+
+- ⚠  Skipping 'sda' — unfulfilled deps: ['indirect']
+- ⚠  Skipping 'report' — unfulfilled deps: ['indirect']
+- ⚠  Skipping 'visualise' — unfulfilled deps: ['indirect', 'report']
+- ⚠  Skipping 'validate' — unfulfilled deps: ['indirect']

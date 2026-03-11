@@ -55,8 +55,10 @@ def _get_step_fns() -> dict:
         "coefficients":  lambda stressor, **kw: __import__("build_water_coefficients").run(stressor=stressor, **kw),
         "indirect":      lambda stressor, **kw: __import__("calculate_indirect_twf").run(stressor=stressor, **kw),
         "direct":        lambda stressor, **kw: __import__("calculate_direct_twf").run(stressor=stressor, **kw),
-        "water":         lambda stressor, **kw: __import__("outbound_twf").run(**kw),
-        "energy":        lambda stressor, **kw: __import__("energy").run(**kw),
+        "water":              lambda stressor, **kw: __import__("outbound_twf").run(**kw),
+        "energy_coeff":       lambda stressor, **kw: __import__("build_energy_coefficients").run(**kw),
+        "indirect_energy":    lambda stressor, **kw: __import__("calculate_indirect_energy").run(**kw),
+        "energy":             lambda stressor, **kw: __import__("energy").run(**kw),
         "sda":           lambda stressor, **kw: __import__("calculate_sda_mc").run(stressor=stressor, **kw),
         "report":        lambda stressor, **kw: __import__("compare_years").run(
                              mode="combined" if stressor == "combined" else stressor, **kw),
@@ -73,7 +75,9 @@ DEPS: dict[str, list[str]] = {
     "indirect":      ["build_io", "demand", "coefficients"],
     "direct":        ["demand"],
     "water":         ["indirect"],
-    "energy":        ["indirect"],
+    "energy_coeff":  ["build_io"],
+    "indirect_energy": ["build_io", "demand", "energy_coeff"],
+    "energy":        ["indirect_energy"],
     "sda":           ["indirect"],
     "report":        ["indirect", "direct"],
     "visualise":     ["indirect", "direct", "report"],
@@ -88,6 +92,8 @@ STEP_DESCS: dict[str, str] = {
     "indirect":     "Indirect footprint W·L·Y  (calculate_indirect_twf.py)",
     "direct":       "Direct operational footprint  (calculate_direct_twf.py)",
     "water":        "Outbound WF + net water balance  (outbound_twf.py)",
+    "energy_coeff": "EXIOBASE → energy coefficients SUT-140  (build_energy_coefficients.py)",
+    "indirect_energy": "Indirect energy E·L·Y  (calculate_indirect_energy.py)",
     "energy":       "Outbound EF + energy benchmarks  (energy.py)",
     "sda":          "SDA + Monte Carlo + Supply-Chain  (calculate_sda_mc.py)",
     "report":       "Cross-year report + Markdown  (compare_years.py)",
@@ -97,8 +103,9 @@ STEP_DESCS: dict[str, str] = {
 
 WATER_STEPS  = ["build_io", "demand", "coefficients", "indirect", "direct",
                 "water", "sda", "report", "visualise", "validate"]
-ENERGY_STEPS = ["build_io", "demand", "coefficients", "indirect", "direct",
-                "energy", "sda", "report", "visualise", "validate"]
+ENERGY_STEPS = ["build_io", "demand", "coefficients", "energy_coeff",
+                "indirect_energy", "direct", "energy", "sda", "report",
+                "visualise", "validate"]
 ALL_STEPS    = list(dict.fromkeys(WATER_STEPS + ENERGY_STEPS))  # dedup, preserve order
 
 PIPELINE     = ALL_STEPS  # canonical order for interactive menu

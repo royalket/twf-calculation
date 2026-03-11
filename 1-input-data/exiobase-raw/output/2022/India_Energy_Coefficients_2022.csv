@@ -1,0 +1,164 @@
+Sector_Index,Sector_Code,Sector_Name,Broad_Category,Energy_2019_Final_TJ_per_EUR_million,Energy_2019_Final_MJ_per_crore,Energy_2019_Emission_TJ_per_EUR_million,Energy_2019_Emission_MJ_per_crore,Extrapolated,Energy_2022_Final_TJ_per_EUR_million,Energy_2022_Emission_TJ_per_EUR_million,Energy_2022_Final_MJ_per_crore,Energy_2022_Emission_MJ_per_crore
+0,IN,Paddy rice,Agriculture,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+1,IN.1,Wheat,Agriculture,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+2,IN.2,Cereal grains nec,Agriculture,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+3,IN.3,Vegetables/fruit,Agriculture,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+4,IN.4,Oil seeds,Agriculture,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+5,IN.5,Sugar cane,Agriculture,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+6,IN.6,Plant fibres,Agriculture,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+7,IN.7,Crops nec,Agriculture,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+8,IN.8,Cattle,Agriculture,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+9,IN.9,Pigs,Agriculture,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+10,IN.10,Poultry,Agriculture,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+11,IN.11,Meat animals nec,Agriculture,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+12,IN.12,Animal products,Agriculture,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+13,IN.13,Raw milk,Agriculture,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+14,IN.14,Wool/silk,Agriculture,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+15,IN.15,Forestry,Agriculture,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+16,IN.16,Fishing,Agriculture,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+17,IN.17,Sector 17,Mining,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+18,IN.18,Sector 18,Mining,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+19,IN.19,Sector 19,Mining,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+20,IN.20,Sector 20,Mining,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+21,IN.21,Sector 21,Mining,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+22,IN.22,Sector 22,Mining,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+23,IN.23,Sector 23,Mining,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+24,IN.24,Sector 24,Mining,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+25,IN.25,Sector 25,Mining,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+26,IN.26,Sector 26,Mining,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+27,IN.27,Sector 27,Mining,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+28,IN.28,Sector 28,Mining,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+29,IN.29,Sector 29,Mining,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+30,IN.30,Sector 30,Mining,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+31,IN.31,Sector 31,Mining,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+32,IN.32,Sector 32,Mining,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+33,IN.33,Sector 33,Mining,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+34,IN.34,Sector 34,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+35,IN.35,Sector 35,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+36,IN.36,Sector 36,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+37,IN.37,Sector 37,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+38,IN.38,Sector 38,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+39,IN.39,Sector 39,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+40,IN.40,Sector 40,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+41,IN.41,Sector 41,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+42,IN.42,Sector 42,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+43,IN.43,Sector 43,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+44,IN.44,Sector 44,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+45,IN.45,Sector 45,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+46,IN.46,Sector 46,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+47,IN.47,Sector 47,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+48,IN.48,Sector 48,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+49,IN.49,Sector 49,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+50,IN.50,Sector 50,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+51,IN.51,Sector 51,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+52,IN.52,Sector 52,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+53,IN.53,Sector 53,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+54,IN.54,Sector 54,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+55,IN.55,Sector 55,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+56,IN.56,Sector 56,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+57,IN.57,Sector 57,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+58,IN.58,Sector 58,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+59,IN.59,Sector 59,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+60,IN.60,Sector 60,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+61,IN.61,Sector 61,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+62,IN.62,Sector 62,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+63,IN.63,Sector 63,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+64,IN.64,Sector 64,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+65,IN.65,Sector 65,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+66,IN.66,Sector 66,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+67,IN.67,Sector 67,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+68,IN.68,Sector 68,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+69,IN.69,Sector 69,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+70,IN.70,Sector 70,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+71,IN.71,Sector 71,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+72,IN.72,Sector 72,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+73,IN.73,Sector 73,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+74,IN.74,Sector 74,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+75,IN.75,Sector 75,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+76,IN.76,Sector 76,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+77,IN.77,Sector 77,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+78,IN.78,Sector 78,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+79,IN.79,Sector 79,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+80,IN.80,Sector 80,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+81,IN.81,Sector 81,Manufacturing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+82,IN.82,Sector 82,Energy Processing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+83,IN.83,Sector 83,Energy Processing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+84,IN.84,Sector 84,Energy Processing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+85,IN.85,Sector 85,Energy Processing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+86,IN.86,Sector 86,Energy Processing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+87,IN.87,Sector 87,Energy Processing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+88,IN.88,Sector 88,Energy Processing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+89,IN.89,Sector 89,Energy Processing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+90,IN.90,Sector 90,Energy Processing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+91,IN.91,Sector 91,Energy Processing,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+92,IN.92,Electricity coal,Utilities/Energy,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+93,IN.93,Electricity gas,Utilities/Energy,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+94,IN.94,Electricity nuclear,Utilities/Energy,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+95,IN.95,Electricity hydro,Utilities/Energy,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+96,IN.96,Electricity wind,Utilities/Energy,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+97,IN.97,Electricity petroleum,Utilities/Energy,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+98,IN.98,Electricity biomass,Utilities/Energy,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+99,IN.99,Electricity solar PV,Utilities/Energy,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+100,IN.100,Electricity solar thermal,Utilities/Energy,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+101,IN.101,Electricity tide,Utilities/Energy,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+102,IN.102,Electricity geothermal,Utilities/Energy,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+103,IN.103,Electricity nec,Utilities/Energy,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+104,IN.104,Electricity transmission,Utilities/Energy,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+105,IN.105,Electricity distribution,Utilities/Energy,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+106,IN.106,Gas distribution,Utilities/Energy,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+107,IN.107,Steam/hot water,Utilities/Energy,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+108,IN.108,Water supply,Utilities/Energy,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+109,IN.109,Sector 109,Services,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+110,IN.110,Sector 110,Services,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+111,IN.111,Sector 111,Services,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+112,IN.112,Sector 112,Services,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+113,IN.113,Hotels and restaurants,Services,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+114,IN.114,Railway transport,Services,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+115,IN.115,Road transport,Services,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+116,IN.116,Sector 116,Services,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+117,IN.117,Sector 117,Services,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+118,IN.118,Sector 118,Services,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+119,IN.119,Air transport,Services,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+120,IN.120,Sector 120,Services,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+121,IN.121,Sector 121,Services,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+122,IN.122,Sector 122,Services,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+123,IN.123,Sector 123,Services,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+124,IN.124,Sector 124,Services,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+125,IN.125,Sector 125,Services,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+126,IN.126,Sector 126,Services,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+127,IN.127,Sector 127,Services,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+128,IN.128,Sector 128,Services,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+129,IN.129,Sector 129,Services,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+130,IN.130,Sector 130,Services,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+131,IN.131,Sector 131,Services,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+132,IN.132,Sector 132,Services,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+133,IN.133,Sector 133,Services,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+134,IN.134,Sector 134,Services,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+135,IN.135,Sector 135,Services,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+136,IN.136,Sector 136,Services,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+137,IN.137,Sector 137,Services,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+138,IN.138,Sector 138,Other,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+139,IN.139,Sector 139,Other,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+140,IN.140,Sector 140,Other,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+141,IN.141,Sector 141,Other,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+142,IN.142,Sector 142,Other,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+143,IN.143,Sector 143,Other,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+144,IN.144,Sector 144,Other,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+145,IN.145,Sector 145,Other,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+146,IN.146,Sector 146,Other,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+147,IN.147,Sector 147,Other,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+148,IN.148,Sector 148,Other,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+149,IN.149,Sector 149,Other,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+150,IN.150,Sector 150,Other,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+151,IN.151,Sector 151,Other,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+152,IN.152,Sector 152,Other,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+153,IN.153,Sector 153,Other,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+154,IN.154,Sector 154,Other,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+155,IN.155,Sector 155,Other,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+156,IN.156,Sector 156,Other,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+157,IN.157,Sector 157,Other,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+158,IN.158,Sector 158,Other,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+159,IN.159,Sector 159,Other,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+160,IN.160,Sector 160,Other,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+161,IN.161,Sector 161,Other,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
+162,IN.162,Sector 162,Other,0.0,0.0,0.0,0.0,True,0.0,0.0,0.0,0.0
