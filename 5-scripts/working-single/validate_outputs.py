@@ -149,32 +149,24 @@ def check_year(year: str):
     else:
         _warn(f"[3] Intensity ({year})", "twf_per_tourist_intensity.csv missing")
 
-    # ── ASSERTION 4: Inbound/domestic L/tourist-day ratio in [2, 30] ─────────
-    # Uses twf_per_tourist_intensity.csv (same source as check [3]).
-    # The previous version read from split_df and divided TWF_m3 by Demand_crore,
-    # producing a TWF/spend ratio (~1.1×) not an intensity ratio — that was wrong.
-    # Correct metric: L_per_inb_tourist_day / L_per_dom_tourist_day.
-    # Expected range [2, 30]: inbound tourists use 2–30× more water per day
-    # than domestic (literature: Hadjikakou 2015, Li 2018; India-specific ~5–15×
-    # at baseline but can fall toward 2× if domestic days are long-haul).
-    # Lower bound relaxed to 2 to avoid false failures from stay-duration effects.
-    if not int_df.empty and "Year" in int_df.columns:
-        yr_row = int_df[int_df["Year"].astype(str) == year]
-        if not yr_row.empty:
-            inb_lpd = float(yr_row.iloc[0].get("L_per_inb_tourist_day", 0))
-            dom_lpd = float(yr_row.iloc[0].get("L_per_dom_tourist_day", 0))
-            if inb_lpd > 0 and dom_lpd > 0:
-                ratio = inb_lpd / dom_lpd
-                assert_in_range(ratio, 2, 30,
-                                f"[4] Inbound/domestic L/day ratio ({year})")
+    # ── ASSERTION 4: Inbound/domestic ratio in [5, 30] ───────────────────────
+    if not split_df.empty and "Type" in split_df.columns and "TWF_m3" in split_df.columns:
+        inb_r = split_df[split_df["Type"] == "Inbound"]
+        dom_r = split_df[split_df["Type"] == "Domestic"]
+        if not inb_r.empty and not dom_r.empty:
+            inb_twf = float(inb_r["TWF_m3"].iloc[0])
+            dom_twf = float(dom_r["TWF_m3"].iloc[0])
+            dem_inb = float(inb_r.get("Demand_crore", pd.Series([0])).iloc[0])
+            dem_dom = float(dom_r.get("Demand_crore", pd.Series([1])).iloc[0])
+            if dem_dom > 0 and dem_inb > 0:
+                ratio = (inb_twf / dem_inb) / (dom_twf / dem_dom) if dom_twf > 0 else 0
+                assert_in_range(ratio, 5, 30, f"[4] Inbound/domestic intensity ratio ({year})")
             else:
-                _warn(f"[4] Inbound/domestic ratio ({year})",
-                      "L_per_inb/dom_tourist_day missing or zero in intensity CSV")
+                _warn(f"[4] Inbound/domestic ratio ({year})", "demand columns missing in split CSV")
         else:
-            _warn(f"[4] Inbound/domestic ratio ({year})", "year not in intensity CSV")
+            _warn(f"[4] Inbound/domestic ratio ({year})", "split CSV lacks Inbound/Domestic rows")
     else:
-        _warn(f"[4] Inbound/domestic ratio ({year})",
-              "twf_per_tourist_intensity.csv missing")
+        _warn(f"[4] Inbound/domestic ratio ({year})", "split CSV missing — re-run with split demand files")
 
     # ── ASSERTION 4b: Green split conservation — inb + dom ≈ aggregate green ─
     # compute_split_twf now writes Green_m3 columns via exact EEIO propagation.

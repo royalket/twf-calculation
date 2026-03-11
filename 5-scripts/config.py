@@ -50,7 +50,10 @@ DIRS = {
     "sda":           BASE_DIR / "3-final-results" / "sda",
     "monte_carlo":   BASE_DIR / "3-final-results" / "monte-carlo",
     "supply_chain":  BASE_DIR / "3-final-results" / "supply-chain",
-    "outbound":      BASE_DIR / "3-final-results" / "outbound-twf",
+    "outbound":         BASE_DIR / "3-final-results" / "outbound-twf",
+    "indirect_energy":  BASE_DIR / "3-final-results" / "indirect-energy",
+    "direct_energy":    BASE_DIR / "3-final-results" / "direct-energy",
+    "outbound_energy":  BASE_DIR / "3-final-results" / "outbound-energy",
     "visualisation": BASE_DIR / "3-final-results" / "visualisation",
     "logs":          BASE_DIR / "logs",
 }
@@ -123,8 +126,8 @@ EUR_INR: dict = {str(int(float(k))): float(v)
                  for k, v in _keyed("EUR_INR", "study_year", "eur_inr").items()}
 
 USD_INR_FULL: dict = {
-    "2015": 65.00, "2016": 66.50, "2017": 64.50, "2018": 69.00,
-    "2019": 70.00, "2020": 74.50, "2021": 74.00, "2022": 75.00, "2023": 82.00,
+    "2015": 64.15, "2016": 66.50, "2017": 64.50, "2018": 69.00,
+    "2019": 70.42, "2020": 74.50, "2021": 74.00, "2022": 78.58, "2023": 82.00,
 }
 
 # Load study-year rates from reference_data.md § USD_INR (single source of truth).
@@ -205,6 +208,57 @@ WSI_RAW_SCORES: dict = _build_wsi_raw_scores()
 # Tourist multiplier: tourists use 1.5× local per-capita water footprint.
 # Source: Hadjikakou et al. (2015); Li (2018); Lee et al. (2021).
 TOURIST_WF_MULTIPLIER: float = 1.5
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# STRESSORS  (registered stressor IDs for the dual-stressor pipeline)
+# ══════════════════════════════════════════════════════════════════════════════
+
+STRESSORS: tuple = ("water", "energy")
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# ENERGY CONSTANTS
+# ══════════════════════════════════════════════════════════════════════════════
+# Unit conversion factors (from TJ, which is EXIOBASE's native energy unit)
+TJ_TO_MJ:  float = 1_000_000.0     # 1 TJ = 1,000,000 MJ
+TJ_TO_GJ:  float = 1_000.0         # 1 TJ = 1,000 GJ
+TJ_TO_KWH: float = 277_777.78      # 1 TJ = 277,777.78 kWh
+
+# EXIOBASE F.txt row labels for energy stressor extraction.
+# "Final"    = total primary energy supply (all sources inc. renewables).
+# "Emission" = combustion-based energy (fossil-related rows); used to
+#              compute the Emission/Final ratio as a carbon-intensity proxy.
+# These must match the exact row strings in the EXIOBASE satellite file.
+ENERGY_ROW_FINAL:    str = "Energy Carrier Net Total"
+ENERGY_ROW_EMISSION: str = "Energy Carrier Net Fossil"
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# OUTBOUND ENERGY DATA  (activity-based, analogous to OUTBOUND_TWF_DATA)
+# ══════════════════════════════════════════════════════════════════════════════
+
+def _build_outbound_energy_destinations() -> list[dict]:
+    """
+    Return list of destination dicts:
+        [{country, dest_share, local_ef_mj_yr, carbon_intensity}, ...]
+    local_ef_mj_yr  = annual per-capita final energy consumption (MJ/yr)
+    carbon_intensity = tonnes CO2e per MJ (optional, default 0.5)
+    """
+    rows = _rows("OUTBOUND_ENERGY_DATA")
+    if not rows:
+        return []
+    return [
+        {
+            "country":           str(r["country"]),
+            "dest_share":        float(r["dest_share"]),
+            "local_ef_mj_yr":    float(r["local_ef_mj_yr"]),
+            "carbon_intensity":  float(r.get("carbon_intensity", 0.5)),
+        }
+        for r in rows
+    ]
+
+OUTBOUND_ENERGY_DESTINATIONS: list = _build_outbound_energy_destinations()
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -383,7 +437,7 @@ def _validate():
             raise ValueError(
                 f"config: WSI_WEIGHTS['{grp}'] = {w} — must be in [0, 1]."
             )
-    # Verify outbound destination shares sum to ≈1
+    # Verify outbound destination shares sum to ≈1 (water)
     if OUTBOUND_DESTINATIONS:
         total_share = sum(d["dest_share"] for d in OUTBOUND_DESTINATIONS)
         if abs(total_share - 1.0) > 0.05:
@@ -391,6 +445,15 @@ def _validate():
             warnings.warn(
                 f"OUTBOUND_TWF_DATA destination shares sum to {total_share:.3f} "
                 "(expected 1.0 ± 0.05). Check reference_data.md § OUTBOUND_TWF_DATA."
+            )
+    # Verify outbound energy destination shares sum to ≈1
+    if OUTBOUND_ENERGY_DESTINATIONS:
+        total_share = sum(d["dest_share"] for d in OUTBOUND_ENERGY_DESTINATIONS)
+        if abs(total_share - 1.0) > 0.05:
+            import warnings
+            warnings.warn(
+                f"OUTBOUND_ENERGY_DATA destination shares sum to {total_share:.3f} "
+                "(expected 1.0 ± 0.05). Check reference_data.md § OUTBOUND_ENERGY_DATA."
             )
 
 _validate()

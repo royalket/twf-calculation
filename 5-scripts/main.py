@@ -1,291 +1,396 @@
 """
-main.py — India Tourism Water Footprint Pipeline
-=================================================
-Runs the pipeline steps in order and coordinates logging.
-Report generation lives in compare_years.py.
-This file contains zero business logic.
+main.py — Pipeline orchestrator
+================================
+Runs the full India tourism footprint pipeline.
 
-Usage
+Usage (CLI)
+-----------
+    python main.py --water               # water pipeline only
+    python main.py --energy              # energy pipeline only
+    python main.py --all                 # water + energy + combined report
+    python main.py --steps build_io coefficients indirect
+    python main.py --stressor energy --steps indirect sda
+    python main.py --list-steps
+
+Usage (interactive — no args)
+------------------------------
+    python main.py                       # launches interactive menu
+
+Steps
 -----
-    python main.py --all
-    python main.py --step build_io water_coefficients
-    python main.py --step compare --ignore-deps
-    python main.py --list
-
-Pipeline steps (in order)
---------------------------
-    build_io           Build IO tables from SUT via PTA method
-    water_coefficients EXIOBASE extract + concordance + SUT-140 mapping
-                       (now extracts BOTH blue and green water)
-    tourism_demand     TSA scale (NAS) + EXIOBASE demand vectors
-    indirect_twf       W × L × Y + Scarce_TWF + Multiplier_Ratio + structural decomp
-    direct_twf         Activity-based operational water
-    outbound_twf       Outbound TWF + net TWF balance (India as importer/exporter)
-    sda_mc             SDA + Monte Carlo + Supply-Chain Path Analysis
-    visualise          All chart generation
-    compare            Cross-year totals + Markdown run report
-
-Step dependencies
------------------
-    indirect_twf  requires: tourism_demand, build_io, water_coefficients
-    outbound_twf  requires: indirect_twf           (needs inbound split TWF)
-    sda_mc        requires: indirect_twf, direct_twf
-    visualise     requires: sda_mc
-    compare       requires: sda_mc, visualise
-
-Changes vs previous version
-----------------------------
-- Added outbound_twf step (new module: outbound_twf.py).
-  Runs after indirect_twf because it loads inbound split TWF for net balance.
-- compare step now reads Scarce_TWF and outbound balance CSVs.
+    build_io        — build_io_tables.py        (SUT → L)
+    demand          — build_tourism_demand.py   (TSA demand vectors)
+    coefficients    — build_water_coefficients.py  (F.txt → SUT 140)
+    indirect        — calculate_indirect_twf.py (W×L×Y)
+    direct          — calculate_direct_twf.py   (activity-based)
+    water           — outbound_twf.py           (outbound WF + net balance)
+    energy          — energy.py                 (outbound EF + benchmarks)
+    sda             — calculate_sda_mc.py       (SDA + MC + supply-chain)
+    report          — compare_years.py          (cross-year report + Markdown)
+    visualise       — visualise_results.py      (all charts)
+    validate        — validate_outputs.py       (sanity checks)
 """
 
+from __future__ import annotations
 import argparse
 import sys
 import time
 import traceback
 from pathlib import Path
-import importlib
 
 sys.path.insert(0, str(Path(__file__).parent))
-from config import DIRS, STUDY_YEARS
+from config import DIRS, STUDY_YEARS, STRESSORS
+from utils import Logger, Timer, section, ok, warn, table_str
 
 
 # ══════════════════════════════════════════════════════════════════════════════
 # STEP REGISTRY
 # ══════════════════════════════════════════════════════════════════════════════
 
-STEPS = {
-    "build_io":           ("Build IO tables (SUT → PTA → L)",                          "pipeline.build_io_tables"),
-    "water_coefficients": ("EXIOBASE extract + concordance + SUT-140 (blue + green)",   "pipeline.build_water_coefficients"),
-    "tourism_demand":     ("TSA scale (NAS) + EXIOBASE demand vectors",                 "pipeline.build_tourism_demand"),
-    "indirect_twf":       ("Indirect TWF (W·L·Y + Scarce_TWF + Multiplier_Ratio)",      "pipeline.calculate_indirect_twf"),
-    "direct_twf":         ("Direct operational water (activity-based)",                 "pipeline.calculate_direct_twf"),
-    "outbound_twf":       ("Outbound TWF + net balance (Hoekstra & Mekonnen 2012)",     "pipeline.outbound_twf"),
-    "sda_mc":             ("SDA + Monte Carlo + Supply-Chain Path Analysis",            "pipeline.calculate_sda_mc"),
-    "visualise":          ("All chart generation (waterfall/violin/Sankey/etc.)",       "pipeline.visualise_results"),
-    "compare":            ("Cross-year comparison + Markdown run report",               "pipeline.compare_years"),
+def _get_step_fns() -> dict:
+    """Lazy import all step run() functions."""
+    return {
+        "build_io":      lambda stressor, **kw: __import__("build_io_tables").run(**kw),
+        "demand":        lambda stressor, **kw: __import__("build_tourism_demand").run(**kw),
+        "coefficients":  lambda stressor, **kw: __import__("build_water_coefficients").run(stressor=stressor, **kw),
+        "indirect":      lambda stressor, **kw: __import__("calculate_indirect_twf").run(stressor=stressor, **kw),
+        "direct":        lambda stressor, **kw: __import__("calculate_direct_twf").run(stressor=stressor, **kw),
+        "water":         lambda stressor, **kw: __import__("outbound_twf").run(**kw),
+        "energy":        lambda stressor, **kw: __import__("energy").run(**kw),
+        "sda":           lambda stressor, **kw: __import__("calculate_sda_mc").run(stressor=stressor, **kw),
+        "report":        lambda stressor, **kw: __import__("compare_years").run(
+                             mode="combined" if stressor == "combined" else stressor, **kw),
+        "visualise":     lambda stressor, **kw: __import__("visualise_results").run(stressor=stressor, **kw),
+        "validate":      lambda stressor, **kw: _run_validate(),
+    }
+
+
+# Step dependencies
+DEPS: dict[str, list[str]] = {
+    "build_io":      [],
+    "demand":        ["build_io"],
+    "coefficients":  ["build_io"],
+    "indirect":      ["build_io", "demand", "coefficients"],
+    "direct":        ["demand"],
+    "water":         ["indirect"],
+    "energy":        ["indirect"],
+    "sda":           ["indirect"],
+    "report":        ["indirect", "direct"],
+    "visualise":     ["indirect", "direct", "report"],
+    "validate":      ["indirect", "direct"],
 }
 
-STEP_DEPS: dict[str, list[str]] = {
-    "build_io":           [],
-    "water_coefficients": [],
-    "tourism_demand":     [],
-    "indirect_twf":       ["tourism_demand", "build_io", "water_coefficients"],
-    "direct_twf":         [],
-    "outbound_twf":       ["indirect_twf"],
-    "sda_mc":             ["indirect_twf", "direct_twf"],
-    "visualise":          ["sda_mc"],
-    "compare":            ["sda_mc", "visualise"],
+# Step descriptions (for interactive menu)
+STEP_DESCS: dict[str, str] = {
+    "build_io":     "Build IO tables  (build_io_tables.py)",
+    "demand":       "Tourism demand vectors  (build_tourism_demand.py)",
+    "coefficients": "EXIOBASE extract + concordance  (build_water_coefficients.py)",
+    "indirect":     "Indirect footprint W·L·Y  (calculate_indirect_twf.py)",
+    "direct":       "Direct operational footprint  (calculate_direct_twf.py)",
+    "water":        "Outbound WF + net water balance  (outbound_twf.py)",
+    "energy":       "Outbound EF + energy benchmarks  (energy.py)",
+    "sda":          "SDA + Monte Carlo + Supply-Chain  (calculate_sda_mc.py)",
+    "report":       "Cross-year report + Markdown  (compare_years.py)",
+    "visualise":    "All chart generation  (visualise_results.py)",
+    "validate":     "Sanity checks on final outputs  (validate_outputs.py)",
 }
 
-PIPELINE = list(STEPS)  # ordered
+WATER_STEPS  = ["build_io", "demand", "coefficients", "indirect", "direct",
+                "water", "sda", "report", "visualise", "validate"]
+ENERGY_STEPS = ["build_io", "demand", "coefficients", "indirect", "direct",
+                "energy", "sda", "report", "visualise", "validate"]
+ALL_STEPS    = list(dict.fromkeys(WATER_STEPS + ENERGY_STEPS))  # dedup, preserve order
+
+PIPELINE     = ALL_STEPS  # canonical order for interactive menu
 
 
 # ══════════════════════════════════════════════════════════════════════════════
 # DEPENDENCY CHECKER
 # ══════════════════════════════════════════════════════════════════════════════
 
-def check_deps(step: str, results: dict, ignore: bool = False) -> tuple[bool, list[str]]:
-    if ignore:
-        return True, []
-    missing = [
-        f"{dep} ({'not run' if dep not in results else 'FAILED'})"
-        for dep in STEP_DEPS.get(step, [])
-        if dep not in results or not results[dep]
-    ]
-    return len(missing) == 0, missing
-
-
-# ══════════════════════════════════════════════════════════════════════════════
-# STEP RUNNER
-# ══════════════════════════════════════════════════════════════════════════════
-
-def run_step(step_key: str, **kwargs) -> bool:
-    desc, module = STEPS[step_key]
-    bar = "=" * 70
-    print(f"\n{bar}\n  STEP: {desc}\n{bar}")
-    t0 = time.time()
+def _run_validate():
+    """
+    Run validate_outputs.main() without letting sys.exit() propagate.
+    validate_outputs calls sys.exit(1) when checks fail — that would kill
+    the whole pipeline. We catch SystemExit, re-raise only on exit code 0
+    (clean exit), and convert failures (code 1) into a RuntimeError so
+    the pipeline logs them as FAIL rather than crashing.
+    """
+    import validate_outputs
     try:
-        mod = importlib.import_module(module)
-        mod.run(**kwargs)
-        print(f"\n  ✓  {step_key}  ({time.time()-t0:.1f}s)")
-        return True
-    except FileNotFoundError as e:
-        print(f"\n  ✗  {step_key} — missing input file: {e}")
-        print("     Ensure prerequisite steps have been run.")
-    except ModuleNotFoundError as e:
-        print(f"\n  ✗  {step_key} — module not found: {e}")
-        print(f"     Expected module file: {module}.py")
-    except TypeError as e:
-        print(f"\n  ✗  {step_key} — run() signature mismatch: {e}")
-        print("     Add '**kwargs' to the run() definition in that module.")
-        traceback.print_exc()
-    except Exception as e:
-        print(f"\n  ✗  {step_key}: {e}")
-        traceback.print_exc()
-    return False
+        validate_outputs.main()
+    except SystemExit as e:
+        if e.code not in (None, 0):
+            raise RuntimeError(
+                f"validate_outputs: {e.code} check(s) failed — see output above"
+            ) from None
+        # exit(0) means all checks passed; do nothing
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-# INTERACTIVE MENU
-# ══════════════════════════════════════════════════════════════════════════════
 
-def interactive_menu() -> list[str]:
-    print("\n" + "=" * 65)
-    print("  India Tourism Water Footprint — Pipeline")
-    print("=" * 65)
-    for i, (key, (name, _)) in enumerate(STEPS.items(), 1):
-        deps = STEP_DEPS.get(key, [])
-        note = f"  [needs: {', '.join(deps)}]" if deps else ""
-        print(f"    {i}. [{key:<22}] {name}{note}")
-    print("\n    A. Run ALL steps")
-    print("    Q. Quit\n")
-    choice = input("  Enter number(s), A, or Q: ").strip().upper()
-    if choice == "Q":
+
+def check_deps(step: str, completed: set[str], ignore: bool = False) -> list[str]:
+    """
+    Return list of unmet dependencies for `step`, or empty list if `ignore` is True.
+    """
+    if ignore:
         return []
-    if choice == "A":
-        return PIPELINE[:]
-    selected = []
-    for token in choice.replace(",", " ").split():
-        if token.isdigit() and 1 <= int(token) <= len(PIPELINE):
-            selected.append(PIPELINE[int(token) - 1])
-        elif token.lower() in STEPS:
-            selected.append(token.lower())
-        else:
-            print(f"  Unknown choice: {token}")
-    return selected
+    return [d for d in DEPS.get(step, []) if d not in completed]
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# MAIN
+# INTERACTIVE MENU  (restored from previous version)
 # ══════════════════════════════════════════════════════════════════════════════
 
-def main():
-    parser = argparse.ArgumentParser(
-        description="India Tourism Water Footprint Pipeline",
-        formatter_class=argparse.RawDescriptionHelpFormatter,
-        epilog=(
-            "Examples:\n"
-            "  python main.py --all\n"
-            "  python main.py --step build_io water_coefficients\n"
-            "  python main.py --step indirect_twf outbound_twf\n"
-            "  python main.py --step compare --ignore-deps\n"
-            "  python main.py --list"
-        ),
-    )
-    parser.add_argument("--all",  action="store_true", help="Run all steps in order")
-    parser.add_argument("--step", nargs="+", choices=list(STEPS), metavar="STEP",
-                        help="One or more step names")
-    parser.add_argument("--list", action="store_true", help="List steps and exit")
-    parser.add_argument("--continue-on-failure", action="store_true",
-                        help="Keep running after a step fails (--all mode only)")
-    parser.add_argument("--ignore-deps", action="store_true",
-                        help="Skip dependency checks")
-    args = parser.parse_args()
+def interactive_menu() -> tuple[list[str], str]:
+    """
+    Display numbered step menu. Returns (steps_to_run, stressor).
+    Mirrors the old main.py interactive experience, extended for water/energy.
+    """
+    bar = "=" * 65
 
-    if args.list:
-        print("\n  Steps and dependencies:")
-        for key, (name, _) in STEPS.items():
-            deps = STEP_DEPS.get(key, [])
-            note = f" [needs: {', '.join(deps)}]" if deps else " [no deps]"
-            print(f"    {key:<24} {name}{note}")
-        print("\n  Order:", " → ".join(PIPELINE))
-        return
+    while True:
+        print(f"\n{bar}")
+        print("  India Tourism Footprint — Pipeline")
+        print(bar)
+        print(f"  {'#':<4}  {'Step':<22}  {'Description'}")
+        print(f"  {'─'*4}  {'─'*22}  {'─'*34}")
+        for i, key in enumerate(PIPELINE, 1):
+            deps = DEPS.get(key, [])
+            dep_note = f"  [needs: {', '.join(deps)}]" if deps else ""
+            print(f"  {i:<4}  {key:<22}  {STEP_DESCS.get(key, '')}{dep_note}")
 
-    if args.all:
-        steps_to_run    = PIPELINE[:]
-        halt_on_failure = not args.continue_on_failure
-    elif args.step:
-        steps_to_run    = list(args.step)
-        halt_on_failure = False
-    else:
-        steps_to_run    = interactive_menu()
-        halt_on_failure = not args.continue_on_failure
-        if not steps_to_run:
-            print("  Nothing to run.")
-            return
+        print()
+        print("  Stressor presets:")
+        print("    W   — Run full WATER pipeline")
+        print("    E   — Run full ENERGY pipeline")
+        print("    A   — Run ALL steps (water + energy + combined report)")
+        print()
+        print("  Or enter step numbers separated by spaces/commas (e.g. 1 2 3)")
+        print("    Q   — Quit")
+        print(bar)
 
-    print(f"\n  Steps : {' → '.join(steps_to_run)}")
-    print(f"  Mode  : {'halt on failure' if halt_on_failure else 'continue on failure'}")
-    if args.ignore_deps:
-        print("  Deps  : checks disabled")
+        raw = input("  Your choice: ").strip().upper()
 
-    DIRS["logs"].mkdir(exist_ok=True)
-    start        = time.time()
-    ts           = int(start)
-    pipeline_log = DIRS["logs"] / f"pipeline_run_{ts}.log"
+        if raw == "Q" or raw == "":
+            return [], "water"
 
-    results: dict = {}
-    timings: dict = {}
-    skipped: dict = {}
+        if raw == "W":
+            _confirm_stressor("water")
+            return WATER_STEPS[:], "water"
 
-    for step in steps_to_run:
-        deps_ok, missing = check_deps(step, results, ignore=args.ignore_deps)
-        if not deps_ok:
-            print(f"\n  SKIP: {step}")
-            print(f"     Unsatisfied deps: {'; '.join(missing)}")
-            skipped[step] = missing
+        if raw == "E":
+            _confirm_stressor("energy")
+            return ENERGY_STEPS[:], "energy"
+
+        if raw == "A":
+            return ALL_STEPS[:], "combined"
+
+        # Parse individual step numbers / names
+        tokens  = raw.replace(",", " ").split()
+        selected: list[str] = []
+        invalid: list[str]  = []
+        for tok in tokens:
+            if tok.isdigit():
+                idx = int(tok)
+                if 1 <= idx <= len(PIPELINE):
+                    selected.append(PIPELINE[idx - 1])
+                else:
+                    invalid.append(tok)
+            elif tok.lower() in DEPS:
+                selected.append(tok.lower())
+            else:
+                invalid.append(tok)
+
+        if invalid:
+            print(f"\n  ⚠  Unknown input(s): {', '.join(invalid)} — try again.")
             continue
 
-        extra = {}
-        if step == "compare":
-            extra = dict(
-                start_ts        = start,
-                steps_req       = steps_to_run,
-                steps_completed = [s for s, ok in results.items() if ok],
-                steps_failed    = [s for s, ok in results.items() if not ok],
-                total_time      = time.time() - start,
-                pipeline_log    = pipeline_log,
-            )
+        if not selected:
+            print("\n  ⚠  Nothing selected — try again.")
+            continue
 
-        step_t0       = time.time()
-        ok            = run_step(step, **extra)
-        results[step] = ok
-        timings[step] = time.time() - step_t0
+        # Ask stressor when running individual steps
+        stressor = _ask_stressor()
+        return selected, stressor
 
-        if not ok and halt_on_failure:
-            print(f"\n  Pipeline halted at '{step}'.")
-            blocked = [s for s in steps_to_run
-                       if s not in results and step in STEP_DEPS.get(s, [])]
-            if blocked:
-                print(f"  Blocked downstream: {', '.join(blocked)}")
-            print("  Fix the issue and re-run.")
-            break
 
-    total_time = time.time() - start
+def _confirm_stressor(stressor: str):
+    print(f"\n  → Stressor: {stressor.upper()}")
 
-    # Summary
-    print(f"\n{'='*65}")
-    print(f"  PIPELINE SUMMARY  ({total_time:.0f}s total)")
-    print(f"{'='*65}")
-    for step in steps_to_run:
-        name  = STEPS[step][0]
-        t_s   = timings.get(step, 0)
-        t_str = f"{t_s:.0f}s" if t_s < 60 else f"{t_s/60:.1f}min"
-        if step in results:
-            tag = "✓ OK  " if results[step] else "✗ FAIL"
-            print(f"  {tag}  {step:<24}  {t_str:>6}  {name}")
-        elif step in skipped:
-            print(f"  SKIP  {step:<24}  {'—':>6}  missing: {', '.join(skipped[step])}")
+
+def _ask_stressor() -> str:
+    print("\n  Stressor for this run:")
+    print("    1  water    (default)")
+    print("    2  energy")
+    print("    3  combined")
+    raw = input("  Choice [1]: ").strip()
+    mapping = {"1": "water", "2": "energy", "3": "combined",
+               "water": "water", "energy": "energy", "combined": "combined"}
+    return mapping.get(raw, "water")
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# RUNNER
+# ══════════════════════════════════════════════════════════════════════════════
+
+def run_pipeline(steps: list[str], stressor: str, log: Logger,
+                 ignore_deps: bool = False) -> dict[str, str]:
+    """
+    Run a list of steps in order. Returns {step: "OK" | "SKIP" | "FAIL"}.
+    """
+    fns       = _get_step_fns()
+    completed: set[str] = set()
+    results:   dict[str, str] = {}
+    timing:    dict[str, float] = {}
+
+    for step in steps:
+        missing = check_deps(step, completed, ignore=ignore_deps)
+        if missing:
+            warn(f"Skipping '{step}' — unfulfilled deps: {missing}", log)
+            results[step] = "SKIP"
+            continue
+
+        if step not in fns:
+            warn(f"Unknown step '{step}'", log)
+            results[step] = "SKIP"
+            continue
+
+        log.section(f"STEP: {step.upper()}  [{stressor}]")
+        t0 = time.time()
+        try:
+            fns[step](stressor)
+            elapsed        = time.time() - t0
+            ok(f"Step '{step}' completed in {elapsed:.1f}s", log)
+            results[step]  = "OK"
+            completed.add(step)
+            timing[step]   = elapsed
+        except Exception as exc:
+            elapsed       = time.time() - t0
+            log.fail(f"Step '{step}' FAILED after {elapsed:.1f}s: {exc}")
+            log._log(traceback.format_exc())
+            results[step] = "FAIL"
+            timing[step]  = elapsed
+
+    # Summary table
+    log.section("PIPELINE SUMMARY")
+    log.table(
+        ["Step", "Status", "Time (s)"],
+        [[s, results.get(s, "—"), f"{timing.get(s, 0):.1f}"] for s in steps],
+    )
+    n_ok   = sum(1 for v in results.values() if v == "OK")
+    n_fail = sum(1 for v in results.values() if v == "FAIL")
+    n_skip = sum(1 for v in results.values() if v == "SKIP")
+    log.info(f"OK: {n_ok}  |  FAIL: {n_fail}  |  SKIP: {n_skip}")
+    return results
+
+
+def _run_combined(log: Logger, ignore_deps: bool = False):
+    ok("Running WATER stressor steps...", log)
+    run_pipeline(WATER_STEPS,  "water",  log, ignore_deps)
+    ok("Running ENERGY stressor steps...", log)
+    run_pipeline(ENERGY_STEPS, "energy", log, ignore_deps)
+    ok("Running combined report...", log)
+    try:
+        from report import run_report
+        run_report(mode="combined")
+    except Exception as exc:
+        log.fail(f"Combined report failed: {exc}")
+        log._log(traceback.format_exc())
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# CLI
+# ══════════════════════════════════════════════════════════════════════════════
+
+def _parse_args():
+    p = argparse.ArgumentParser(
+        description="India Tourism Water + Energy Footprint Pipeline",
+        formatter_class=argparse.RawTextHelpFormatter,
+        epilog=(
+            "Examples:\n"
+            "  python main.py                          # interactive menu\n"
+            "  python main.py --water                  # full water pipeline\n"
+            "  python main.py --energy                 # full energy pipeline\n"
+            "  python main.py --all                    # water + energy + combined\n"
+            "  python main.py --steps build_io demand coefficients\n"
+            "  python main.py --stressor energy --steps indirect sda\n"
+            "  python main.py --steps validate --ignore-deps\n"
+            "  python main.py --list-steps\n"
+        ),
+    )
+    mode = p.add_mutually_exclusive_group()
+    mode.add_argument("--water",  action="store_true", help="Run water pipeline")
+    mode.add_argument("--energy", action="store_true", help="Run energy pipeline")
+    mode.add_argument("--all",    action="store_true", help="Run water + energy + combined")
+
+    p.add_argument("--stressor", choices=list(STRESSORS) + ["combined"],
+                   default=None, help="Override stressor")
+    p.add_argument("--steps", nargs="+", default=None,
+                   choices=list(_get_step_fns()), metavar="STEP",
+                   help="Run specific steps only")
+    p.add_argument("--list-steps", action="store_true",
+                   help="Print all steps and exit")
+    p.add_argument("--ignore-deps", action="store_true",
+                   help="Skip dependency checks")
+    p.add_argument("--years", nargs="+", default=STUDY_YEARS,
+                   help=f"Study years (default: {STUDY_YEARS})")
+    return p.parse_args()
+
+
+def main():
+    args = _parse_args()
+
+    if args.list_steps:
+        print("\n  Steps and dependencies:")
+        for key in PIPELINE:
+            deps = DEPS.get(key, [])
+            dep_str = f"  [needs: {', '.join(deps)}]" if deps else "  [no deps]"
+            print(f"    {key:<22}  {STEP_DESCS.get(key, '')}{dep_str}")
+        print(f"\n  Order: {' → '.join(PIPELINE)}")
+        sys.exit(0)
+
+    # ── Determine steps + stressor ────────────────────────────────────────────
+    interactive = False
+    if args.all:
+        stressor, steps = "combined", ALL_STEPS[:]
+    elif args.water:
+        stressor, steps = "water",    WATER_STEPS[:]
+    elif args.energy:
+        stressor, steps = "energy",   ENERGY_STEPS[:]
+    elif args.stressor:
+        stressor = args.stressor
+        steps    = args.steps or (WATER_STEPS if stressor == "water"
+                                  else ENERGY_STEPS if stressor == "energy"
+                                  else ALL_STEPS)
+    elif args.steps:
+        stressor = "water"   # default stressor when steps given without --stressor
+        steps    = args.steps
+    else:
+        # No CLI flags → launch interactive menu
+        interactive = True
+        steps, stressor = interactive_menu()
+        if not steps:
+            print("  Nothing to run. Exiting.")
+            sys.exit(0)
+
+    # ── Run ───────────────────────────────────────────────────────────────────
+    DIRS["logs"].mkdir(parents=True, exist_ok=True)
+    with Logger("pipeline", DIRS["logs"]) as log:
+        t = Timer()
+        log.section(f"INDIA TOURISM FOOTPRINT PIPELINE  [{stressor.upper()}]")
+        log.info(f"Steps    : {' → '.join(steps)}")
+        log.info(f"Stressor : {stressor}")
+        log.info(f"Years    : {args.years if not interactive else STUDY_YEARS}")
+        if args.ignore_deps:
+            log.info("Deps     : checks DISABLED (--ignore-deps)")
+
+        if stressor == "combined":
+            _run_combined(log, ignore_deps=args.ignore_deps)
         else:
-            print(f"  ----  {step:<24}  {'—':>6}  (halted before this step)")
+            run_pipeline(steps, stressor, log, ignore_deps=args.ignore_deps)
 
-    # Write pipeline log
-    with open(pipeline_log, "w", encoding="utf-8") as f:
-        f.write(f"Run   : {time.strftime('%Y-%m-%d %H:%M:%S')}\n")
-        f.write(f"Steps : {', '.join(steps_to_run)}\n")
-        f.write(f"Halt  : {halt_on_failure}  |  IgnoreDeps: {args.ignore_deps}\n")
-        f.write(f"Time  : {total_time:.0f}s\n\n")
-        for step in steps_to_run:
-            if step in results:
-                f.write(f"{'OK' if results[step] else 'FAILED'}: {step}\n")
-            elif step in skipped:
-                f.write(f"SKIPPED: {step}  ({', '.join(skipped[step])})\n")
-            else:
-                f.write(f"NOT_RUN: {step}\n")
-
-    print(f"\n  Pipeline log: {pipeline_log}\n")
+        log.ok(f"Pipeline complete in {t.elapsed()}")
 
 
 if __name__ == "__main__":

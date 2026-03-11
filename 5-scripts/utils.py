@@ -231,6 +231,60 @@ def fmt_m3(val: float) -> str:
     return f"{val:,.0f} m³"
 
 
+def fmt_mj(val: float) -> str:
+    """Smart formatter for energy: auto-selects MJ / GJ / TJ / PJ."""
+    if val is None or (isinstance(val, float) and np.isnan(val)):
+        return "—"
+    if abs(val) >= 1e12:
+        return f"{val/1e12:.3f} PJ"
+    if abs(val) >= 1e9:
+        return f"{val/1e9:.3f} TJ"
+    if abs(val) >= 1e6:
+        return f"{val/1e6:.1f} GJ"
+    return f"{val:,.0f} MJ"
+
+
+def safe_divide(numerator: float, denominator: float, default: float = 0.0) -> float:
+    """Division that returns `default` instead of raising on zero denominator."""
+    try:
+        if denominator == 0:
+            return default
+        return numerator / denominator
+    except (TypeError, ZeroDivisionError):
+        return default
+
+
+def enrich_df(df: "pd.DataFrame", value_col: str,
+              add_total: bool = False, label_col: str = "Country") -> "pd.DataFrame":
+    """
+    Add a Share_pct column (value / sum × 100) to df.
+    Optionally append a TOTAL row.
+    """
+    import pandas as pd
+    df = df.copy()
+    total_val = df[value_col].sum()
+    df["Share_pct"] = df[value_col].apply(
+        lambda v: round(safe_divide(v, total_val) * 100, 2)
+    )
+    if add_total and not df.empty:
+        total_row = {c: "" for c in df.columns}
+        total_row[label_col] = "TOTAL"
+        total_row[value_col] = total_val
+        total_row["Share_pct"] = 100.0
+        df = pd.concat([df, pd.DataFrame([total_row])], ignore_index=True)
+    return df
+
+
+def add_total_row(df: "pd.DataFrame", label_col: str = "Year",
+                  numeric_only: bool = True) -> "pd.DataFrame":
+    """Append a TOTAL row summing all numeric columns."""
+    import pandas as pd
+    num_cols = df.select_dtypes(include="number").columns.tolist() if numeric_only else []
+    total_row = {c: df[c].sum() if c in num_cols else ("TOTAL" if c == label_col else "")
+                 for c in df.columns}
+    return pd.concat([df, pd.DataFrame([total_row])], ignore_index=True)
+
+
 def crore_to_usd_m(crore: float, rate: float) -> float:
     """
     Convert ₹ crore → USD million.
