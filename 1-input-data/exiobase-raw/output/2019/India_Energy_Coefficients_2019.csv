@@ -16,81 +16,81 @@ Sector_Index,Sector_Code,Sector_Name,Broad_Category,Energy_2019_Final_TJ_per_EUR
 14,IN.14,Wool/silk,Agriculture,0.0,0.0,0.0,0.0,False
 15,IN.15,Forestry,Agriculture,0.0,0.0,0.0,0.0,False
 16,IN.16,Fishing,Agriculture,0.0,0.0,0.0,0.0,False
-17,IN.17,Sector 17,Mining,0.0,0.0,0.0,0.0,False
-18,IN.18,Sector 18,Mining,0.0,0.0,0.0,0.0,False
-19,IN.19,Sector 19,Mining,0.0,0.0,0.0,0.0,False
-20,IN.20,Sector 20,Mining,0.0,0.0,0.0,0.0,False
-21,IN.21,Sector 21,Mining,0.0,0.0,0.0,0.0,False
-22,IN.22,Sector 22,Mining,0.0,0.0,0.0,0.0,False
-23,IN.23,Sector 23,Mining,0.0,0.0,0.0,0.0,False
-24,IN.24,Sector 24,Mining,0.0,0.0,0.0,0.0,False
-25,IN.25,Sector 25,Mining,0.0,0.0,0.0,0.0,False
-26,IN.26,Sector 26,Mining,0.0,0.0,0.0,0.0,False
-27,IN.27,Sector 27,Mining,0.0,0.0,0.0,0.0,False
-28,IN.28,Sector 28,Mining,0.0,0.0,0.0,0.0,False
-29,IN.29,Sector 29,Mining,0.0,0.0,0.0,0.0,False
-30,IN.30,Sector 30,Mining,0.0,0.0,0.0,0.0,False
-31,IN.31,Sector 31,Mining,0.0,0.0,0.0,0.0,False
-32,IN.32,Sector 32,Mining,0.0,0.0,0.0,0.0,False
-33,IN.33,Sector 33,Mining,0.0,0.0,0.0,0.0,False
-34,IN.34,Sector 34,Manufacturing,0.0,0.0,0.0,0.0,False
-35,IN.35,Sector 35,Manufacturing,0.0,0.0,0.0,0.0,False
-36,IN.36,Sector 36,Manufacturing,0.0,0.0,0.0,0.0,False
-37,IN.37,Sector 37,Manufacturing,0.0,0.0,0.0,0.0,False
-38,IN.38,Sector 38,Manufacturing,0.0,0.0,0.0,0.0,False
-39,IN.39,Sector 39,Manufacturing,0.0,0.0,0.0,0.0,False
-40,IN.40,Sector 40,Manufacturing,0.0,0.0,0.0,0.0,False
-41,IN.41,Sector 41,Manufacturing,0.0,0.0,0.0,0.0,False
-42,IN.42,Sector 42,Manufacturing,0.0,0.0,0.0,0.0,False
-43,IN.43,Sector 43,Manufacturing,0.0,0.0,0.0,0.0,False
-44,IN.44,Sector 44,Manufacturing,0.0,0.0,0.0,0.0,False
-45,IN.45,Sector 45,Manufacturing,0.0,0.0,0.0,0.0,False
-46,IN.46,Sector 46,Manufacturing,0.0,0.0,0.0,0.0,False
-47,IN.47,Sector 47,Manufacturing,0.0,0.0,0.0,0.0,False
-48,IN.48,Sector 48,Manufacturing,0.0,0.0,0.0,0.0,False
-49,IN.49,Sector 49,Manufacturing,0.0,0.0,0.0,0.0,False
-50,IN.50,Sector 50,Manufacturing,0.0,0.0,0.0,0.0,False
-51,IN.51,Sector 51,Manufacturing,0.0,0.0,0.0,0.0,False
-52,IN.52,Sector 52,Manufacturing,0.0,0.0,0.0,0.0,False
-53,IN.53,Sector 53,Manufacturing,0.0,0.0,0.0,0.0,False
-54,IN.54,Sector 54,Manufacturing,0.0,0.0,0.0,0.0,False
-55,IN.55,Sector 55,Manufacturing,0.0,0.0,0.0,0.0,False
-56,IN.56,Sector 56,Manufacturing,0.0,0.0,0.0,0.0,False
-57,IN.57,Sector 57,Manufacturing,0.0,0.0,0.0,0.0,False
-58,IN.58,Sector 58,Manufacturing,0.0,0.0,0.0,0.0,False
-59,IN.59,Sector 59,Manufacturing,0.0,0.0,0.0,0.0,False
-60,IN.60,Sector 60,Manufacturing,0.0,0.0,0.0,0.0,False
-61,IN.61,Sector 61,Manufacturing,0.0,0.0,0.0,0.0,False
-62,IN.62,Sector 62,Manufacturing,0.0,0.0,0.0,0.0,False
-63,IN.63,Sector 63,Manufacturing,0.0,0.0,0.0,0.0,False
-64,IN.64,Sector 64,Manufacturing,0.0,0.0,0.0,0.0,False
-65,IN.65,Sector 65,Manufacturing,0.0,0.0,0.0,0.0,False
-66,IN.66,Sector 66,Manufacturing,0.0,0.0,0.0,0.0,False
-67,IN.67,Sector 67,Manufacturing,0.0,0.0,0.0,0.0,False
-68,IN.68,Sector 68,Manufacturing,0.0,0.0,0.0,0.0,False
-69,IN.69,Sector 69,Manufacturing,0.0,0.0,0.0,0.0,False
-70,IN.70,Sector 70,Manufacturing,0.0,0.0,0.0,0.0,False
-71,IN.71,Sector 71,Manufacturing,0.0,0.0,0.0,0.0,False
-72,IN.72,Sector 72,Manufacturing,0.0,0.0,0.0,0.0,False
-73,IN.73,Sector 73,Manufacturing,0.0,0.0,0.0,0.0,False
-74,IN.74,Sector 74,Manufacturing,0.0,0.0,0.0,0.0,False
-75,IN.75,Sector 75,Manufacturing,0.0,0.0,0.0,0.0,False
-76,IN.76,Sector 76,Manufacturing,0.0,0.0,0.0,0.0,False
-77,IN.77,Sector 77,Manufacturing,0.0,0.0,0.0,0.0,False
-78,IN.78,Sector 78,Manufacturing,0.0,0.0,0.0,0.0,False
-79,IN.79,Sector 79,Manufacturing,0.0,0.0,0.0,0.0,False
-80,IN.80,Sector 80,Manufacturing,0.0,0.0,0.0,0.0,False
-81,IN.81,Sector 81,Manufacturing,0.0,0.0,0.0,0.0,False
-82,IN.82,Sector 82,Energy Processing,0.0,0.0,0.0,0.0,False
-83,IN.83,Sector 83,Energy Processing,0.0,0.0,0.0,0.0,False
-84,IN.84,Sector 84,Energy Processing,0.0,0.0,0.0,0.0,False
-85,IN.85,Sector 85,Energy Processing,0.0,0.0,0.0,0.0,False
-86,IN.86,Sector 86,Energy Processing,0.0,0.0,0.0,0.0,False
-87,IN.87,Sector 87,Energy Processing,0.0,0.0,0.0,0.0,False
-88,IN.88,Sector 88,Energy Processing,0.0,0.0,0.0,0.0,False
-89,IN.89,Sector 89,Energy Processing,0.0,0.0,0.0,0.0,False
-90,IN.90,Sector 90,Energy Processing,0.0,0.0,0.0,0.0,False
-91,IN.91,Sector 91,Energy Processing,0.0,0.0,0.0,0.0,False
+17,IN.17,Anthracite,Mining,0.0,0.0,0.0,0.0,False
+18,IN.18,Coking Coal,Mining,0.0,0.0,0.0,0.0,False
+19,IN.19,Bituminous Coal,Mining,0.0,0.0,0.0,0.0,False
+20,IN.20,Sub-Bituminous Coal,Mining,0.0,0.0,0.0,0.0,False
+21,IN.21,Patent Fuel,Mining,0.0,0.0,0.0,0.0,False
+22,IN.22,Lignite,Mining,0.0,0.0,0.0,0.0,False
+23,IN.23,BKB/Peat,Mining,0.0,0.0,0.0,0.0,False
+24,IN.24,Peat,Mining,0.0,0.0,0.0,0.0,False
+25,IN.25,Crude petroleum,Mining,0.0,0.0,0.0,0.0,False
+26,IN.26,Natural gas,Mining,0.0,0.0,0.0,0.0,False
+27,IN.27,Gas liquids,Mining,0.0,0.0,0.0,0.0,False
+28,IN.28,Other hydrocarbons,Mining,0.0,0.0,0.0,0.0,False
+29,IN.29,Uranium/thorium,Mining,0.0,0.0,0.0,0.0,False
+30,IN.30,Iron ores,Mining,0.0,0.0,0.0,0.0,False
+31,IN.31,Copper ores,Mining,0.0,0.0,0.0,0.0,False
+32,IN.32,Nickel ores,Mining,0.0,0.0,0.0,0.0,False
+33,IN.33,Aluminium ores,Mining,0.0,0.0,0.0,0.0,False
+34,IN.34,Meat cattle,Manufacturing,0.0,0.0,0.0,0.0,False
+35,IN.35,Meat pigs,Manufacturing,0.0,0.0,0.0,0.0,False
+36,IN.36,Meat poultry,Manufacturing,0.0,0.0,0.0,0.0,False
+37,IN.37,Meat nec,Manufacturing,0.0,0.0,0.0,0.0,False
+38,IN.38,Vegetable oils,Manufacturing,0.0,0.0,0.0,0.0,False
+39,IN.39,Dairy products,Manufacturing,0.0,0.0,0.0,0.0,False
+40,IN.40,Processed rice,Manufacturing,0.0,0.0,0.0,0.0,False
+41,IN.41,Sugar,Manufacturing,0.0,0.0,0.0,0.0,False
+42,IN.42,Food products nec,Manufacturing,0.0,0.0,0.0,0.0,False
+43,IN.43,Beverages,Manufacturing,0.0,0.0,0.0,0.0,False
+44,IN.44,Fish products,Manufacturing,0.0,0.0,0.0,0.0,False
+45,IN.45,Tobacco products,Manufacturing,0.0,0.0,0.0,0.0,False
+46,IN.46,Textiles,Manufacturing,0.0,0.0,0.0,0.0,False
+47,IN.47,Wearing apparel,Manufacturing,0.0,0.0,0.0,0.0,False
+48,IN.48,Leather products,Manufacturing,0.0,0.0,0.0,0.0,False
+49,IN.49,Wood products,Manufacturing,0.0,0.0,0.0,0.0,False
+50,IN.50,Pulp,Manufacturing,0.0,0.0,0.0,0.0,False
+51,IN.51,Re-processed paper,Manufacturing,0.0,0.0,0.0,0.0,False
+52,IN.52,Paper products,Manufacturing,0.0,0.0,0.0,0.0,False
+53,IN.53,Printed matter,Manufacturing,0.0,0.0,0.0,0.0,False
+54,IN.54,Coke Oven Coke,Manufacturing,0.0,0.0,0.0,0.0,False
+55,IN.55,Gas Coke,Manufacturing,0.0,0.0,0.0,0.0,False
+56,IN.56,Coal Tar,Manufacturing,0.0,0.0,0.0,0.0,False
+57,IN.57,Gas Works Gas,Manufacturing,0.0,0.0,0.0,0.0,False
+58,IN.58,Coke oven gas,Manufacturing,0.0,0.0,0.0,0.0,False
+59,IN.59,Blast Furnace Gas,Manufacturing,0.0,0.0,0.0,0.0,False
+60,IN.60,Other recovered gases,Manufacturing,0.0,0.0,0.0,0.0,False
+61,IN.61,Petroleum Refinery,Manufacturing,0.0,0.0,0.0,0.0,False
+62,IN.62,Ethane,Manufacturing,0.0,0.0,0.0,0.0,False
+63,IN.63,LPG,Manufacturing,0.0,0.0,0.0,0.0,False
+64,IN.64,Motor Gasoline,Manufacturing,0.0,0.0,0.0,0.0,False
+65,IN.65,Aviation Gasoline,Manufacturing,0.0,0.0,0.0,0.0,False
+66,IN.66,Jet Fuel (gasoline),Manufacturing,0.0,0.0,0.0,0.0,False
+67,IN.67,Jet Fuel (kerosene),Manufacturing,0.0,0.0,0.0,0.0,False
+68,IN.68,Kerosene,Manufacturing,0.0,0.0,0.0,0.0,False
+69,IN.69,Gas/Diesel Oil,Manufacturing,0.0,0.0,0.0,0.0,False
+70,IN.70,Heavy Fuel Oil,Manufacturing,0.0,0.0,0.0,0.0,False
+71,IN.71,Refinery Gas,Manufacturing,0.0,0.0,0.0,0.0,False
+72,IN.72,Liquefied Refinery Gas,Manufacturing,0.0,0.0,0.0,0.0,False
+73,IN.73,Refinery Feedstocks,Manufacturing,0.0,0.0,0.0,0.0,False
+74,IN.74,Additives,Manufacturing,0.0,0.0,0.0,0.0,False
+75,IN.75,Other Hydrocarbons,Manufacturing,0.0,0.0,0.0,0.0,False
+76,IN.76,White Spirit,Manufacturing,0.0,0.0,0.0,0.0,False
+77,IN.77,Lubricants,Manufacturing,0.0,0.0,0.0,0.0,False
+78,IN.78,Bitumen,Manufacturing,0.0,0.0,0.0,0.0,False
+79,IN.79,Paraffin Waxes,Manufacturing,0.0,0.0,0.0,0.0,False
+80,IN.80,Petroleum Coke,Manufacturing,0.0,0.0,0.0,0.0,False
+81,IN.81,Non-spec Petroleum,Manufacturing,0.0,0.0,0.0,0.0,False
+82,IN.82,Industrial Biofuels,Energy Processing,0.0,0.0,0.0,0.0,False
+83,IN.83,Municipal wastes (renew),Energy Processing,0.0,0.0,0.0,0.0,False
+84,IN.84,Solid biofuels,Energy Processing,0.0,0.0,0.0,0.0,False
+85,IN.85,Other liquid biofuels,Energy Processing,0.0,0.0,0.0,0.0,False
+86,IN.86,Municipal Wastes (non-renew),Energy Processing,0.0,0.0,0.0,0.0,False
+87,IN.87,Solid biofuels (2),Energy Processing,0.0,0.0,0.0,0.0,False
+88,IN.88,Other liquid biofuels (2),Energy Processing,0.0,0.0,0.0,0.0,False
+89,IN.89,N-fertiliser,Energy Processing,0.0,0.0,0.0,0.0,False
+90,IN.90,P-fertiliser,Energy Processing,0.0,0.0,0.0,0.0,False
+91,IN.91,Chemicals nec,Energy Processing,0.0,0.0,0.0,0.0,False
 92,IN.92,Electricity coal,Utilities/Energy,0.0,0.0,0.0,0.0,False
 93,IN.93,Electricity gas,Utilities/Energy,0.0,0.0,0.0,0.0,False
 94,IN.94,Electricity nuclear,Utilities/Energy,0.0,0.0,0.0,0.0,False
@@ -108,35 +108,35 @@ Sector_Index,Sector_Code,Sector_Name,Broad_Category,Energy_2019_Final_TJ_per_EUR
 106,IN.106,Gas distribution,Utilities/Energy,0.0,0.0,0.0,0.0,False
 107,IN.107,Steam/hot water,Utilities/Energy,0.0,0.0,0.0,0.0,False
 108,IN.108,Water supply,Utilities/Energy,0.0,0.0,0.0,0.0,False
-109,IN.109,Sector 109,Services,0.0,0.0,0.0,0.0,False
-110,IN.110,Sector 110,Services,0.0,0.0,0.0,0.0,False
-111,IN.111,Sector 111,Services,0.0,0.0,0.0,0.0,False
-112,IN.112,Sector 112,Services,0.0,0.0,0.0,0.0,False
+109,IN.109,Construction,Services,0.0,0.0,0.0,0.0,False
+110,IN.110,Motor vehicles,Services,0.0,0.0,0.0,0.0,False
+111,IN.111,Wholesale trade,Services,0.0,0.0,0.0,0.0,False
+112,IN.112,Retail trade,Services,0.0,0.0,0.0,0.0,False
 113,IN.113,Hotels and restaurants,Services,0.0,0.0,0.0,0.0,False
 114,IN.114,Railway transport,Services,0.0,0.0,0.0,0.0,False
 115,IN.115,Road transport,Services,0.0,0.0,0.0,0.0,False
-116,IN.116,Sector 116,Services,0.0,0.0,0.0,0.0,False
-117,IN.117,Sector 117,Services,0.0,0.0,0.0,0.0,False
-118,IN.118,Sector 118,Services,0.0,0.0,0.0,0.0,False
+116,IN.116,Pipeline transport,Services,0.0,0.0,0.0,0.0,False
+117,IN.117,Sea/coastal transport,Services,0.0,0.0,0.0,0.0,False
+118,IN.118,Inland water transport,Services,0.0,0.0,0.0,0.0,False
 119,IN.119,Air transport,Services,0.0,0.0,0.0,0.0,False
-120,IN.120,Sector 120,Services,0.0,0.0,0.0,0.0,False
-121,IN.121,Sector 121,Services,0.0,0.0,0.0,0.0,False
-122,IN.122,Sector 122,Services,0.0,0.0,0.0,0.0,False
-123,IN.123,Sector 123,Services,0.0,0.0,0.0,0.0,False
-124,IN.124,Sector 124,Services,0.0,0.0,0.0,0.0,False
-125,IN.125,Sector 125,Services,0.0,0.0,0.0,0.0,False
-126,IN.126,Sector 126,Services,0.0,0.0,0.0,0.0,False
-127,IN.127,Sector 127,Services,0.0,0.0,0.0,0.0,False
-128,IN.128,Sector 128,Services,0.0,0.0,0.0,0.0,False
-129,IN.129,Sector 129,Services,0.0,0.0,0.0,0.0,False
-130,IN.130,Sector 130,Services,0.0,0.0,0.0,0.0,False
-131,IN.131,Sector 131,Services,0.0,0.0,0.0,0.0,False
-132,IN.132,Sector 132,Services,0.0,0.0,0.0,0.0,False
-133,IN.133,Sector 133,Services,0.0,0.0,0.0,0.0,False
-134,IN.134,Sector 134,Services,0.0,0.0,0.0,0.0,False
-135,IN.135,Sector 135,Services,0.0,0.0,0.0,0.0,False
-136,IN.136,Sector 136,Services,0.0,0.0,0.0,0.0,False
-137,IN.137,Sector 137,Services,0.0,0.0,0.0,0.0,False
+120,IN.120,Transport support/travel agencies,Services,0.0,0.0,0.0,0.0,False
+121,IN.121,Post and telecom,Services,0.0,0.0,0.0,0.0,False
+122,IN.122,Financial services,Services,0.0,0.0,0.0,0.0,False
+123,IN.123,Insurance,Services,0.0,0.0,0.0,0.0,False
+124,IN.124,Financial auxiliaries,Services,0.0,0.0,0.0,0.0,False
+125,IN.125,Real estate,Services,0.0,0.0,0.0,0.0,False
+126,IN.126,Machinery rental,Services,0.0,0.0,0.0,0.0,False
+127,IN.127,Computer services,Services,0.0,0.0,0.0,0.0,False
+128,IN.128,R&D services,Services,0.0,0.0,0.0,0.0,False
+129,IN.129,Business services,Services,0.0,0.0,0.0,0.0,False
+130,IN.130,Public administration,Services,0.0,0.0,0.0,0.0,False
+131,IN.131,Education,Services,0.0,0.0,0.0,0.0,False
+132,IN.132,Health and social work,Services,0.0,0.0,0.0,0.0,False
+133,IN.133,Sewage/refuse,Services,0.0,0.0,0.0,0.0,False
+134,IN.134,Membership organizations,Services,0.0,0.0,0.0,0.0,False
+135,IN.135,Recreational/cultural,Services,0.0,0.0,0.0,0.0,False
+136,IN.136,Other services,Services,0.0,0.0,0.0,0.0,False
+137,IN.137,Private households,Services,0.0,0.0,0.0,0.0,False
 138,IN.138,Sector 138,Other,0.0,0.0,0.0,0.0,False
 139,IN.139,Sector 139,Other,0.0,0.0,0.0,0.0,False
 140,IN.140,Sector 140,Other,0.0,0.0,0.0,0.0,False

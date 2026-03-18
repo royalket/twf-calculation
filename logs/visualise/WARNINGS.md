@@ -257,3 +257,153 @@
 - ⚠  Missing: sc_path_top50_2015.csv — panel will be skipped
 - ⚠  Missing: sc_path_top50_2019.csv — panel will be skipped
 - ⚠  Missing: sc_path_top50_2022.csv — panel will be skipped
+
+## visualise_results  (2026-03-11 21:31)
+
+- ⚠  Missing: sc_path_top50_2015.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2019.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2022.csv — panel will be skipped
+
+## visualise_results  (2026-03-12 07:35)
+
+- ⚠  Missing: sc_path_top50_2015.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2019.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2022.csv — panel will be skipped
+
+## visualise_results  (2026-03-12 07:45)
+
+- ⚠  Missing: sc_path_top50_2015.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2019.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2022.csv — panel will be skipped
+
+## visualise_results  (2026-03-12 09:46)
+
+- ⚠  Missing: sc_path_top50_2015.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2019.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2022.csv — panel will be skipped
+
+## visualise_results  (2026-03-12 09:47)
+
+- ⚠  Missing: sc_path_top50_2015.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2019.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2022.csv — panel will be skipped
+
+## visualise_results  (2026-03-13 07:10)
+
+- ⚠  Missing: sc_path_top50_2015.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2019.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2022.csv — panel will be skipped
+
+## visualise_results  (2026-03-13 07:16)
+
+- ⚠  Missing: sc_path_top50_2015.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2019.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2022.csv — panel will be skipped
+
+## visualise_results  (2026-03-13 07:31)
+
+- ⚠  Missing: sc_path_top50_2015.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2019.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2022.csv — panel will be skipped
+
+## visualise_results  (2026-03-13 08:17)
+
+- ⚠  Missing: sc_path_top50_2015.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2019.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2022.csv — panel will be skipped
+
+## visualise_results  (2026-03-13 08:18)
+
+- ⚠  Missing: sc_path_top50_2015.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2019.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2022.csv — panel will be skipped
+
+## visualise_results  (2026-03-13 08:31)
+
+- ⚠  Missing: sc_path_top50_2015.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2019.csv — panel will be skipped
+- ⚠  Missing: sc_path_top50_2022.csv — panel will be skipped
+
+## visualise_results  (2026-03-13 09:05)
+
+- ⚠  Figure 7 — SDA waterfall (million m³, CI caps, act bands) — ERROR: 'Total_Water_m3'
+- ⚠  Figure 8 — Ridge plot + embedded tornado inset — ERROR: 'Total_Water_m3'
+- ⚠  FAILED: Figure 7 — SDA waterfall (million m³, CI caps, act bands)
+- ⚠  FAILED: Figure 8 — Ridge plot + embedded tornado inset
+
+## visualise_results  (2026-03-13 09:32)
+
+- ⚠  Missing: mc_variance_decomp.csv — panel will use fallback data
+
+## visualise_results  (2026-03-13 09:49)
+
+- ⚠  Missing: mc_variance_decomp.csv — panel will use fallback data
+
+## visualise_results  (2026-03-13 09:50)
+
+- ⚠  Missing: mc_variance_decomp.csv — panel will use fallback data
+
+## visualise_results  (2026-03-13 09:50)
+
+- ⚠  Figure 7 — SDA waterfall (million m³) — ERROR: 'Total_Water_m3'
+- ⚠  FAILED: Figure 7 — SDA waterfall (million m³)
+
+## visualise_results  (2026-03-14 11:43)
+
+- ⚠  Figure 7 — SDA waterfall (million m³) — ERROR: 'Total_Water_m3'
+- ⚠  FAILED: Figure 7 — SDA waterfall (million m³)
+
+## visualise_results  (2026-03-14 12:07)
+
+- ⚠  Figure 7 — SDA waterfall (million m³) — ERROR: 'Total_Water_m3'
+- ⚠  FAILED: Figure 7 — SDA waterfall (million m³)
+
+## visualise_results  (2026-03-14 15:44)
+
+- ⚠  Figure 7 — SDA waterfall (million m³) — ERROR: 'Total_Water_m3'
+- ⚠  FAILED: Figure 7 — SDA waterfall (million m³)
+
+## visualise_results  (2026-03-14 15:49)
+
+- ⚠  Figure 7 — SDA waterfall (million m³) — ERROR: 'Total_Water_m3'
+- ⚠  FAILED: Figure 7 — SDA waterfall (million m³)
+
+## visualise_results  (2026-03-14 16:19)
+
+- ⚠  Figure 7 — SDA waterfall (million m³) — ERROR: 'Total_Water_m3'
+- ⚠  FAILED: Figure 7 — SDA waterfall (million m³)
+
+## visualise_results  (2026-03-14 16:30)
+
+- ⚠  Figure 7 — SDA waterfall (million m³) — ERROR: 'Total_Water_m3'
+- ⚠  FAILED: Figure 7 — SDA waterfall (million m³)
+
+## visualise_results  (2026-03-14 16:37)
+
+- ⚠  Figure 7 — SDA waterfall (million m³) — ERROR: 'Total_Water_m3'
+- ⚠  FAILED: Figure 7 — SDA waterfall (million m³)
+
+## visualise_results  (2026-03-14 17:31)
+
+- ⚠  Figure 7 — SDA waterfall (million m³) — ERROR: 'steps-post' is not a valid value for ls; supported values are '-', '--', '-.', ':', 'None', ' ', '', 'solid', 'dashed', 'dashdot', 'dotted'
+- ⚠  FAILED: Figure 7 — SDA waterfall (million m³)
+
+## visualise_results  (2026-03-14 17:49)
+
+- ⚠  Figure 7 — SDA waterfall (million m³) — ERROR: 'steps-post' is not a valid value for ls; supported values are '-', '--', '-.', ':', 'None', ' ', '', 'solid', 'dashed', 'dashdot', 'dotted'
+- ⚠  FAILED: Figure 7 — SDA waterfall (million m³)
+
+## visualise_results  (2026-03-14 21:39)
+
+- ⚠  Figure 7 — SDA waterfall (million m³) — ERROR: 'steps-post' is not a valid value for ls; supported values are '-', '--', '-.', ':', 'None', ' ', '', 'solid', 'dashed', 'dashdot', 'dotted'
+- ⚠  FAILED: Figure 7 — SDA waterfall (million m³)
+
+## visualise_results  (2026-03-14 21:54)
+
+- ⚠  Figure 7 — SDA waterfall (million m³) — ERROR: 'steps-post' is not a valid value for ls; supported values are '-', '--', '-.', ':', 'None', ' ', '', 'solid', 'dashed', 'dashdot', 'dotted'
+- ⚠  FAILED: Figure 7 — SDA waterfall (million m³)
+
+## visualise_results  (2026-03-14 22:03)
+
+- ⚠  Figure 7 — SDA waterfall (million m³) — ERROR: 'steps-post' is not a valid value for ls; supported values are '-', '--', '-.', ':', 'None', ' ', '', 'solid', 'dashed', 'dashdot', 'dotted'
+- ⚠  FAILED: Figure 7 — SDA waterfall (million m³)

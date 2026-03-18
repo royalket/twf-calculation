@@ -16,29 +16,35 @@ Usage (interactive — no args)
 ------------------------------
     python main.py                       # launches interactive menu
 
-Steps
------
-    build_io        — build_io_tables.py        (SUT → L)
-    demand          — build_tourism_demand.py   (TSA demand vectors)
-    coefficients    — build_water_coefficients.py  (F.txt → SUT 140)
-    indirect        — calculate_indirect_twf.py (W×L×Y)
-    direct          — calculate_direct_twf.py   (activity-based)
-    water           — outbound_twf.py           (outbound WF + net balance)
-    energy          — energy.py                 (outbound EF + benchmarks)
-    sda             — calculate_sda_mc.py       (SDA + MC + supply-chain)
-    report          — compare_years.py          (cross-year report + Markdown)
-    visualise       — visualise_results.py      (all charts)
-    validate        — validate_outputs.py       (sanity checks)
+Steps (post-merge naming)
+--------------------------
+    build_io        — build_io.py              (SUT → L)
+    demand          — build_demand.py          (TSA demand vectors)
+    coefficients    — build_coefficients.py    (F.txt → SUT 140, water + energy)
+    indirect        — indirect.py              (C×L×Y, water + energy)
+    direct          — direct.py                (activity-based direct TWF)
+    outbound        — outbound.py              (outbound footprint + net balance)
+    sda             — decompose.py             (SDA + MC + supply-chain)
+    report          — compare.py               (cross-year report + Markdown)
+    visualise       — visualise.py             (all charts)
+    validate        — validate_outputs.py      (sanity checks)
+
+TODO-1: Remove sys.path.insert() after packaging with pyproject.toml + pip install -e .
+        Replace with proper package imports.
+TODO-2: Replace __import__ in step registry with importlib.import_module.
 """
 
 from __future__ import annotations
 import argparse
+import importlib
 import sys
 import time
 import traceback
 from pathlib import Path
 
+# TODO-1: remove after packaging
 sys.path.insert(0, str(Path(__file__).parent))
+
 from config import DIRS, STUDY_YEARS, STRESSORS
 from utils import Logger, Timer, section, ok, warn, table_str
 
@@ -48,67 +54,92 @@ from utils import Logger, Timer, section, ok, warn, table_str
 # ══════════════════════════════════════════════════════════════════════════════
 
 def _get_step_fns() -> dict:
-    """Lazy import all step run() functions."""
+    """
+    Lazy import all step run() functions.
+
+    Post-merge file mapping (6 files → 3):
+        build_coefficients.py  replaces  build_water_coefficients.py +
+                                          build_energy_coefficients.py
+        indirect.py            replaces  calculate_indirect_twf.py +
+                                          calculate_indirect_energy.py
+        outbound.py            replaces  outbound_twf.py + energy.py
+
+    Renamed (no merge):
+        build_io.py            ← build_io_tables.py
+        build_demand.py        ← build_tourism_demand.py
+        direct.py              ← calculate_direct_twf.py
+        decompose.py           ← calculate_sda_mc.py
+        compare.py             ← compare_years.py
+        visualise.py           ← visualise_results.py
+
+    TODO-2: Replace __import__ with importlib.import_module(name).run.
+    """
+    def _mod(name):
+        """Lazy module importer — avoids importing all modules at startup."""
+        return importlib.import_module(name)
+
     return {
-        "build_io":      lambda stressor, **kw: __import__("build_io_tables").run(**kw),
-        "demand":        lambda stressor, **kw: __import__("build_tourism_demand").run(**kw),
-        "coefficients":  lambda stressor, **kw: __import__("build_water_coefficients").run(stressor=stressor, **kw),
-        "indirect":      lambda stressor, **kw: __import__("calculate_indirect_twf").run(stressor=stressor, **kw),
-        "direct":        lambda stressor, **kw: __import__("calculate_direct_twf").run(stressor=stressor, **kw),
-        "water":              lambda stressor, **kw: __import__("outbound_twf").run(**kw),
-        "energy_coeff":       lambda stressor, **kw: __import__("build_energy_coefficients").run(**kw),
-        "indirect_energy":    lambda stressor, **kw: __import__("calculate_indirect_energy").run(**kw),
-        "energy":             lambda stressor, **kw: __import__("energy").run(**kw),
-        "sda":           lambda stressor, **kw: __import__("calculate_sda_mc").run(stressor=stressor, **kw),
-        "report":        lambda stressor, **kw: __import__("compare_years").run(
-                             mode="combined" if stressor == "combined" else stressor, **kw),
-        "visualise":     lambda stressor, **kw: __import__("visualise_results").run(stressor=stressor, **kw),
-        "validate":      lambda stressor, **kw: _run_validate(),
+        # ── IO + demand ──────────────────────────────────────────────────────
+        "build_io":     lambda stressor, **kw: _mod("build_io").run(**kw),
+        "demand":       lambda stressor, **kw: _mod("build_demand").run(**kw),
+
+        # ── Merged stressor-agnostic steps ──────────────────────────────────
+        # build_coefficients.py accepts stressor="water"|"energy"
+        "coefficients": lambda stressor, **kw: _mod("build_coefficients").run(stressor=stressor, **kw),
+        # indirect.py accepts stressor="water"|"energy"
+        "indirect":     lambda stressor, **kw: _mod("indirect").run(stressor=stressor, **kw),
+        # outbound.py accepts stressor="water"|"energy"
+        "outbound":     lambda stressor, **kw: _mod("outbound").run(stressor=stressor, **kw),
+
+        # ── Stressor-specific steps (still separate) ────────────────────────
+        "direct":       lambda stressor, **kw: _mod("direct").run(stressor=stressor, **kw),
+        "sda":          lambda stressor, **kw: _mod("decompose").run(stressor=stressor, **kw),
+
+        # ── Reporting + validation ──────────────────────────────────────────
+        "report":       lambda stressor, **kw: _mod("compare").run(
+                            mode="combined" if stressor == "combined" else stressor, **kw),
+        "visualise":    lambda stressor, **kw: _mod("visualise").run(stressor=stressor, **kw),
+        "validate":     lambda stressor, **kw: _run_validate(),
     }
 
 
-# Step dependencies
+# ── Step dependencies ─────────────────────────────────────────────────────────
+
 DEPS: dict[str, list[str]] = {
-    "build_io":      [],
-    "demand":        ["build_io"],
-    "coefficients":  ["build_io"],
-    "indirect":      ["build_io", "demand", "coefficients"],
-    "direct":        ["demand"],
-    "water":         ["indirect"],
-    "energy_coeff":  ["build_io"],
-    "indirect_energy": ["build_io", "demand", "energy_coeff"],
-    "energy":        ["indirect_energy"],
-    "sda":           ["indirect"],
-    "report":        ["indirect", "direct"],
-    "visualise":     ["indirect", "direct", "report"],
-    "validate":      ["indirect", "direct"],
+    "build_io":     [],
+    "demand":       ["build_io"],
+    "coefficients": ["build_io"],
+    "indirect":     ["build_io", "demand", "coefficients"],
+    "direct":       ["demand"],
+    "outbound":     ["indirect"],
+    "sda":          ["indirect"],
+    "report":       ["indirect", "direct"],
+    "visualise":    ["indirect", "direct", "report"],
+    "validate":     ["indirect", "direct"],
 }
 
-# Step descriptions (for interactive menu)
+# ── Step descriptions (for interactive menu) ──────────────────────────────────
+
 STEP_DESCS: dict[str, str] = {
-    "build_io":     "Build IO tables  (build_io_tables.py)",
-    "demand":       "Tourism demand vectors  (build_tourism_demand.py)",
-    "coefficients": "EXIOBASE extract + concordance  (build_water_coefficients.py)",
-    "indirect":     "Indirect footprint W·L·Y  (calculate_indirect_twf.py)",
-    "direct":       "Direct operational footprint  (calculate_direct_twf.py)",
-    "water":        "Outbound WF + net water balance  (outbound_twf.py)",
-    "energy_coeff": "EXIOBASE → energy coefficients SUT-140  (build_energy_coefficients.py)",
-    "indirect_energy": "Indirect energy E·L·Y  (calculate_indirect_energy.py)",
-    "energy":       "Outbound EF + energy benchmarks  (energy.py)",
-    "sda":          "SDA + Monte Carlo + Supply-Chain  (calculate_sda_mc.py)",
-    "report":       "Cross-year report + Markdown  (compare_years.py)",
-    "visualise":    "All chart generation  (visualise_results.py)",
+    "build_io":     "Build IO tables from SUT  (build_io.py)",
+    "demand":       "Tourism demand vectors  (build_demand.py)",
+    "coefficients": "EXIOBASE extract + concordance  (build_coefficients.py)",
+    "indirect":     "Indirect footprint C·L·Y  (indirect.py)",
+    "direct":       "Direct operational footprint  (direct.py)",
+    "outbound":     "Outbound footprint + net balance  (outbound.py)",
+    "sda":          "SDA + Monte Carlo + Supply-Chain  (decompose.py)",
+    "report":       "Cross-year report + Markdown  (compare.py)",
+    "visualise":    "All chart generation  (visualise.py)",
     "validate":     "Sanity checks on final outputs  (validate_outputs.py)",
 }
 
-WATER_STEPS  = ["build_io", "demand", "coefficients", "indirect", "direct",
-                "water", "sda", "report", "visualise", "validate"]
-ENERGY_STEPS = ["build_io", "demand", "coefficients", "energy_coeff",
-                "indirect_energy", "direct", "energy", "sda", "report",
-                "visualise", "validate"]
+WATER_STEPS  = ["build_io", "demand", "coefficients", "indirect",
+                "direct", "outbound", "sda", "report", "visualise", "validate"]
+ENERGY_STEPS = ["build_io", "demand", "coefficients", "indirect",
+                "direct", "outbound", "sda", "report", "visualise", "validate"]
 ALL_STEPS    = list(dict.fromkeys(WATER_STEPS + ENERGY_STEPS))  # dedup, preserve order
 
-PIPELINE     = ALL_STEPS  # canonical order for interactive menu
+PIPELINE = ALL_STEPS  # canonical order for interactive menu
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -118,10 +149,8 @@ PIPELINE     = ALL_STEPS  # canonical order for interactive menu
 def _run_validate():
     """
     Run validate_outputs.main() without letting sys.exit() propagate.
-    validate_outputs calls sys.exit(1) when checks fail — that would kill
-    the whole pipeline. We catch SystemExit, re-raise only on exit code 0
-    (clean exit), and convert failures (code 1) into a RuntimeError so
-    the pipeline logs them as FAIL rather than crashing.
+    validate_outputs calls sys.exit(1) on failures — we catch SystemExit and
+    convert non-zero codes to RuntimeError so the pipeline logs them as FAIL.
     """
     import validate_outputs
     try:
@@ -131,29 +160,21 @@ def _run_validate():
             raise RuntimeError(
                 f"validate_outputs: {e.code} check(s) failed — see output above"
             ) from None
-        # exit(0) means all checks passed; do nothing
-
-
 
 
 def check_deps(step: str, completed: set[str], ignore: bool = False) -> list[str]:
-    """
-    Return list of unmet dependencies for `step`, or empty list if `ignore` is True.
-    """
+    """Return list of unmet dependencies for `step`."""
     if ignore:
         return []
     return [d for d in DEPS.get(step, []) if d not in completed]
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# INTERACTIVE MENU  (restored from previous version)
+# INTERACTIVE MENU
 # ══════════════════════════════════════════════════════════════════════════════
 
 def interactive_menu() -> tuple[list[str], str]:
-    """
-    Display numbered step menu. Returns (steps_to_run, stressor).
-    Mirrors the old main.py interactive experience, extended for water/energy.
-    """
+    """Display numbered step menu. Returns (steps_to_run, stressor)."""
     bar = "=" * 65
 
     while True:
@@ -179,24 +200,21 @@ def interactive_menu() -> tuple[list[str], str]:
 
         raw = input("  Your choice: ").strip().upper()
 
-        if raw == "Q" or raw == "":
+        if raw in ("Q", ""):
             return [], "water"
-
         if raw == "W":
-            _confirm_stressor("water")
+            print("\n  → Stressor: WATER")
             return WATER_STEPS[:], "water"
-
         if raw == "E":
-            _confirm_stressor("energy")
+            print("\n  → Stressor: ENERGY")
             return ENERGY_STEPS[:], "energy"
-
         if raw == "A":
             return ALL_STEPS[:], "combined"
 
         # Parse individual step numbers / names
-        tokens  = raw.replace(",", " ").split()
+        tokens   = raw.replace(",", " ").split()
         selected: list[str] = []
-        invalid: list[str]  = []
+        invalid:  list[str] = []
         for tok in tokens:
             if tok.isdigit():
                 idx = int(tok)
@@ -212,18 +230,12 @@ def interactive_menu() -> tuple[list[str], str]:
         if invalid:
             print(f"\n  ⚠  Unknown input(s): {', '.join(invalid)} — try again.")
             continue
-
         if not selected:
             print("\n  ⚠  Nothing selected — try again.")
             continue
 
-        # Ask stressor when running individual steps
         stressor = _ask_stressor()
         return selected, stressor
-
-
-def _confirm_stressor(stressor: str):
-    print(f"\n  → Stressor: {stressor.upper()}")
 
 
 def _ask_stressor() -> str:
@@ -232,8 +244,10 @@ def _ask_stressor() -> str:
     print("    2  energy")
     print("    3  combined")
     raw = input("  Choice [1]: ").strip()
-    mapping = {"1": "water", "2": "energy", "3": "combined",
-               "water": "water", "energy": "energy", "combined": "combined"}
+    mapping = {
+        "1": "water", "2": "energy", "3": "combined",
+        "water": "water", "energy": "energy", "combined": "combined",
+    }
     return mapping.get(raw, "water")
 
 
@@ -243,11 +257,9 @@ def _ask_stressor() -> str:
 
 def run_pipeline(steps: list[str], stressor: str, log: Logger,
                  ignore_deps: bool = False) -> dict[str, str]:
-    """
-    Run a list of steps in order. Returns {step: "OK" | "SKIP" | "FAIL"}.
-    """
+    """Run a list of steps in order. Returns {step: 'OK'|'SKIP'|'FAIL'}."""
     fns       = _get_step_fns()
-    completed: set[str] = set()
+    completed: set[str]       = set()
     results:   dict[str, str] = {}
     timing:    dict[str, float] = {}
 
@@ -267,13 +279,13 @@ def run_pipeline(steps: list[str], stressor: str, log: Logger,
         t0 = time.time()
         try:
             fns[step](stressor)
-            elapsed        = time.time() - t0
+            elapsed = time.time() - t0
             ok(f"Step '{step}' completed in {elapsed:.1f}s", log)
-            results[step]  = "OK"
+            results[step] = "OK"
             completed.add(step)
-            timing[step]   = elapsed
+            timing[step]  = elapsed
         except Exception as exc:
-            elapsed       = time.time() - t0
+            elapsed = time.time() - t0
             log.fail(f"Step '{step}' FAILED after {elapsed:.1f}s: {exc}")
             log._log(traceback.format_exc())
             results[step] = "FAIL"
@@ -299,8 +311,8 @@ def _run_combined(log: Logger, ignore_deps: bool = False):
     run_pipeline(ENERGY_STEPS, "energy", log, ignore_deps)
     ok("Running combined report...", log)
     try:
-        from report import run_report
-        run_report(mode="combined")
+        compare = importlib.import_module("compare")
+        compare.run(mode="combined")
     except Exception as exc:
         log.fail(f"Combined report failed: {exc}")
         log._log(traceback.format_exc())
@@ -351,7 +363,7 @@ def main():
     if args.list_steps:
         print("\n  Steps and dependencies:")
         for key in PIPELINE:
-            deps = DEPS.get(key, [])
+            deps    = DEPS.get(key, [])
             dep_str = f"  [needs: {', '.join(deps)}]" if deps else "  [no deps]"
             print(f"    {key:<22}  {STEP_DESCS.get(key, '')}{dep_str}")
         print(f"\n  Order: {' → '.join(PIPELINE)}")
@@ -367,14 +379,15 @@ def main():
         stressor, steps = "energy",   ENERGY_STEPS[:]
     elif args.stressor:
         stressor = args.stressor
-        steps    = args.steps or (WATER_STEPS if stressor == "water"
-                                  else ENERGY_STEPS if stressor == "energy"
-                                  else ALL_STEPS)
+        steps    = args.steps or (
+            WATER_STEPS  if stressor == "water"  else
+            ENERGY_STEPS if stressor == "energy" else
+            ALL_STEPS
+        )
     elif args.steps:
-        stressor = "water"   # default stressor when steps given without --stressor
+        stressor = "water"
         steps    = args.steps
     else:
-        # No CLI flags → launch interactive menu
         interactive = True
         steps, stressor = interactive_menu()
         if not steps:

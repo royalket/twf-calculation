@@ -1,0 +1,4 @@
+io_year,year_label,stressor,total_primary,total_secondary,ratio,n_nonzero_primary,n_nonzero_secondary,extrapolated_n
+2015-16,2015,water,595720.38,2036908.03,3.419,60,20,0
+2019-20,2019,water,600874.11,2104073.47,3.502,60,20,0
+2021-22,2022,water,557058.7,1960506.56,3.519,63,41,0

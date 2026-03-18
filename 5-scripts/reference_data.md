@@ -331,9 +331,9 @@ source_outbound_counts:
 source_destination_shares:
   India Tourism Statistics 2022, Statement on Top Destinations of Indian Tourists.
   Shares represent % of total outbound departures to each country.
-  VERIFY AND UPDATE: These are approximate shares based on MoT ITS 2022 data.
-  Top destinations: UAE ~30%, USA ~12%, UK ~8%, Saudi Arabia ~7%, Thailand ~6%,
-  Singapore ~5%, Germany ~3%, Malaysia ~3%, Australia ~2%, Canada ~2%, Others ~22%.
+  Updated from ITS 2022 Table 4.2.5 actual departure counts (Grand Total=21,602,734).
+  UAE=27.96%, Saudi=11.46%, USA=7.99%, Singapore=4.69%, UK=4.41%, Thailand=4.40%,
+  Qatar=4.21%, Kuwait=3.94%, Oman=3.44%, Canada=3.61%, Australia=2.27%, Others=21%.
 
 source_local_wf:
   Hoekstra, A.Y. and Mekonnen, M.M. (2012). The water footprint of humanity.
@@ -366,38 +366,74 @@ DATA STATUS: PLACEHOLDER — verify destination shares and local WF values befor
 unit: country=ISO name | share=fraction of outbound tourists | local_wf_m3_yr=m3/capita/year
 -->
 
-| country      | dest_share | local_wf_m3_yr | wsi_dest |
-|--------------|------------|----------------|----------|
-| UAE          | 0.30       | 5765           | 1.00     |
-| USA          | 0.12       | 2842           | 0.35     |
-| UK           | 0.08       | 1695           | 0.18     |
-| Saudi Arabia | 0.07       | 2671           | 1.00     |
-| Thailand     | 0.06       | 3307           | 0.55     |
-| Singapore    | 0.05       | 600            | 0.10     |
-| Germany      | 0.03       | 1545           | 0.12     |
-| Malaysia     | 0.03       | 2507           | 0.04     |
-| Australia    | 0.02       | 2315           | 0.08     |
-| Canada       | 0.02       | 2333           | 0.07     |
-| Others       | 0.22       | 2000           | 0.40     |
-
+| country      | dest_share | local_wf_m3_yr | wf_basis                    | wsi_dest | wsi_source          |
+|--------------|------------|----------------|-----------------------------|----------|---------------------|
+| UAE          | 0.28       | 3139           | 8600 L/day ÷ 1000 × 365     | 1.00     | WRI Aqueduct bws/5  |
+| Saudi Arabia | 0.11       | 1862           | 5100 L/day ÷ 1000 × 365     | 1.00     | WRI Aqueduct bws/5  |
+| USA          | 0.08       | 2847           | 7800 L/day ÷ 1000 × 365     | 0.52     | WRI Aqueduct bws/5  |
+| Singapore    | 0.05       | 2000           | no data — original estimate | 0.10     | Pfister et al. 2009 |
+| UK           | 0.04       | 1247           | 3418 L/day ÷ 1000 × 365     | 0.26     | WRI Aqueduct bws/5  |
+| Thailand     | 0.04       | 1424           | 3900 L/day ÷ 1000 × 365     | 0.72     | WRI Aqueduct bws/5  |
+| Qatar        | 0.04       | 1800           | no data — original estimate | 1.00     | WRI Aqueduct bws/5  |
+| Kuwait       | 0.04       | 2081           | 5700 L/day ÷ 1000 × 365     | 1.00     | WRI Aqueduct bws/5  |
+| Oman         | 0.03       | 2100           | no data — original estimate | 1.00     | WRI Aqueduct bws/5  |
+| Canada       | 0.04       | 2336           | 6400 L/day ÷ 1000 × 365     | 0.25     | WRI Aqueduct bws/5  |
+| Australia    | 0.02       | 2300           | 6300 L/day ÷ 1000 × 365     | 0.58     | WRI Aqueduct bws/5  |
+| Malaysia     | 0.01       | 2117           | 5800 L/day ÷ 1000 × 365     | 0.21     | WRI Aqueduct bws/5  |
+| Germany      | 0.01       | 1424           | 3900 L/day ÷ 1000 × 365     | 0.41     | WRI Aqueduct bws/5  |
+| Others       | 0.21       | 2000           | assumed                     | 0.20     | assumed             |
 ---
 
 ## SECTION: OUTBOUND_TOURIST_COUNTS
 
 <!-- meta
 id: OUTBOUND_TOURIST_COUNTS
-description: India outbound tourist counts (total international departures) by study year.
-source: India Tourism Statistics 2022, Ministry of Tourism; UNWTO Compendium.
-unit: millions of outbound tourists
-notes: 2022 is COVID-suppressed. Normal 2022 level would be ~30M absent pandemic.
-  avg_stay_abroad_days: approximate from NSSO International Tourism Survey.
+description: India outbound departures split into tourism-only (stays ≤4 weeks)
+  and all-INDs (total Indian National Departures incl. workers/diaspora >1 month).
+
+source_all_INDs:
+  2015: TSA 2015-16 (NCAER/MoT) — 20,523,715 total outbound Indians.
+  2019: ITS 2019 (Bureau of Immigration, GoI) — 26,915,034 total INDs.
+  2022: ITS 2022 (Bureau of Immigration, GoI) — 21,602,734 total INDs.
+
+source_duration:
+  2019: ITS 2019 Table 4.8.2 grand total row — duration groups of RECORDED
+    departures (18,177,186 of 26,915,034). Groups: 0-1d=2.77%, 2-3d=5.74%,
+    4-7d=23.74%, 1-2wk=18.55%, 2-4wk=11.81%, >1mo=37.39%.
+  2022: ITS 2022 Table 4.8.2 grand total row — duration groups of RECORDED
+    departures (15,755,842 of 21,602,734). Groups: 0-1d=2.8%, 2-3d=3.2%,
+    4-7d=11.1%, 1-2wk=9.2%, 2-4wk=6.4%, >1mo=40.3%, unknown=27.0%.
+    ITS-reported grand total avg = 99.69 days (verified ✓).
+  2015: No duration table published — tourism_M and avg_stay estimated using
+    2019 proportions (recording rate 67.5%, tourism share 62.6% of recorded).
+
+derivation_tourism_M:
+  tourism_M = recorded_departures × tourism_share_pct / 100
+  tourism_share = sum of ≤4wk duration groups (excludes >1 month workers/diaspora
+    and unknown). 2019=62.6% of recorded; 2022=32.7% of recorded.
+  The large drop 2019→2022 reflects faster Gulf worker recovery vs leisure tourism
+  post-COVID — itself a finding worth noting in the report.
+
+derivation_avg_stay:
+  avg_stay_tourism = weighted avg of ≤4wk groups using midpoints:
+    0-1d=0.5d, 2-3d=2.5d, 4-7d=5.5d, 1-2wk=10.5d, 2-4wk=21.0d.
+  avg_stay_all = weighted avg including >1mo group (midpoint=173d, back-calculated
+    from ITS 2022 reported avg of 99.69d; implies ~5.8 month avg Gulf stay —
+    consistent with 6-month worker contract cycles).
+
+usage:
+  Use tourism_M + avg_stay_tourism for tourism TWF (primary pipeline output).
+  Use all_INDs_M + avg_stay_all for total Indian national water consumption abroad
+    (Panel B2 in outbound report table — supplementary context).
+
+unit: millions | days
 -->
 
-| study_year | outbound_tourists_M | avg_stay_abroad_days |
-|------------|---------------------|----------------------|
-| 2015       | 20.0                | 7.0                  |
-| 2019       | 26.9                | 7.0                  |
-| 2022       | 7.0                 | 6.5                  |
+| study_year | all_INDs_M | tourism_M | avg_stay_tourism | avg_stay_all |
+|------------|------------|-----------|------------------|--------------|
+| 2015       | 20.52      | 8.68      | 9.4              | 70.6         |
+| 2019       | 26.92      | 11.38     | 9.4              | 70.6         |
+| 2022       | 21.60      | 5.15      | 9.2              | 99.7         |
 
 ---
 

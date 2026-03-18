@@ -285,18 +285,37 @@ def _build_outbound_destinations() -> list[dict]:
 
 def _build_outbound_counts() -> dict:
     """
-    Return {study_year: {outbound_tourists_M, avg_stay_abroad_days}}.
+    Return {study_year: {tourism_M, all_INDs_M, avg_stay_tourism, avg_stay_all,
+                         outbound_tourists_M (alias), avg_stay_abroad_days (alias)}}.
+
+    Two scopes:
+      tourism   — stays ≤4 weeks (ITS Table 4.8.2 duration groups); primary TWF output.
+      all_INDs  — total Indian National Departures incl. workers/diaspora >1 month.
+
+    Aliases kept for backward compatibility with any code using old column names.
     """
     rows = _rows("OUTBOUND_TOURIST_COUNTS")
     if not rows:
         return {}
-    return {
-        str(int(r["study_year"])): {
-            "outbound_tourists_M":    float(r["outbound_tourists_M"]),
-            "avg_stay_abroad_days":   float(r["avg_stay_abroad_days"]),
+    result = {}
+    for r in rows:
+        yr = str(int(float(r["study_year"])))
+        tourism_m   = float(r["tourism_M"])
+        all_inds_m  = float(r["all_INDs_M"])
+        avg_tourism = float(r["avg_stay_tourism"])
+        avg_all     = float(r["avg_stay_all"])
+        result[yr] = {
+            # Primary tourism-only fields
+            "tourism_M":            tourism_m,
+            "avg_stay_tourism":     avg_tourism,
+            # All-INDs fields (workers + diaspora + tourists)
+            "all_INDs_M":           all_inds_m,
+            "avg_stay_all":         avg_all,
+            # Backward-compatible aliases (default = tourism scope)
+            "outbound_tourists_M":  tourism_m,
+            "avg_stay_abroad_days": avg_tourism,
         }
-        for r in rows
-    }
+    return result
 
 OUTBOUND_DESTINATIONS: list  = _build_outbound_destinations()
 OUTBOUND_COUNTS: dict        = _build_outbound_counts()

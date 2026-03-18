@@ -1,0 +1,77 @@
+Category_Name,Category_Type,Demand_crore,Total_Water_m3,Green_Water_m3,Agr_pct_of_indirect,Elec_pct_of_indirect,Petro_pct_of_indirect,Direct_m3
+Processed Fruit/Veg,Food Mfg,136999.75863168403,2236637722.9114013,7774673941.00336,87.7,1.4,3.6,211005448.0
+Hotels & Restaurants,Services,194228.36801320128,604447968.9772478,484215564.3680391,23.2,4.5,66.9,299148292.0
+Road Transport,Services,330771.42604213953,544801642.0118217,1219317133.944608,65.4,7.9,19.5,509450336.0
+Beverages,Food Mfg,63118.29262328661,439005121.89261353,1251881159.834474,89.3,3.7,5.0,97214066.0
+Grain Mill & Bakery,Food Mfg,6468.353643475862,242294350.9104557,658778898.4739133,97.3,0.5,1.4,9962484.0
+Ready Made Garments,Textiles,113298.98978269128,230235100.7934301,440745171.47682446,54.9,10.9,13.7,174501797.0
+Other Services,Services,60049.08848817643,221515893.08951437,556561371.3823272,95.9,1.1,1.8,92486914.0
+Other Chemicals,Manufacturing,72304.70444689656,189736851.47938284,378025780.3141408,56.9,8.5,29.4,111362872.0
+Air Transport,Services,85203.09072831436,154187601.86227956,133726506.00975004,25.9,4.6,66.0,131228818.0
+Health & Social Work,Services,168214.64790537933,135348034.06973383,217068557.05601424,45.9,13.2,16.6,259082261.0
+Railway Transport,Services,25926.19133427426,65180589.37650825,312411480.9822039,89.0,2.2,5.1,39931221.0
+Leather Footwear,Textiles,30969.503371688857,60142923.34071801,173062968.32729188,68.6,9.1,12.6,47698872.0
+Financial Services,Services,69667.42320877626,54796691.63067004,70069203.68148735,34.0,9.7,39.8,107300962.0
+Textiles,Textiles,10466.762722542104,48414438.93283689,120521203.6645565,71.4,7.8,15.1,16120787.0
+Real Estate,Services,67932.41032196632,38609051.956661314,60819632.60017845,40.8,27.2,22.6,104628715.0
+Support & Travel Agencies,Services,12885.512034890136,31856673.416041106,38173749.11263108,36.7,6.1,52.8,19846117.0
+Printing/Publishing,Manufacturing,10022.883072870893,26203508.097313065,24270830.26134803,27.6,12.9,11.6,15437129.0
+"Electricity, Heat & Energy",Utilities,3488.9209075140348,19130387.419053033,12596025.553459477,19.6,64.3,13.9,5373596.0
+Paper Products,Manufacturing,5518.948412742584,19094896.417938624,14920533.512992106,23.9,9.6,6.9,8500221.0
+Tobacco Products,Food Mfg,4622.043398065117,9136119.141953353,36589072.69485111,77.8,7.1,8.3,7118818.0
+Public Admin & Education,Services,7751.561982048116,6634184.659370635,10762125.701734493,46.8,11.9,19.2,11938866.0
+Cultural & Rec Services,Services,14706.99753596632,4537954.862668048,6269776.95511354,38.7,12.8,25.2,22651548.0
+Machinery Rental,Services,1318.9247825052123,1564127.9817910693,2986494.806086123,58.1,15.7,18.4,2031393.0
+Pipeline/Water Transport,Services,3257.5966378412195,1087683.0329954647,1830746.0807367498,50.2,17.4,20.3,5017313.0
+Misc Food Products,Food Mfg,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Iron Ore,Mining,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Coal & Lignite,Mining,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Processed Tea/Coffee,Food Mfg,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Other Metallic Minerals,Mining,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Processed Poultry,Food Mfg,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Non-Metallic Minerals,Mining,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Edible Oils,Food Mfg,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Processed Meat,Food Mfg,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Processed Fish,Food Mfg,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Copper Ore,Mining,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Machinery,Manufacturing,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Leather (excl. Ftwr),Textiles,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Wood & Furniture,Manufacturing,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Wheat,Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Natural Gas,Mining,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Rubber & Plastics,Manufacturing,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Petroleum Products,Manufacturing,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Fertilizers,Manufacturing,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Crude Petroleum,Mining,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Cement & Non-Metallic,Manufacturing,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Iron & Steel,Manufacturing,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Non-Ferrous Metals,Manufacturing,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Sugar,Food Mfg,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Electrical Machinery,Manufacturing,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Business Services,Services,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Electronics,Manufacturing,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Gems & Jewellery,Manufacturing,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Dairy Products,Food Mfg,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Computer & R&D,Services,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Misc Manufacturing,Manufacturing,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Fishing,Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Water Supply,Utilities,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Construction,Manufacturing,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Forestry,Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Other Livestock,Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Other Crops,Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Fruits & Vegetables,Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Cotton & Jute,Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Oil Seeds,Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Trade (Retail & Wholesale),Services,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Transport Equipment,Manufacturing,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Cereals & Pulses,Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Defence,Services,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Egg & Poultry (Live),Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Sewage/Waste Mgmt,Services,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Waste Management,Services,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Wool/Silk,Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Milk (Raw),Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Post & Telecom,Services,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Sugarcane,Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+Paddy,Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0
