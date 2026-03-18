@@ -545,54 +545,14 @@ def fig2_anatomy_plate(log=None):
         green_mm3[yr]  = g
         scarce_mm3[yr] = s
 
-    # ── Load source-group shares per year (origin view) ───────────────────────
-    SECTOR_GROUPS  = ["Agriculture", "Food Mfg", "Energy & Petrol",
-                      "Manufacturing", "Services & Other"]
-    SECTOR_COLORS  = [_C_ORANGE, _C_VERM, _C_BLUE, _C_SKY, "#888888"]
-    # default fallback shares
-    SECTOR_SHARES = {
-        "2015": np.array([0.81, 0.09, 0.07, 0.02, 0.01]),
-        "2019": np.array([0.79, 0.10, 0.08, 0.02, 0.01]),
-        "2022": np.array([0.77, 0.11, 0.08, 0.03, 0.01]),
-    }
-    for yr in STUDY_YEARS:
-        orig = _load_origin(yr, log)
-        if orig.empty:
-            continue
-        sc, vc = _src_val_cols(orig)
-        if not sc or not vc:
-            continue
-        grp = orig.groupby(sc)[vc].sum()
-        tot = grp.sum()
-        if tot <= 0:
-            continue
-        mapped = np.zeros(5)
-        for name, val in grp.items():
-            nm = str(name).lower()
-            if "agr" in nm or "crop" in nm or "paddy" in nm:
-                mapped[0] += val
-            elif "food" in nm or "bev" in nm:
-                mapped[1] += val
-            elif "energy" in nm or "petrol" in nm or "elec" in nm or "util" in nm or "min" in nm:
-                mapped[2] += val
-            elif "manuf" in nm or "textile" in nm:
-                mapped[3] += val
-            else:
-                mapped[4] += val
-        if mapped.sum() > 0:
-            SECTOR_SHARES[yr] = mapped / mapped.sum()
-
     # ── Figure: one wide vertical stacked bar per year ───────────────────────
     fig, ax = plt.subplots(figsize=(13, 8))
     fig.patch.set_facecolor("white")
     ax.set_facecolor("white")
 
-    n_yrs    = len(STUDY_YEARS)
-    bar_w    = 0.42          # outer bar (blue+green+scarce) — narrower
-    inner_w  = 0.16          # nested sector bar — centred inside outer
-    direct_w = 0.10          # direct water bar — to the right of outer
-    direct_gap = 0.05        # gap between outer right edge and direct bar
-    x_pos    = np.arange(n_yrs)
+    n_yrs = len(STUDY_YEARS)
+    bar_w = 0.50          # outer bar (blue/green/direct/scarce) — full width
+    x_pos = np.arange(n_yrs)
 
     for xi, yr in enumerate(STUDY_YEARS):
         b  = blue_mm3[yr]
@@ -601,7 +561,7 @@ def fig2_anatomy_plate(log=None):
         d  = direct.get(yr, 0) / 1e6
         total_h = b + g + d   # full stacked height in M m³
 
-        # ── Outer stacked bar: Blue (bottom), Green (middle), Direct (top) ──
+        # ── Stacked bar: Blue (bottom), Green (middle), Direct (top) ──
         ax.bar(xi, b, width=bar_w, bottom=0,
                color=_C_BLUE, alpha=0.88,
                edgecolor="white", linewidth=0.7, zorder=3)
@@ -616,23 +576,6 @@ def fig2_anatomy_plate(log=None):
                color=_C_SCARCE, alpha=0.22,
                edgecolor=_C_SCARCE, linewidth=0.8,
                linestyle="--", zorder=4)
-
-        # ── Inner nested bar: sector breakdown — CENTRED inside outer ──────
-        x_inner_center = xi
-        sectors = SECTOR_SHARES[yr]
-        cum = 0.0
-        sector_total = b + g   # sector bar spans blue+green only
-        for si, (sh, sc_) in enumerate(zip(sectors, SECTOR_COLORS)):
-            seg_h = sh * sector_total
-            ax.bar(x_inner_center, seg_h, width=inner_w,
-                   bottom=cum, color=sc_, alpha=0.95,
-                   edgecolor="white", linewidth=0.4, zorder=5)
-            if sh >= 0.12:
-                ax.text(x_inner_center, cum + seg_h/2,
-                        f"{SECTOR_GROUPS[si]}\n{sh*100:.0f}%",
-                        ha="center", va="center", fontsize=6.5,
-                        color="white", fontweight="bold", clip_on=True, zorder=6)
-            cum += seg_h
 
         # ── Outside brackets ──────────────────────────────────────────────
         x_left  = xi - bar_w/2 - 0.03
@@ -688,16 +631,8 @@ def fig2_anatomy_plate(log=None):
         mpatches.Patch(color=_C_VERM,   alpha=0.82, label="Direct water (activity-based)"),
         mpatches.Patch(color=_C_SCARCE, alpha=0.22, label="Scarce TWF overlay (blue × WSI)"),
     ]
-    sector_handles = [
-        mpatches.Patch(color=SECTOR_COLORS[i], alpha=0.95, label=SECTOR_GROUPS[i])
-        for i in range(len(SECTOR_GROUPS))
-    ]
-    leg1 = ax.legend(handles=outer_handles, fontsize=8, loc="upper left",
-                     title="Water type", title_fontsize=8,
-                     frameon=True, framealpha=0.92, edgecolor="#ddd")
-    ax.add_artist(leg1)
-    ax.legend(handles=sector_handles, fontsize=8, loc="upper right",
-              title="Source sector (inner bar)", title_fontsize=8,
+    ax.legend(handles=outer_handles, fontsize=8, loc="upper left",
+              title="Water type", title_fontsize=8,
               frameon=True, framealpha=0.92, edgecolor="#ddd")
 
     plt.tight_layout()
@@ -1091,21 +1026,84 @@ def fig6_flow_strip(log=None):
 
     indirect = _load_indirect_totals(log)
 
-    SRC_GROUPS = ["Agriculture", "Food Mfg", "Manufacturing", "Services", "Energy"]
+    # Source groups MUST match the indirect module's origin categories exactly
+    # (Agriculture / Electricity / Petroleum / Manufacturing / Services)
+    # so that the figure is consistent with S7b and Main Table 5A.
+    SRC_GROUPS = ["Agriculture", "Electricity", "Petroleum", "Manufacturing", "Services"]
     DST_GROUPS = ["Food & Bev", "Accommodation", "Transport", "Shopping", "Recreation"]
-    SRC_COLORS = [_C_ORANGE, _C_VERM, _C_BLUE, _C_GREEN, "#666666"]
-    DST_COLORS = [_C_SKY,    _C_PINK, _C_GREEN, _C_ORANGE, "#aaaaaa"]
+    SRC_COLORS = [_C_ORANGE, _C_BLUE, _C_VERM, _C_SKY, "#888888"]
+    DST_COLORS = [_C_ORANGE, _C_PINK, _C_GREEN, _C_SKY, "#aaaaaa"]
 
+    # Default fallback shares (Agriculture-dominant, consistent with indirect results)
     SRC_SHARES = {
-        "2015": np.array([0.73, 0.09, 0.08, 0.06, 0.04]),
-        "2019": np.array([0.70, 0.10, 0.09, 0.07, 0.04]),
-        "2022": np.array([0.67, 0.11, 0.10, 0.07, 0.05]),
+        "2015": np.array([0.73, 0.11, 0.08, 0.06, 0.02]),
+        "2019": np.array([0.71, 0.12, 0.09, 0.06, 0.02]),
+        "2022": np.array([0.69, 0.12, 0.10, 0.07, 0.02]),
     }
     DST_SHARES = {
         "2015": np.array([0.62, 0.14, 0.12, 0.07, 0.05]),
         "2019": np.array([0.60, 0.15, 0.13, 0.07, 0.05]),
         "2022": np.array([0.58, 0.16, 0.14, 0.07, 0.05]),
     }
+
+    # --- Load source shares from pipeline origin CSVs (data-driven) ----------
+    for yr in STUDY_YEARS:
+        orig = _load_origin(yr, log)
+        if orig.empty:
+            continue
+        sc, vc = _src_val_cols(orig)
+        if not sc or not vc:
+            continue
+        grp = orig.groupby(sc)[vc].sum()
+        tot = grp.sum()
+        if tot <= 0:
+            continue
+        mapped = np.zeros(5)
+        for name, val in grp.items():
+            nm = str(name).lower()
+            if "agr" in nm or "crop" in nm or "paddy" in nm or "food" in nm or "bev" in nm:
+                mapped[0] += val   # Agriculture (incl. food mfg upstream pull)
+            elif "elec" in nm or "util" in nm or "power" in nm:
+                mapped[1] += val   # Electricity
+            elif "petrol" in nm or "oil" in nm or "refin" in nm or "fuel" in nm or "coal" in nm or "min" in nm:
+                mapped[2] += val   # Petroleum & Mining
+            elif "manuf" in nm or "textile" in nm or "chem" in nm or "mach" in nm:
+                mapped[3] += val   # Manufacturing
+            else:
+                mapped[4] += val   # Services & Other
+        if mapped.sum() > 0:
+            SRC_SHARES[yr] = mapped / mapped.sum()
+
+    # --- Load destination shares from TSA category CSVs ----------------------
+    for yr in STUDY_YEARS:
+        cat_df = _load_category(yr, log)
+        if cat_df.empty or "Total_Water_m3" not in cat_df.columns:
+            continue
+        tot = cat_df["Total_Water_m3"].sum()
+        if tot <= 0:
+            continue
+        mapped_dst = np.zeros(5)
+        name_col = next((c for c in cat_df.columns
+                         if c.lower() in ("category_name", "category", "name")), None)
+        type_col = next((c for c in cat_df.columns if "type" in c.lower()), None)
+        for _, row in cat_df.iterrows():
+            val  = float(row["Total_Water_m3"])
+            cnm  = str(row[name_col]).lower() if name_col else ""
+            ctyp = str(row[type_col]).lower() if type_col else ""
+            combined = cnm + " " + ctyp
+            if any(k in combined for k in ("food", "beverage", "restaurant", "meal", "processed")):
+                mapped_dst[0] += val
+            elif any(k in combined for k in ("hotel", "accom", "lodg", "guest")):
+                mapped_dst[1] += val
+            elif any(k in combined for k in ("transport", "rail", "road", "air", "water pass")):
+                mapped_dst[2] += val
+            elif any(k in combined for k in ("shop", "garment", "footwear", "gems", "cosmetic",
+                                              "soaps", "books", "travel goods")):
+                mapped_dst[3] += val
+            else:
+                mapped_dst[4] += val
+        if mapped_dst.sum() > 0:
+            DST_SHARES[yr] = mapped_dst / mapped_dst.sum()
 
     def _cum_positions(shares):
         pos = []; y = 1.0

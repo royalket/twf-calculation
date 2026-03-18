@@ -2977,6 +2977,100 @@ def _fill_narrative_placeholders(text: str, first_yr: str, last_yr: str,
     text = text.replace("{{HOTEL_FOOD_SWITCH_PCT}}",    "30")
     text = text.replace("{{HOTEL_FOOD_SWITCH_IMPACT}}", f"{impact:.0f}")
 
+    # ── WATER PRODUCTIVITY PER DOLLAR OF TOURISM OUTPUT (§4.5 Table) ─────────
+    # Metric: how much water is consumed per unit of tourism economic output.
+    # Denominator = NAS-scaled total nominal tourism demand (₹ crore) — best
+    # available proxy for tourism GVA given no dedicated MoSPI tourism GVA series.
+    # Tokens: {{WPD_TABLE}}, {{WPD_LITRE_PER_INR}}, {{WPD_USD_LAST}}
+    try:
+        _dem_cmp2 = _safe_csv(DIRS["demand"] / "demand_intensity_comparison.csv")
+        _tot_df2  = _safe_csv(DIRS["comparison"] / "twf_total_all_years.csv")
+        _ind_all2 = _safe_csv(DIRS["indirect"] / "indirect_water_all_years.csv")
+
+        wpd_rows  = ""
+        wpd_base_m3_per_cr = None
+        wpd_litre_per_inr_last = "-"
+        wpd_usd_last = "-"
+
+        for _yi, yr in enumerate(STUDY_YEARS):
+            # Nominal tourism demand (₹ crore)
+            _dem_nom = 0.0
+            if not _dem_cmp2.empty and "Metric" in _dem_cmp2.columns:
+                _nom_r = _dem_cmp2[
+                    (_dem_cmp2["Year"].astype(str) == yr) &
+                    (_dem_cmp2["Metric"].str.contains("nominal", case=False, na=False))
+                ]
+                if not _nom_r.empty:
+                    _dem_nom = float(_nom_r["Value"].iloc[0])
+
+            # Total blue TWF (bn m³)
+            _twf_bn = 0.0
+            if not _tot_df2.empty and "Year" in _tot_df2.columns and "Total_bn_m3" in _tot_df2.columns:
+                _tr = _tot_df2[_tot_df2["Year"].astype(str) == yr]
+                if not _tr.empty:
+                    _twf_bn = float(_tr["Total_bn_m3"].iloc[0])
+            if _twf_bn == 0.0 and not _ind_all2.empty and "Year" in _ind_all2.columns:
+                _tr2 = _ind_all2[_ind_all2["Year"].astype(str) == yr]
+                if not _tr2.empty and "Indirect_TWF_billion_m3" in _tr2.columns:
+                    _twf_bn = float(_tr2["Indirect_TWF_billion_m3"].iloc[0])
+
+            _usd_rate  = USD_INR.get(yr, 70.0)
+            _dem_usd_m = round(_dem_nom * 10 / _usd_rate, 0) if _dem_nom and _usd_rate else 0.0
+
+            # m³ per ₹ crore = (bn m³ × 1e9) / (₹ crore) = 1e9 × bn / crore
+            _m3_per_cr = (_twf_bn * 1e9 / _dem_nom) if _dem_nom > 0 else 0.0
+            # Litres per ₹  = m³ per crore ÷ 10,000  (1 crore = 1e7 ₹; 1 m³ = 1000 L → L/₹ = m³/cr / 1e4)
+            _l_per_inr = _m3_per_cr / 1e4 if _m3_per_cr > 0 else 0.0
+            # m³ per USD = (bn m³ × 1e9) / (USD M × 1e6)
+            _m3_per_usd = (_twf_bn * 1e9 / (_dem_usd_m * 1e6)) if _dem_usd_m > 0 else 0.0
+
+            _delta = "(base)" if wpd_base_m3_per_cr is None else (
+                f"{100*(_m3_per_cr - wpd_base_m3_per_cr)/wpd_base_m3_per_cr:+.1f}%"
+                if wpd_base_m3_per_cr else "-"
+            )
+            if wpd_base_m3_per_cr is None and _m3_per_cr > 0:
+                wpd_base_m3_per_cr = _m3_per_cr
+
+            wpd_rows += (
+                f"| {yr} "
+                f"| {_dem_nom:,.0f} "
+                f"| {_dem_usd_m:,.0f} "
+                f"| {_twf_bn:.4f} "
+                f"| {_m3_per_cr:,.1f} "
+                f"| {_l_per_inr:.4f} "
+                f"| {_m3_per_usd:.2f} "
+                f"| {_delta} |\n"
+            )
+
+            if yr == STUDY_YEARS[-1]:
+                wpd_litre_per_inr_last = f"{_l_per_inr:.4f}"
+                wpd_usd_last = f"{_m3_per_usd:.2f}"
+
+        text = text.replace("{{WPD_TABLE}}", wpd_rows or "| - | - | - | - | - | - | - | - |\n")
+        text = text.replace("{{WPD_LITRE_PER_INR}}", wpd_litre_per_inr_last)
+        text = text.replace("{{WPD_USD_LAST}}", wpd_usd_last)
+    except Exception as _e:
+        text = text.replace("{{WPD_TABLE}}", "| - | - | - | - | - | - | - | - |\n")
+        text = text.replace("{{WPD_LITRE_PER_INR}}", "-")
+        text = text.replace("{{WPD_USD_LAST}}", "-")
+
+    # ── §2.4 direct methodology scalar tokens ─────────────────────────────────
+    try:
+        _h15 = DIRECT_WATER["hotel"].get("2015", {}).get("base", "-")
+        _hN  = DIRECT_WATER["hotel"].get(STUDY_YEARS[-1], {}).get("base", "-")
+        text = text.replace("{{HOTEL_BASE_2015}}", str(_h15))
+        text = text.replace("{{HOTEL_BASE_2022}}", str(_hN))
+    except Exception:
+        text = text.replace("{{HOTEL_BASE_2015}}", "-").replace("{{HOTEL_BASE_2022}}", "-")
+    try:
+        _last_act = ACTIVITY_DATA.get(STUDY_YEARS[-1], {})
+        _dom_stay = _last_act.get("avg_stay_days_dom", "-")
+        _inb_stay = _last_act.get("avg_stay_days_inb", "-")
+        text = text.replace("{{AVG_STAY_DOM_LAST}}", str(_dom_stay))
+        text = text.replace("{{AVG_STAY_INB_LAST}}", str(_inb_stay))
+    except Exception:
+        text = text.replace("{{AVG_STAY_DOM_LAST}}", "-").replace("{{AVG_STAY_INB_LAST}}", "-")
+
     # ── DIRECT TWF INLINE TABLE TOKENS (Section 3.6) ─────────────────────────
     # Fills per-sector, per-year tokens for the new inline 4-sector table.
     # Tokens: HOTEL_INB_{yr}, HOTEL_INB_PCT_{yr}, HOTEL_DOM_{yr}, HOTEL_DOM_PCT_{yr},

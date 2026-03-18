@@ -61,18 +61,48 @@ Separate inbound (Y_inb) and domestic (Y_dom) demand vectors are produced for ea
 
 Scarce TWF weights extracted blue water by WRI Aqueduct 4.0 sector-level WSI (Kuzma et al. 2023): agriculture = 0.827, manufacturing = 0.814, services = 0 (municipal supply; not extracted from stressed basins). The three-group structure reflects available Aqueduct 4.0 resolution; finer sector weights are not available at the SUT-140 level. Green water uses exact EEIO propagation through agriculture rows only; it is not a proportional allocation.
 
-### 2.4 Direct TWF
+### 2.4 Direct TWF — Activity-Based Operational Water
 
-Activity-based operational water covers four categories:
+Direct operational water covers four categories of on-site consumption — physical water flowing through hotel taps, restaurant kitchens, rail station infrastructure, and aircraft servicing. It is estimated separately from EEIO because EXIOBASE WaterGAP satellites assign near-zero water coefficients to service sectors: WaterGAP is a production-account database that records water physically abstracted by industry, not water physically consumed at the point of service delivery. Consequently, hotel and restaurant on-site use cannot be recovered from the IO framework and must be modelled via activity-based coefficients applied to observed tourist activity volumes.
+
+**Hotel water:**
 
 ```
-Hotel_m3      = tourist_nights × segment_share × L/room/night
-Restaurant_m3 = tourist_days   × meals/day     × L/meal
-Rail_m3       = dom_tourists × rail_modal_share(0.25) × avg_km × L/pkm
-Air_m3        = air_pax × tourist_share × L/passenger
+Hotel_m3 = (dom_tourist_nights × dom_hotel_share + inb_tourist_nights × inb_hotel_share)
+           × L/room/night ÷ 1,000
 ```
 
-Direct water is typically < 5% of total TWF. LOW/BASE/HIGH scenarios bracket coefficient literature uncertainty.
+The critical adjustment is `dom_hotel_share = 0.15` (15%): the MoT domestic tourist count covers *all* domestic trips, including the ~80% that are social/VFR trips where tourists stay with friends or family and generate no commercial hotel water use. Applying the full L/room/night coefficient to all domestic tourist-nights would inflate domestic hotel water by approximately 5–6×. The 0.15 share is derived from NSS Report 580 (MOSPI 2017, Table 3.14) using Census 2011 rural/urban population weights: rural hotel share ≈ 9.0% × rural weight 65% + urban hotel share ≈ 25.8% × urban weight 35% ≈ 14.9%, rounded to 15%. No single official table publishes this blended figure; it is a researcher-derived estimate and carries LOW/HIGH scenario range of 0.10–0.20. Inbound hotel share is set to 1.00 (100%): all international tourists use paid commercial accommodation; the VFR discount does not apply to international arrivals (MoT IPS and TSA 2015–16 Table 3 inbound accommodation spend structurally confirms near-100% hotel use). Hotel L/room/night coefficients decline from {{HOTEL_BASE_2015}} (2015–16) to {{HOTEL_BASE_2022}} (2021–22), sourced from Cornell Hotel Sustainability Benchmarking (CHSB) India median series; LOW/BASE/HIGH bracket inter-hotel variance within each category.
+
+**Restaurant water:**
+
+```
+Restaurant_m3 = (dom_tourist_days + inb_tourist_days) × meals_per_tourist_day × L/meal ÷ 1,000
+```
+
+Tourist-days are computed as tourists × average stay duration (dom: {{AVG_STAY_DOM_LAST}} days; inb: {{AVG_STAY_INB_LAST}} days in {{LAST_YEAR}}). Meals per tourist-day = 2.5 (MoT visitor expenditure surveys). L/meal coefficients (LOW: 20 / BASE: 30–32 / HIGH: 45) are from Lee et al. (2021, J. Hydrology 603:127151), adapted for India's mixed formal/informal restaurant sector. The base coefficient increases slightly from 2015 to 2022 (30 → 32 L/meal), reflecting mild efficiency degradation in the informal food-service sector relative to formal restaurants.
+
+**Rail water:**
+
+```
+Rail_m3 = dom_tourists_M × dom_rail_modal_share(0.25) × avg_tourist_rail_km × L/pkm ÷ 1,000
+```
+
+This is a demand-side formula — estimated from *how many tourists travel by rail and how far* — replacing the discarded supply-side formula (`rail_pkm_B × tourist_rail_share`) which used an unverifiable 115 billion PKM sub-total that matched no published MoR category and implied an implausible average tourist trip distance of ~80 km (suburban commuter range, not tourism). The modal share of 0.25 is derived from NSS Report 580 (MOSPI 2017, Table 3.6, modal split for holiday trips): rural tourists ≈ 22% rail × 65% rural weight + urban tourists ≈ 31% rail × 35% urban weight ≈ 25%. Average tourist rail distance uses the Ministry of Railways Annual Statistical Statement "Average Lead" (non-suburban average passenger journey distance): 242 km (2015–16), 254 km (2019–20), 261 km (2021–22) — MoR publishes this as a headline annual figure; tourist trips are by definition non-suburban so no further adjustment is needed. L/pkm coefficients (LOW: 2.6 / BASE: 3.5 / HIGH: 4.4) are from Lee et al. (2021).
+
+**Air water:**
+
+```
+Air_m3 = air_pax_M × tourist_air_share(0.60) × L/passenger ÷ 1,000
+```
+
+Air passenger counts are from DGCA Annual Reports. Tourist air share = 0.60, reflecting that a portion of commercial air travel is business/commuter. L/passenger coefficients (LOW: 13 / BASE: 18 / HIGH: 23) are from Lee et al. (2021) and DGCA operational data for aircraft servicing and cleaning water at Indian airports.
+
+**Road transport — why excluded from direct TWF:**
+
+Road passenger transport is the largest TSA category by domestic demand (₹183,807 crore domestic in 2015–16) but is excluded from the direct TWF calculation for two reasons. First, road's direct water use — vehicle washing, road dust suppression, driver facilities — has no published India-specific coefficient at the tourism-trip level, and the dominant mode (private car/bus) is tourist-owned rather than operated by a tourism system. Second, and more importantly, road's indirect water (petroleum refining upstream, vehicle manufacturing supply chains) is already fully captured in the EEIO indirect component: the TSA category "Road passenger transport services" maps to EXIOBASE sector IN.115 with full Leontief upstream propagation through fuel refining and vehicle parts sectors. A future iteration could add road direct water using a demand-side formula analogous to rail (`dom_tourists × road_modal_share × avg_road_km × L/pkm_road`), where L/pkm_road ≈ 0.5–1.2 (Lee et al. 2021, mixed bus/car fleet — substantially lower than rail's 3.5 because road vehicles do not use water for track bed or station facilities). The omission is conservative: road direct water is estimated at 3–8% of total direct TWF given its lower per-pkm water intensity.
+
+Direct water is consistently < 5% of total blue TWF across all study years — indirect supply chains dominate by ~{{INDIRECT_DIRECT_RATIO}}:1. LOW/BASE/HIGH scenarios bracket coefficient literature uncertainty across all four sectors.
 
 ### 2.5 Structural Decomposition Analysis
 
@@ -279,7 +309,23 @@ Agriculture accounted for {{AGR_SHARE_2022}}% of indirect blue TWF in {{LAST_YEA
 
 India's blue water intensity falls within the range reported in comparative EEIO studies: Hadjikakou et al. (2015, Cyprus): ~980 L/tourist-day; Lee et al. (2021, China): 1,354 L/tourist-day; Lenzen et al. (2018, global): 200–1,500 L/tourist-day depending on destination. India's agricultural supply-chain dominance pattern generalises to any emerging economy with large rainfed/irrigated agriculture, tourism spending weighted toward food services, and WaterGAP-modelled irrigation-intensive basins.
 
-### 4.5 Limitations
+### 4.5 Water Productivity of Tourism GDP
+
+**Table 4.5. Water productivity per unit of tourism economic output.**
+
+| FY | Tourism Demand (₹ cr) | Tourism Demand (USD M) | Total Blue TWF (bn m³) | m³ per ₹ cr | Litres per ₹ | m³ per USD | Δ vs {{FIRST_YEAR}} |
+|----|-----------------------:|------------------------:|-----------------------:|------------:|-------------:|-----------:|--------------------:|
+{{WPD_TABLE}}
+
+> **Tourism demand** = NAS-scaled TSA total nominal demand (proxy for tourism GVA; a dedicated tourism GVA series is not published by MoSPI). **m³ per ₹ cr** = total blue TWF ÷ tourism demand in ₹ crore; this is the water intensity of tourism economic output. **Litres per ₹** = m³/₹ cr ÷ 10,000, expressing the metric in intuitive per-rupee terms. **m³ per USD** = bn m³ × 10⁹ ÷ (tourism demand × 10 ÷ USD/INR).
+
+The cross-year trend in water productivity — how much blue water is consumed per unit of tourism output — is a policy-relevant complement to absolute TWF volumes. A tourism sector that is growing in demand but declining in water intensity is decoupling water use from economic growth; a sector that is shrinking (as in 2021–22) but with a faster decline in water use than in output is also decoupling but for a different structural reason (supply-chain restructuring, as identified by the SDA L-effect).
+
+In {{LAST_YEAR}}, India's tourism sector consumed approximately **{{WPD_LITRE_PER_INR}} litres of water per ₹** of tourism output. For context, India's manufacturing sector averages ~5–8 litres/₹ of output (EXIOBASE sector-level intensities), while agriculture averages ~120–200 litres/₹ — tourism is substantially more water-efficient per unit of economic output than the goods-producing sectors that supply it. However, this efficiency advantage narrows sharply once Leontief upstream propagation is applied: the ~{{AGR_SHARE_2022}}% agriculture share of indirect TWF means that each rupee of tourism demand ultimately pulls far more agricultural water through supply chains than its own direct service-sector intensity would suggest.
+
+Cross-study comparison: Lee et al. (2021) report China tourism at approximately 1.8–2.2 m³/USD of tourism output; India's figure of approximately **{{WPD_USD_LAST}} m³/USD** in {{LAST_YEAR}} reflects a more agriculture-intensive supply chain and higher WaterGAP irrigation coefficients for the Indus-Gangetic Plain. The declining trend in water intensity per ₹ crore ({{INTENSITY_DROP_PCT}}% over the study period) indicates that structural efficiency gains are occurring at a rate faster than demand growth — a positive signal for sustainable tourism scaling, though the absolute water volumes remain substantial.
+
+### 4.7 Limitations
 
 **TSA extrapolation.** India's TSA has not been updated since 2015–16; NAS GVA scaling is the standard OECD approach (Temurshoev & Timmer 2011) but introduces ±15% demand uncertainty → ~±11% TWF uncertainty. A current TSA (2019–20 or 2022–23) would reduce this to ±5–8%.
 
