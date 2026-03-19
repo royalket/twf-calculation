@@ -604,9 +604,9 @@ def fig2_anatomy_plate(log=None):
 
         # Direct bracket (right side, b+g → total_h)
         if d > 0.1:
-            ax.annotate("", xy=(x_right, b+g+d), xytext=(x_right, b+g),
-                        arrowprops=dict(arrowstyle="<->", color=_C_VERM, lw=1.3))
-            ax.text(x_right + 0.02, b+g + d/2, f"Direct\n{d:,.1f}",
+                ax.annotate("", xy=(x_right, b+g+d), xytext=(x_right, b+g),
+                    arrowprops=dict(arrowstyle="<->", color=_C_VERM, lw=1.3))
+                ax.text(x_right + 0.02, b+g + d/2, f"Direct\n{d:,.0f}",
                     ha="left", va="center", fontsize=7,
                     color=_C_VERM, fontweight="bold", clip_on=False)
 
@@ -1396,7 +1396,8 @@ def fig7_sda_waterfall(log=None):
     ax.step(xs_step, running_total_y, where="post",
             color="#333333", lw=1.8, alpha=0.70, zorder=4,
             label="Cumulative TWF level (step)")
-    ax.plot(xs_step, running_total_y, ".", color="#333333", ms=5, alpha=0.70, zorder=4)
+        # Draw continuous step line without point markers (remove dots for cleaner look)
+    ax.plot(xs_step, running_total_y, color="#333333", lw=1.2, alpha=0.70, zorder=4)
  
     ax.set_xticks(xs_step)
     ax.set_xticklabels([s[0] for s in segments], fontsize=8, rotation=20, ha="right")
