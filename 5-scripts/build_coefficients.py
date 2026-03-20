@@ -63,7 +63,7 @@ from utils import (
     Timer, Logger,
 )
 
-Stressor = Literal["water", "energy"]
+Stressor = Literal["water", "energy", "depletion"]
 
 # ── Per-stressor configuration ────────────────────────────────────────────────
 # All differences between water and energy pipelines are captured here.
@@ -108,6 +108,27 @@ STRESSOR_CFG: dict[str, dict] = {
             (secondary / primary.replace(0, float("nan"))).fillna(0)
         ),
         "extrapolate": True,    # energy F.txt for 2022 may be missing
+    },
+    "depletion": {
+        "row_prefixes": {
+            # material/F.txt rows all start with "Domestic Extraction Used - ..."
+            "primary": "Domestic Extraction Used",
+            "secondary": "Domestic Extraction Used - NONE",
+        },
+        "col_suffix_primary":   "t_per_crore",
+        "col_suffix_secondary": "t_per_crore_sec",
+        "col_suffix_raw":       "t_per_EUR_million",
+        "col_suffix_raw_sec":   "t_per_EUR_million_sec",
+        "unit_label":           "t/crore",
+        "conv_fn": lambda eur_inr: 100.0 / eur_inr,         # t/EUR-M -> t/₹cr
+        "concordance_file":     "concordance_depletion_{io_tag}.csv",
+        "sut_file":             "depletion_coefficients_140_{io_tag}.csv",
+        "audit_file":           "India_Depletion_Coefficients_{year}.csv",
+        "ratio_col":            "Secondary_share_pct",
+        "ratio_fn": lambda primary, secondary: (
+            0 * primary
+        ),
+        "extrapolate": False,
     },
 }
 
@@ -168,9 +189,60 @@ SECTOR_LABELS = {
 }
 
 SECTOR_BROAD = {
-    range(0, 17): "Agriculture", range(17, 34): "Mining",
-    range(34, 82): "Manufacturing", range(82, 92): "Energy Processing",
-    range(92, 109): "Utilities/Energy", range(109, 138): "Services",
+    # EXIOBASE 0-indexed sector positions → descriptive audit category.
+    # These are used ONLY for the Broad_Category column in the audit CSV
+    # written by build_coefficients.py.  They do NOT flow into indirect.py's
+    # Source_Group column — that comes exclusively from classify_source_group()
+    # in utils.py which uses SUT 1-indexed product IDs.
+    # "Energy Processing" and "Utilities/Energy" are intentionally kept as
+    # distinct labels because EXIOBASE ranges 82–91 (coal/gas/nuclear power
+    # generation) and 92–108 (electricity transmission, gas distribution,
+    # steam) are meaningfully different sub-sectors in the EXIOBASE taxonomy.
+    range(0,  17): "Agriculture",
+    range(17, 34): "Mining",
+    range(34, 82): "Manufacturing",
+    range(82, 92): "Electricity",   # FIX-1c: align with classify_source_group() canonical label
+    range(92, 109): "Electricity",   # FIX-1c: both energy ranges map to "Electricity" in SUT taxonomy
+    range(109, 138): "Services",
+}
+
+# SECTOR_SUBGROUP — finer-grained label for the audit CSV Sector_Subgroup column.
+# Keyed by EXIOBASE sector code string (e.g. "IN.82").  Used ONLY for readability
+# in supplementary tables — never touches the EEIO calculation.
+# For non-Electricity sectors the subgroup equals the broad category.
+SECTOR_SUBGROUP: dict[str, str] = {
+    # ── Bioenergy ─────────────────────────────────────────────────────────────
+    "IN.82":  "Bioenergy Processing",    # Industrial Biofuels
+    "IN.83":  "Bioenergy Processing",    # Biogasification/Biomethane
+    "IN.84":  "Bioenergy Processing",    # Biogas from Landfill
+    "IN.85":  "Bioenergy Processing",    # Charcoal
+    # ── Fossil fuel processing / combustion ───────────────────────────────────
+    "IN.86":  "Fossil Fuel Processing",  # Hard Coal
+    "IN.87":  "Fossil Fuel Processing",  # Lignite/Brown Coal
+    "IN.88":  "Fossil Fuel Processing",  # Petroleum Refinery
+    "IN.99":  "Fossil Fuel Processing",  # Combustion Gas
+    "IN.100": "Fossil Fuel Processing",  # Combustion Oil
+    "IN.101": "Fossil Fuel Processing",  # Combustion Coal
+    "IN.102": "Fossil Fuel Processing",  # Combustion Peat
+    # ── Nuclear ───────────────────────────────────────────────────────────────
+    "IN.92":  "Nuclear Generation",
+    # ── Renewables ────────────────────────────────────────────────────────────
+    "IN.93":  "Renewable Generation",    # Hydro
+    "IN.94":  "Renewable Generation",    # Wind
+    "IN.95":  "Renewable Generation",    # Solar PV
+    "IN.96":  "Renewable Generation",    # Solar Thermal
+    "IN.97":  "Renewable Generation",    # Tide/Wave/Ocean
+    "IN.98":  "Renewable Generation",    # Geothermal
+    # ── Thermal (waste/biomass combustion) ────────────────────────────────────
+    "IN.103": "Thermal Generation",      # Combustion Biomass
+    "IN.104": "Thermal Generation",      # Combustion Waste
+    # ── Distribution ──────────────────────────────────────────────────────────
+    "IN.105": "Energy Distribution",     # Electricity Distribution
+    "IN.106": "Energy Distribution",     # Gas Distribution
+    "IN.107": "Energy Distribution",     # Steam & Hot Water
+    # ── Utilities ─────────────────────────────────────────────────────────────
+    "IN.108": "Water Supply",            # Water Collection/Distribution
+    "IN.109": "Construction",            # Construction
 }
 
 def broad_category(idx: int) -> str:
@@ -178,6 +250,13 @@ def broad_category(idx: int) -> str:
         if idx in r:
             return cat
     return "Other"
+
+def sector_subgroup(code: str) -> str:
+    """Return a descriptive subgroup label for a single EXIOBASE sector code.
+    Falls back to broad_category() for sectors not listed in SECTOR_SUBGROUP.
+    Used ONLY for the Sector_Subgroup column in the audit CSV — not the EEIO calc.
+    """
+    return SECTOR_SUBGROUP.get(code, "")  # empty string = same as broad category
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -231,9 +310,9 @@ def get_concordance() -> dict:
         "TEXT_M01": {"name": "Textiles",           "sut": [56,57,58,59,60,62], "exio": ["IN.46"],    "cat": "Textiles"},
         "TEXT_M02": {"name": "Leather (excl. Ftwr)","sut": [64],       "exio": [],                   "cat": "Textiles"},
         # ── WOOD & PAPER ──────────────────────────────────────────────────────
-        "WOOD_M01": {"name": "Wood & Furniture",   "sut": [65,68],     "exio": ["IN.49"],            "cat": "Manufacturing"},
-        "WOOD_M02": {"name": "Paper Products",     "sut": [66],        "exio": ["IN.50","IN.51","IN.52","IN.138","IN.162"], "cat": "Manufacturing"},
-        "WOOD_M03": {"name": "Printing/Publishing","sut": [67],        "exio": ["IN.53"],            "cat": "Manufacturing"},
+        "WOOD_M01": {"name": "Wood & Furniture",   "sut": [65,68],     "exio": ["IN.49"],            "cat": "Wood & Paper"},   # FIX-1b
+        "WOOD_M02": {"name": "Paper Products",     "sut": [66],        "exio": ["IN.50","IN.51","IN.52","IN.138","IN.162"], "cat": "Wood & Paper"},   # FIX-1b
+        "WOOD_M03": {"name": "Printing/Publishing","sut": [67],        "exio": ["IN.53"],            "cat": "Wood & Paper"},   # FIX-1b
         # ── CHEMICALS & PETROLEUM ─────────────────────────────────────────────
         "CHEM_M01": {"name": "Rubber & Plastics",  "sut": [69,70],
                      "exio": ["IN.71","IN.72","IN.75","IN.76","IN.77","IN.78","IN.79","IN.80","IN.81","IN.140"], "cat": "Manufacturing"},
@@ -264,7 +343,7 @@ def get_concordance() -> dict:
                               "IN.104","IN.105","IN.106","IN.107"],                  "cat": "Utilities"},
         "UTIL_M02": {"name": "Water Supply",       "sut": [115],       "exio": ["IN.108"],           "cat": "Utilities"},
         # ── CONSTRUCTION ──────────────────────────────────────────────────────
-        "CONS_M01": {"name": "Construction",       "sut": [116],       "exio": ["IN.109"],           "cat": "Manufacturing"},
+        "CONS_M01": {"name": "Construction",       "sut": [116],       "exio": ["IN.109"],           "cat": "Utilities"},      # FIX-1a: Construction is Utilities not Manufacturing
         # ── SERVICES ──────────────────────────────────────────────────────────
         "SERV_001": {"name": "Hotels & Restaurants","sut": [118],      "exio": ["IN.113"],           "cat": "Services"},
         "SERV_002": {"name": "Railway Transport",  "sut": [119],       "exio": ["IN.114"],           "cat": "Services"},
@@ -276,12 +355,14 @@ def get_concordance() -> dict:
         "SERV_008": {"name": "Trade (Retail & Wholesale)", "sut": [117], "exio": ["IN.111","IN.112"], "cat": "Services"},
         "SERV_009": {"name": "Business Services",  "sut": [130],       "exio": ["IN.129"],           "cat": "Services"},
         "SERV_010": {"name": "Public Admin & Education","sut": [131],  "exio": ["IN.130","IN.131"],  "cat": "Services"},
-        "SERV_011": {"name": "Defence",            "sut": [],          "exio": [],                   "cat": "Services"},
+        # FIX-1d: removed SERV_011 "Defence" (sut=[], exio=[]) — phantom row, zero contribution,
+        #         skewed category counts and self_check() assigned-sector summary.
+        # FIX-1d: removed SERV_016 "Waste Management" (sut=[], exio=[]) — duplicate of SERV_013
+        #         Sewage/Waste Mgmt which already covers IN.133 and all waste-related EXIOBASE rows.
         "SERV_012": {"name": "Health & Social Work","sut": [132],      "exio": ["IN.132"],           "cat": "Services"},
         "SERV_013": {"name": "Sewage/Waste Mgmt",  "sut": [133],
                      "exio": ["IN.133","IN.148","IN.149","IN.150","IN.151","IN.152",
                               "IN.153","IN.154","IN.155","IN.156","IN.157","IN.158","IN.159"], "cat": "Services"},
-        "SERV_016": {"name": "Waste Management",   "sut": [],          "exio": [],                   "cat": "Services"},
         "SERV_017": {"name": "Cultural & Rec Services","sut": [135],   "exio": ["IN.135"],           "cat": "Services"},
         "SERV_018": {"name": "Other Services",     "sut": [136,137],   "exio": ["IN.134","IN.136","IN.137"], "cat": "Services"},
         "SERV_019": {"name": "Post & Telecom",     "sut": [134],       "exio": ["IN.121"],           "cat": "Services"},
@@ -387,10 +468,11 @@ def extract_stressor(f_path: Path, year: str, stressor: Stressor,
     rows = []
     for i, code in enumerate(india_cols):
         rows.append({
-            "Sector_Index":   i,
-            "Sector_Code":    code,
-            "Sector_Name":    SECTOR_LABELS.get(code, f"Sector {i}"),
-            "Broad_Category": broad_category(i),
+            "Sector_Index":    i,
+            "Sector_Code":     code,
+            "Sector_Name":     SECTOR_LABELS.get(code, f"Sector {i}"),
+            "Broad_Category":  broad_category(i),
+            "Sector_Subgroup": sector_subgroup(code),  # descriptive sub-label; blank = same as Broad_Category
             f"{stressor.capitalize()}_{year}_{cfg['col_suffix_raw']}":       float(primary_raw.iloc[i]),
             f"{stressor.capitalize()}_{year}_{cfg['col_suffix_primary']}":   float(primary_conv.iloc[i]),
             f"{stressor.capitalize()}_{year}_{cfg['col_suffix_raw_sec']}":   float(secondary_raw.iloc[i]),
@@ -459,10 +541,17 @@ def build_concordance_table(exio_df: pd.DataFrame, concordance: dict,
     for cat_id, info in concordance.items():
         vp = sum(exio_prim.get(code, 0) for code in info["exio"])
         vs = sum(exio_sec.get(code, 0)  for code in info["exio"])
+        # Derive subgroup: if all EXIO codes share one subgroup use it,
+        # otherwise list the distinct subgroups (comma-separated).
+        # Falls back to cat if no EXIO codes are in SECTOR_SUBGROUP.
+        sub_vals = [SECTOR_SUBGROUP[c] for c in info["exio"] if c in SECTOR_SUBGROUP]
+        unique_subs = list(dict.fromkeys(sub_vals))   # ordered dedup
+        cat_subgroup = (", ".join(unique_subs) if unique_subs else info["cat"])
         rows.append({
             "Category_ID":        cat_id,
             "Category_Name":      info["name"],
             "Category_Type":      info["cat"],
+            "Category_Subgroup":  cat_subgroup,  # finer label for supplementary tables
             "N_EXIOBASE_Sectors": len(info["exio"]),
             "EXIOBASE_Sectors":   ",".join(info["exio"]),
             "SUT_Product_IDs":    ",".join(map(str, info["sut"])),
@@ -543,7 +632,13 @@ def run(stressor: Stressor = "water", **kwargs):
             log.section(f"Year: {io_year}  ({stressor}: {year_label})")
 
             # ── Locate F.txt ─────────────────────────────────────────────────
-            sub = "energy" if stressor == "energy" else "water"
+            # depletion coefficients live in the material satellite (material/F.txt)
+            if stressor == "energy":
+                sub = "energy"
+            elif stressor == "depletion":
+                sub = "material"
+            else:
+                sub = "water"
             candidates = [
                 exio_base / f"IOT_{year_label}_ixi" / "F.txt",
                 exio_base / f"IOT_{year_label}_ixi" / "satellite" / "F.txt",
@@ -647,5 +742,5 @@ def run(stressor: Stressor = "water", **kwargs):
 if __name__ == "__main__":
     import argparse
     ap = argparse.ArgumentParser()
-    ap.add_argument("--stressor", choices=["water", "energy"], default="water")
+    ap.add_argument("--stressor", choices=["water", "energy", "depletion"], default="water")
     run(stressor=ap.parse_args().stressor)
