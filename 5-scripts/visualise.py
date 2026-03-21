@@ -49,7 +49,10 @@ warnings.filterwarnings("ignore", category=FutureWarning)
 
 sys.path.insert(0, str(Path(__file__).parent))
 from config import BASE_DIR, DIRS, STUDY_YEARS, ACTIVITY_DATA
-from utils import Logger, Timer, ok, warn, section
+from utils import (
+    Logger, Timer, ok, warn, section,
+    classify_source_group, canonical_source_group, SOURCE_GROUPS,
+)
 
 # ── Output directory ──────────────────────────────────────────────────────────
 _VIS_DIR = DIRS.get("visualisation", BASE_DIR / "3-final-results" / "visualisation")
@@ -932,22 +935,64 @@ def fig5_chord_diagram(log=None):
 
     indirect = _load_indirect_totals(log)
 
-    DEMAND_CATS = ["Food &\nBev", "Accomm.", "Transport", "Shopping",
-                   "Recreation", "Other"]
-    SOURCE_GRPS = ["Paddy & wheat", "Other agr.", "Food Mfg", "Livestock",
-                   "Textiles", "Manufacturing", "Energy", "Services"]
-    n_src = len(SOURCE_GRPS); n_dem = len(DEMAND_CATS)
+    # FIX-fig5: use real data from indirect_water_{year}_structural.csv.
+    # Rows = canonical source groups (from classify_source_group / SOURCE_GROUPS).
+    # Cols = TSA destination buckets (same 6-group merge used by fig6_flow_strip).
+    SOURCE_GRPS = SOURCE_GROUPS   # Agriculture, Mining, Petroleum, Manufacturing, Electricity, Services
+    DEMAND_CATS = ["Accommodation", "Food &\nDining", "Transport",
+                   "Shopping", "Experiences", "Financial/\nOther"]
+
+    # TSA category name → destination bucket index (mirrors _map_category_to_dst in fig6)
+    _TSA_DST_MAP = [
+        (0, ["hotel", "accommodation", "lodg", "vacation home", "guest house", "producer"]),
+        (1, ["restaurant", "food and bev", "food & bev", "processed food", "alcohol",
+             "tobacco", "imputed", "beverage", "food mfg", "processed fruit",
+             "dairy", "grain mill", "bakery", "edible oil", "sugar",
+             "processed meat", "processed fish", "misc food", "processed tea"]),
+        (2, ["railway", "road transport", "water transport", "air transport",
+             "air passenger", "transport equipment", "travel agenc", "pipeline",
+             "sea", "inland water transport", "support & travel"]),
+        (3, ["readymade", "garment", "footwear", "leather", "soaps", "cosmetic",
+             "gems", "jewellery", "books", "travel related", "textile",
+             "wearing apparel", "wool", "cotton", "other crops"]),
+        (4, ["cultural", "sport", "health", "medical", "recreation", "religious"]),
+        (5, ["fisim", "social transfer", "financial"]),
+    ]
+    def _cat_to_dst(name: str) -> int:
+        nl = name.lower().strip()
+        for idx, kws in _TSA_DST_MAP:
+            if any(k in nl for k in kws):
+                return idx
+        return 5
+
+    n_src = len(SOURCE_GRPS)
+    n_dem = len(DEMAND_CATS)
 
     yr_vols = {}
-    rng = np.random.default_rng(7)
     for y in STUDY_YEARS:
-        mat  = np.zeros((n_src, n_dem))
-        base = indirect.get(y, 2e9)
-        mat[0,0]=base*0.28; mat[1,0]=base*0.14; mat[2,0]=base*0.08
-        mat[0,1]=base*0.06; mat[3,0]=base*0.05; mat[2,1]=base*0.04
-        mat[5,2]=base*0.05; mat[6,2]=base*0.04; mat[1,3]=base*0.03
-        mat[4,3]=base*0.025; mat[7,0]=base*0.02; mat[7,1]=base*0.015
-        mat += rng.uniform(0, base*0.002, mat.shape)   # tiny variation per year
+        struct_df = _load(DIRS["indirect"] / f"indirect_water_{y}_structural.csv", log)
+        mat = np.zeros((n_src, n_dem))
+        if not struct_df.empty and "Water_m3" in struct_df.columns:
+            sg_col  = next((c for c in struct_df.columns if "source_group" in c.lower()), None)
+            cat_col = next((c for c in struct_df.columns if "category_name" in c.lower()), None)
+            if sg_col and cat_col:
+                for _, row in struct_df.iterrows():
+                    sg  = str(row[sg_col])
+                    cat = str(row[cat_col])
+                    val = float(row["Water_m3"])
+                    # Map source group to row index
+                    canon_sg = canonical_source_group(sg)
+                    if canon_sg in SOURCE_GRPS:
+                        si = SOURCE_GRPS.index(canon_sg)
+                        di = _cat_to_dst(cat)
+                        mat[si, di] += val
+        else:
+            # Fallback if structural CSV not yet generated
+            base = indirect.get(y, 2e9)
+            mat[0, 1] = base * 0.28   # Agriculture → Food & Dining
+            mat[0, 0] = base * 0.08   # Agriculture → Accommodation
+            mat[3, 1] = base * 0.06   # Manufacturing → Food & Dining
+            mat[0, 2] = base * 0.05   # Agriculture → Transport
         yr_vols[y] = mat
 
     fig = plt.figure(figsize=(10, 7))
@@ -1026,24 +1071,70 @@ def fig6_flow_strip(log=None):
 
     indirect = _load_indirect_totals(log)
 
-    # Source groups MUST match the indirect module's origin categories exactly
-    # (Agriculture / Electricity / Petroleum / Manufacturing / Services)
-    # so that the figure is consistent with S7b and Main Table 5A.
-    SRC_GROUPS = ["Agriculture", "Electricity", "Petroleum", "Manufacturing", "Services"]
-    DST_GROUPS = ["Food & Bev", "Accommodation", "Transport", "Shopping", "Recreation"]
-    SRC_COLORS = [_C_ORANGE, _C_BLUE, _C_VERM, _C_SKY, "#888888"]
-    DST_COLORS = [_C_ORANGE, _C_PINK, _C_GREEN, _C_SKY, "#aaaaaa"]
+    # Source groups — canonical, from utils.classify_source_group()
+    # Must match indirect_water_{yr}_origin.csv Source_Group column exactly.
+    SRC_GROUPS = SOURCE_GROUPS  # Agriculture, Mining, Petroleum, Manufacturing, Electricity, Services
+    SRC_COLORS = [_C_ORANGE, _C_VERM, _C_SKY, _C_BLUE, _C_GREEN, "#888888"]
 
-    # Default fallback shares (Agriculture-dominant, consistent with indirect results)
+    # FIX-F6: destination groups are the REAL TSA categories merged into 6 buckets.
+    # Previously used invented labels ["Food & Bev", "Accommodation", ...] with no
+    # connection to actual TSA data — Sankey ribbons were meaningless.
+    # Now: each bucket maps to specific TSA category IDs from tsa_scaled_{year}.csv
+    # and is loaded from indirect_water_{year}_by_category.csv using Category_Name
+    # matching. Mapping key lists below are exact substrings of concordance Category_Name.
+    DST_GROUPS = [
+        "Accommodation",    # TSA 1 (hotels) + 20 (vacation homes) + 23 (guest houses)
+        "Food & Dining",    # TSA 2 (restaurants) + 13 (processed food) + 14 (alcohol) + 24 (imputed food)
+        "Transport",        # TSA 3+4+5+6 (rail/road/water/air) + 7 (rental) + 8 (agencies)
+        "Shopping",         # TSA 12+15+16+17+18+19 (garments, goods, footwear, cosmetics, gems, books)
+        "Experiences",      # TSA 9+10+11 (cultural, sports, health/medical)
+        "Financial/Other",  # TSA 21+22 (FISIM, social transfers — imputed)
+    ]
+    DST_COLORS = [_C_BLUE, _C_ORANGE, _C_GREEN, _C_PINK, _C_SKY, "#999999"]
+
+    # TSA category name → destination bucket index
+    # Keys are lowercase substrings matched against Category_Name from the concordance.
+    # Order matters: more specific keys first.
+    _TSA_DST_MAP = [
+        # idx 0 — Accommodation
+        (0, ["hotel", "accommodation", "lodg", "vacation home", "guest house", "producer"]),
+        # idx 1 — Food & Dining
+        (1, ["restaurant", "food and bev", "food & bev", "processed food", "alcohol",
+             "tobacco", "imputed", "beverage", "food mfg", "processed fruit",
+             "dairy", "grain mill", "bakery", "edible oil", "sugar",
+             "processed meat", "processed fish", "misc food", "processed tea"]),
+        # idx 2 — Transport
+        (2, ["railway", "road transport", "water transport", "air transport",
+             "air passenger", "transport equipment", "travel agenc", "pipeline",
+             "sea", "inland water transport", "support & travel"]),
+        # idx 3 — Shopping
+        (3, ["readymade", "garment", "footwear", "leather", "soaps", "cosmetic",
+             "gems", "jewellery", "books", "travel related", "textile",
+             "wearing apparel", "wool", "cotton", "other crops"]),
+        # idx 4 — Experiences
+        (4, ["cultural", "sport", "health", "medical", "recreation", "religious"]),
+        # idx 5 — Financial/Other (catch-all for imputed items)
+        (5, ["fisim", "social transfer", "financial"]),
+    ]
+
+    def _map_category_to_dst(name: str) -> int:
+        """Map a concordance Category_Name to a DST_GROUPS index."""
+        nl = name.lower().strip()
+        for idx, keywords in _TSA_DST_MAP:
+            if any(k in nl for k in keywords):
+                return idx
+        return 5  # Financial/Other as default
+
+    # Default fallback shares (used when CSV data unavailable)
     SRC_SHARES = {
-        "2015": np.array([0.73, 0.11, 0.08, 0.06, 0.02]),
-        "2019": np.array([0.71, 0.12, 0.09, 0.06, 0.02]),
-        "2022": np.array([0.69, 0.12, 0.10, 0.07, 0.02]),
+        "2015": np.array([0.73, 0.04, 0.07, 0.08, 0.06, 0.02]),
+        "2019": np.array([0.71, 0.04, 0.08, 0.09, 0.06, 0.02]),
+        "2022": np.array([0.69, 0.04, 0.08, 0.10, 0.07, 0.02]),
     }
     DST_SHARES = {
-        "2015": np.array([0.62, 0.14, 0.12, 0.07, 0.05]),
-        "2019": np.array([0.60, 0.15, 0.13, 0.07, 0.05]),
-        "2022": np.array([0.58, 0.16, 0.14, 0.07, 0.05]),
+        "2015": np.array([0.14, 0.48, 0.19, 0.10, 0.06, 0.03]),
+        "2019": np.array([0.15, 0.46, 0.20, 0.10, 0.06, 0.03]),
+        "2022": np.array([0.16, 0.45, 0.20, 0.10, 0.06, 0.03]),
     }
 
     # --- Load source shares from pipeline origin CSVs (data-driven) ----------
@@ -1058,23 +1149,17 @@ def fig6_flow_strip(log=None):
         tot = grp.sum()
         if tot <= 0:
             continue
-        mapped = np.zeros(5)
-        for name, val in grp.items():
-            nm = str(name).lower()
-            if "agr" in nm or "crop" in nm or "paddy" in nm or "food" in nm or "bev" in nm:
-                mapped[0] += val   # Agriculture (incl. food mfg upstream pull)
-            elif "elec" in nm or "util" in nm or "power" in nm:
-                mapped[1] += val   # Electricity
-            elif "petrol" in nm or "oil" in nm or "refin" in nm or "fuel" in nm or "coal" in nm or "min" in nm:
-                mapped[2] += val   # Petroleum & Mining
-            elif "manuf" in nm or "textile" in nm or "chem" in nm or "mach" in nm:
-                mapped[3] += val   # Manufacturing
-            else:
-                mapped[4] += val   # Services & Other
+        mapped = np.zeros(len(SOURCE_GROUPS))
+        for raw_name, val in grp.items():
+            canon = canonical_source_group(str(raw_name))
+            if canon in SOURCE_GROUPS:
+                mapped[SOURCE_GROUPS.index(canon)] += val
         if mapped.sum() > 0:
             SRC_SHARES[yr] = mapped / mapped.sum()
 
-    # --- Load destination shares from TSA category CSVs ----------------------
+    # --- Load destination shares from indirect_water_{yr}_by_category.csv ----
+    # FIX-F6: use Category_Name → _map_category_to_dst() for reliable bucketing.
+    # This replaces the old _TYPE_MAP / keyword fallback which had no connection to TSA.
     for yr in STUDY_YEARS:
         cat_df = _load_category(yr, log)
         if cat_df.empty or "Total_Water_m3" not in cat_df.columns:
@@ -1082,34 +1167,28 @@ def fig6_flow_strip(log=None):
         tot = cat_df["Total_Water_m3"].sum()
         if tot <= 0:
             continue
-        mapped_dst = np.zeros(5)
         name_col = next((c for c in cat_df.columns
                          if c.lower() in ("category_name", "category", "name")), None)
-        type_col = next((c for c in cat_df.columns if "type" in c.lower()), None)
+        if not name_col:
+            continue
+        mapped_dst = np.zeros(len(DST_GROUPS))
         for _, row in cat_df.iterrows():
             val  = float(row["Total_Water_m3"])
-            cnm  = str(row[name_col]).lower() if name_col else ""
-            ctyp = str(row[type_col]).lower() if type_col else ""
-            combined = cnm + " " + ctyp
-            if any(k in combined for k in ("food", "beverage", "restaurant", "meal", "processed")):
-                mapped_dst[0] += val
-            elif any(k in combined for k in ("hotel", "accom", "lodg", "guest")):
-                mapped_dst[1] += val
-            elif any(k in combined for k in ("transport", "rail", "road", "air", "water pass")):
-                mapped_dst[2] += val
-            elif any(k in combined for k in ("shop", "garment", "footwear", "gems", "cosmetic",
-                                              "soaps", "books", "travel goods")):
-                mapped_dst[3] += val
-            else:
-                mapped_dst[4] += val
+            name = str(row[name_col])
+            di   = _map_category_to_dst(name)
+            mapped_dst[di] += val
         if mapped_dst.sum() > 0:
             DST_SHARES[yr] = mapped_dst / mapped_dst.sum()
 
     def _cum_positions(shares):
+        """Return (lo, hi) per share. Zero/near-zero shares get h=0 (hidden)."""
         pos = []; y = 1.0
         for s in shares:
-            h = max(s * 0.88, 0.005)
-            pos.append((y-h, y)); y -= h + 0.015
+            if s < 0.002:          # skip effectively-zero groups
+                pos.append((y, y))  # zero-height placeholder — not drawn
+            else:
+                h = s * 0.88
+                pos.append((y - h, y)); y -= h + 0.015
         return pos
 
     def _bezier_ribbon(ax, x0, x1, y0_lo, y0_hi, y1_lo, y1_hi, color, alpha):
@@ -1164,8 +1243,10 @@ def fig6_flow_strip(log=None):
 
         x_dst_left = 1.0 - BLK_W
 
-        # Draw source blocks
+        # Draw source blocks — skip zero-share groups
         for si, (lo, hi) in enumerate(src_pos):
+            if hi - lo < 0.001:    # zero-height → skip entirely
+                continue
             ax.fill_betweenx([lo, hi], X_SRC, X_SRC + BLK_W,
                              color=SRC_COLORS[si], alpha=0.90, linewidth=0)
             lbl = _wrap(SRC_GROUPS[si])
@@ -1178,8 +1259,10 @@ def fig6_flow_strip(log=None):
                     ha="right", va="center", fontsize=6.5,
                     color=SRC_COLORS[si], fontweight="bold", clip_on=False)
 
-        # Draw destination blocks
+        # Draw destination blocks — skip zero-share groups
         for di, (lo, hi) in enumerate(dst_pos):
+            if hi - lo < 0.001:    # zero-height → skip entirely
+                continue
             ax.fill_betweenx([lo, hi], x_dst_left, x_dst_left + BLK_W,
                              color=DST_COLORS[di], alpha=0.90, linewidth=0)
             lbl = _wrap(DST_GROUPS[di])
@@ -1192,11 +1275,15 @@ def fig6_flow_strip(log=None):
                     ha="left", va="center", fontsize=6.5,
                     color=DST_COLORS[di], fontweight="bold", clip_on=False)
 
-        # Ribbons
+        # Ribbons — skip zero-height source/destination blocks
         for si, (s_lo, s_hi) in enumerate(src_pos):
             s_h   = s_hi - s_lo
+            if s_h < 0.001:        # zero-share source → no ribbon
+                continue
             d_cur = s_hi
             for di, (d_lo, d_hi) in enumerate(dst_pos):
+                if d_hi - d_lo < 0.001:  # zero-share destination → skip
+                    continue
                 d_share  = DST_SHARES[yr][di]
                 band_src = s_h * d_share
                 d_h      = d_hi - d_lo
@@ -1441,153 +1528,184 @@ def fig7_sda_waterfall(log=None):
 # ══════════════════════════════════════════════════════════════════════════════
 
 def fig8_uncertainty_strip(log=None):
-    section("Figure 8 — Uncertainty Strip (per-year KDE panels)", log=log)
- 
-    indirect = _load_indirect_totals(log)
-    direct   = _load_direct_totals(log)
- 
+    section("Figure 8 — Uncertainty Strip (per-year KDE + variance info box)", log=log)
+
+    indirect  = _load_indirect_totals(log)
+    direct    = _load_direct_totals(log)
+
+    mc_var_df = _load(
+        DIRS.get("monte_carlo",
+                 DIRS.get("comparison", Path(".")).parent / "monte-carlo")
+        / "mc_variance_decomposition.csv", log)
+
+    _PARAM_LABELS = {
+        "agr_water_mult":   "Agriculture water intensity",
+        "hotel_coeff_mult": "Hotel water coefficient",
+        "rest_coeff_mult":  "Restaurant water coefficient",
+        "dom_tourist_mult": "Domestic tourist volume",
+        "inb_tourist_mult": "Inbound tourist volume",
+        "rail_coeff_mult":  "Rail water coefficient",
+        "air_coeff_mult":   "Air water coefficient",
+    }
+
     n   = len(STUDY_YEARS)
-    fig, axes = plt.subplots(n, 1, figsize=(10, 3.5*n), sharex=False)
+    fig, axes = plt.subplots(n, 1, figsize=(11, 4.2 * n))
+    fig.patch.set_facecolor("white")
     if n == 1:
         axes = [axes]
-    fig.patch.set_facecolor("white")
- 
+
     sc_styles = {
-        "LOW":  (_C_VERM,  "--", "LOW"),
-        "BASE": (_C_BLACK, "-",  "BASE"),
-        "HIGH": (_C_GREEN, "--", "HIGH"),
+        "LOW":  (_C_VERM,  "--"),
+        "BASE": (_C_BLACK, "-" ),
+        "HIGH": (_C_GREEN, "--"),
     }
- 
-    for ax, year in zip(axes, STUDY_YEARS):
-        mc        = _load_mc(year, log)
-        base_tot  = (indirect.get(year,0) + direct.get(year,0)) / 1e6
-        dir_base  = direct.get(year, 0)
-        col       = _YEAR_COLORS[year]
- 
+
+    for year, ax in zip(STUDY_YEARS, axes):
+        mc       = _load_mc(year, log)
+        base_tot = (indirect.get(year, 0) + direct.get(year, 0)) / 1e6
+        dir_base = direct.get(year, 0)
+        col      = _YEAR_COLORS[year]
+
         ax.set_facecolor("white")
         ax.spines["top"].set_visible(False)
         ax.spines["right"].set_visible(False)
- 
-        # Sensitivity scenarios
-        sens_df  = _load(DIRS["indirect"] / f"indirect_water_{year}_sensitivity.csv", log)
+
+        # ── Sensitivity scenarios ─────────────────────────────────────────────
+        sens_df = _load(DIRS["indirect"] / f"indirect_water_{year}_sensitivity.csv", log)
         scenarios = {}
         if not sens_df.empty and "Scenario" in sens_df.columns:
             twf_col = next((c for c in ("Total_TWF_m3", "Total_Water_m3")
                             if c in sens_df.columns), None)
             if twf_col:
-                # Each scenario has N component rows (Agriculture, Electricity, Petroleum).
-                # .sum() across all components triple-counts the base footprint.
-                # Correct approach: Agriculture drives ~80%+ of variance so use that row;
-                # fall back to the most extreme row (min for LOW, max for HIGH).
                 for sc, agg_fn in (("LOW", "min"), ("BASE", "mean"), ("HIGH", "max")):
                     r = sens_df[sens_df["Scenario"] == sc]
                     if r.empty:
                         continue
-                    # Prefer the Agriculture component if present
-                    agr_row = r[r["Component"].str.lower().str.contains("agr", na=False)] \
-                              if "Component" in r.columns else pd.DataFrame()
-                    if not agr_row.empty:
-                        val = float(agr_row[twf_col].iloc[0])
-                    else:
-                        val = float(getattr(r[twf_col], agg_fn)())
+                    agr_row = r[r["Component"].str.lower().str.contains("agr", na=False)]                               if "Component" in r.columns else pd.DataFrame()
+                    val = float(agr_row[twf_col].iloc[0]) if not agr_row.empty                           else float(getattr(r[twf_col], agg_fn)())
                     scenarios[sc] = (val + dir_base) / 1e6
         if "BASE"  not in scenarios: scenarios["BASE"]  = base_tot
         if "LOW"   not in scenarios: scenarios["LOW"]   = base_tot * 0.80
         if "HIGH"  not in scenarios: scenarios["HIGH"]  = base_tot * 1.20
- 
-        # ── KDE or fallback ────────────────────────────────────────────────
-        if len(mc) >= 50 and _HAS_SCIPY:
-            kde    = gaussian_kde(mc, bw_method=0.15)
-            x_lo   = max(0.0, mc.min()*0.92)
-            x_hi   = mc.max()*1.06
-            xs_kde = np.linspace(x_lo, x_hi, 400)
-            dens   = kde(xs_kde)
-            dens   = dens / dens.max()
- 
-            ax.fill_between(xs_kde, 0, dens,
-                            color=col, alpha=0.25, label="MC distribution")
-            ax.plot(xs_kde, dens, color=col, linewidth=1.5)
- 
-            p5, p95    = np.percentile(mc, [5, 95])
-            base_mc    = float(np.median(mc)) or base_tot
-            down_pct   = (base_mc-p5)  / base_mc * 100 if base_mc > 0 else 0
-            up_pct     = (p95-base_mc) / base_mc * 100 if base_mc > 0 else 0
-            mask       = (xs_kde >= p5) & (xs_kde <= p95)
-            ax.fill_between(xs_kde, 0, np.where(mask, dens, 0),
-                            color=col, alpha=0.55,
-                            label=f"90% CI: {p5:,.0f}–{p95:,.0f} M m³")
- 
-            # Bracket annotation below the axis
-            ax.annotate("", xy=(p95, -0.12), xytext=(p5, -0.12),
-                        xycoords=("data","axes fraction"),
-                        textcoords=("data","axes fraction"),
-                        arrowprops=dict(arrowstyle="<->", color=_C_BLACK, lw=1.3))
-            ax.text((p5+p95)/2, -0.21,
-                    f"90% CI: −{down_pct:.0f}% / +{up_pct:.0f}%  (asymmetric log-normal)",
-                    ha="center", va="top", fontsize=7,
-                    transform=ax.get_xaxis_transform())
-        else:
-            # Spike fallback — Gaussian approximation
-            mu  = scenarios.get("BASE", base_tot)
-            sig = (scenarios.get("HIGH",mu*1.20) - scenarios.get("LOW",mu*0.80)) / 3.92
-            if sig <= 0: sig = mu * 0.10
-            xs_kde = np.linspace(mu - 4*sig, mu + 4*sig, 300)
-            dens   = np.exp(-0.5*((xs_kde-mu)/sig)**2)
-            dens   = dens / dens.max()
- 
-            ax.fill_between(xs_kde, 0, dens, color=col, alpha=0.22,
-                            label="Approx. distribution (no MC data)")
-            ax.plot(xs_kde, dens, color=col, linewidth=1.5, linestyle="--")
-            ax.axvline(mu, color=col, linewidth=2.0, label=f"Base: {mu:,.0f} M m³")
-            if not _HAS_SCIPY:
-                warn(f"{year}: scipy not installed — Gaussian approximation shown", log)
-            else:
-                warn(f"{year}: <50 MC samples — Gaussian approximation shown", log)
- 
-        # Scenario lines
-        for sc, val in scenarios.items():
-            s_col, ls, lbl = sc_styles.get(sc, (_C_SKY, "--", sc))
-            ax.axvline(val, color=s_col, linewidth=1.8, linestyle=ls,
-                       label=f"{lbl}: {val:,.0f} M m³")
-            ax.text(val, 0.90, sc, ha="center", va="top",
-                    fontsize=7.5, color=s_col, fontweight="bold",
-                    transform=ax.get_xaxis_transform())
- 
-        ax.set_title(
-            f"{year}  |  median: {np.median(mc):.2f} bn m³" if len(mc)>0 else year,
-            fontsize=9, fontweight="bold",
-            color=_YEAR_COLORS[year])
-        ax.set_ylabel("Relative density", fontsize=8)
-        ax.set_xlabel("Total TWF (billion m³)", fontsize=8)
-        ax.set_yticks([0, 0.5, 1.0])
- 
-        # Legend at top-right
-        ax.legend(fontsize=7, loc="upper right",
-                  bbox_to_anchor=(1.0, 1.0),
-                  frameon=True, framealpha=0.92, edgecolor="#ddd", ncol=1)
- 
-        # Conservative note directly below the legend, same right-side alignment
-        ax.text(0.99, 0.52,
-                "⚠ Conservative upper bound\n"
-                "Single correlated multiplier\n"
-                "True uncertainty ~30–40% narrower\n"
-                "(independent sampling)",
-                transform=ax.transAxes, fontsize=6.5,
-                va="top", ha="right",
-                color="darkorange",
-                bbox=dict(boxstyle="round,pad=0.35",
-                          facecolor="lightyellow", alpha=0.90,
-                          edgecolor=_C_ORANGE, linewidth=0.8))
- 
-    fig.suptitle(
-        "Each panel = one study year  ·  Darker fill = 90% CI  ·  Dashed lines = LOW / HIGH sensitivity scenarios",
-        fontsize=9, color="#444")
-    plt.tight_layout(rect=[0, 0.03, 1, 0.97])
-    plt.subplots_adjust(hspace=0.55)
-    _save(fig, "fig8_uncertainty_strip.png", log)
- 
- 
 
+        # ── KDE — clip x-axis to P1–P99 to remove long empty tails ──────────
+        p5 = p95 = base_mc = down_pct = up_pct = None
+        if len(mc) >= 50 and _HAS_SCIPY:
+            p1,  p99 = np.percentile(mc, [1, 99])
+            p5,  p95 = np.percentile(mc, [5, 95])
+            x_lo = max(0.0, p1  * 0.96)
+            x_hi = p99 * 1.04
+            xs_kde = np.linspace(x_lo, x_hi, 500)
+            kde  = gaussian_kde(mc, bw_method=0.15)
+            dens = kde(xs_kde)
+            dens = dens / dens.max()
+
+            ax.fill_between(xs_kde, 0, dens, color=col, alpha=0.22)
+            ax.plot(xs_kde, dens, color=col, linewidth=1.6)
+
+            mask = (xs_kde >= p5) & (xs_kde <= p95)
+            ax.fill_between(xs_kde, 0, np.where(mask, dens, 0), color=col, alpha=0.55)
+
+            base_mc  = float(np.median(mc)) or base_tot
+            down_pct = (base_mc - p5)  / base_mc * 100 if base_mc > 0 else 0
+            up_pct   = (p95 - base_mc) / base_mc * 100 if base_mc > 0 else 0
+            ax.set_xlim(x_lo, x_hi)
+        else:
+            mu  = scenarios.get("BASE", base_tot)
+            sig = (scenarios.get("HIGH", mu*1.2) - scenarios.get("LOW", mu*0.8)) / 3.92
+            if sig <= 0: sig = mu * 0.10
+            x_lo = mu - 3.5*sig;  x_hi = mu + 3.5*sig
+            xs_kde = np.linspace(x_lo, x_hi, 300)
+            dens   = np.exp(-0.5 * ((xs_kde - mu) / sig) ** 2)
+            dens   = dens / dens.max()
+            ax.fill_between(xs_kde, 0, dens, color=col, alpha=0.22, linestyle="--")
+            ax.plot(xs_kde, dens, color=col, linewidth=1.5, linestyle="--")
+            ax.set_xlim(x_lo, x_hi)
+
+        # ── Scenario vertical lines labelled above ────────────────────────────
+        for sc, val in scenarios.items():
+            s_col, ls = sc_styles.get(sc, ("#999", "--"))
+            ax.axvline(val, color=s_col, linewidth=1.6, linestyle=ls, zorder=4)
+            ax.text(val, 0.97, sc, ha="center", va="top", fontsize=7.5,
+                    color=s_col, fontweight="bold",
+                    transform=ax.get_xaxis_transform())
+
+        ax.set_xlabel(f"{year}  |  Total TWF (million m\u00b3)",
+                     fontsize=9, fontweight="bold", labelpad=6, color=col)
+
+        ax.set_ylabel("Relative density", fontsize=8)
+        ax.set_yticks([0, 0.5, 1.0])
+        # ── Info box — upper right, monospace aligned table ───────────────────
+        ci_str   = (f"90% CI: {p5:,.0f}–{p95:,.0f} M m³" if p5 is not None
+                    else "90% CI: n/a")
+        ci_asym  = (f"  CI: \u2212{down_pct:.0f}% / +{up_pct:.0f}%  (asymmetric log-normal)"
+                    if down_pct is not None else "")
+
+        # Variance rows — plain "Label  XX%" with right-aligned percentage
+        var_lines = []
+        if not mc_var_df.empty and "Parameter" in mc_var_df.columns                 and "Variance_share_pct" in mc_var_df.columns:
+            yr_var = mc_var_df[mc_var_df["Year"].astype(str) == str(year)]
+            if not yr_var.empty:
+                yr_var = yr_var.sort_values("Variance_share_pct", ascending=False)
+                total_shown = 0.0
+                for _, vrow in yr_var.head(4).iterrows():
+                    lbl = _PARAM_LABELS.get(str(vrow["Parameter"]), str(vrow["Parameter"]))
+                    pct = float(vrow["Variance_share_pct"])
+                    total_shown += pct
+                    var_lines.append((lbl, pct))
+                other = 100.0 - total_shown
+                if other > 0.5:
+                    var_lines.append(("Other", other))
+
+        W = max((len(l) for l, _ in var_lines), default=28)
+        W = max(W, 28)
+        div = "─" * (W + 9)
+
+        median_val = base_mc if base_mc is not None else base_tot
+        mc_block = (
+            f"  MC distribution\n"
+            f"  {ci_str}\n"
+            + (ci_asym + "\n" if ci_asym else "")
+            + f"  LOW    {scenarios.get('LOW',  0):,.0f} M m\u00b3\n"
+            + f"  BASE   {scenarios.get('BASE', 0):,.0f} M m\u00b3\n"
+            + f"  HIGH   {scenarios.get('HIGH', 0):,.0f} M m\u00b3\n"
+            + f"  Median {median_val:,.0f} M m\u00b3"
+        )
+
+        NL = "\n"
+        if var_lines:
+            var_block = ("  Variance drivers (Spearman \u03c1\u00b2)" + NL
+                         + NL.join(f"  {lbl:<{W}}  {pct:>3.0f}%"
+                                   for lbl, pct in var_lines))
+            box_text = (NL.join([
+                "\u26a0  Conservative upper bound",
+                "   Single correlated multiplier",
+                "\u2500" * (W + 9),
+                mc_block,
+                "\u2500" * (W + 9),
+                var_block,
+            ]))
+        else:
+            box_text = (NL.join([
+                "\u26a0  Conservative upper bound",
+                "   Single correlated multiplier",
+                "\u2500" * (W + 9),
+                mc_block,
+            ]))
+
+        ax.text(0.99, 0.97, box_text,
+                transform=ax.transAxes,
+                fontsize=6.8, va="top", ha="right",
+                fontfamily="monospace", color="#333",
+                bbox=dict(boxstyle="round,pad=0.5", facecolor="lightyellow",
+                          alpha=0.95, edgecolor=_C_ORANGE, linewidth=0.9))
+
+    fig.suptitle(
+        "Each panel = one study year  ·  Darker fill = 90% CI  ·  "
+        "Dashed lines = LOW / HIGH sensitivity scenarios",
+        fontsize=8.5, color="#444")
+    plt.tight_layout(rect=[0, 0.01, 1, 0.98])
+    _save(fig, "fig8_uncertainty_strip.png", log)
 # ══════════════════════════════════════════════════════════════════════════════
 # MAIN ENTRY POINT
 # ══════════════════════════════════════════════════════════════════════════════

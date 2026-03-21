@@ -1,141 +1,141 @@
-Rank,Product_ID,Product_Name,Source_Group,Tourism_Output_cr,Dependency_Index,Water_Coeff,Tourism_Water_m3
-1,32,Crude petroleum,Mining,1911625.9241,30.5192,0.0,0
-2,120,Railway Transport,Services,307445.4613,4.9084,0.0,0
-3,127,Financial services,Services,273424.327,4.3652,0.0,0
-4,118,Repair & Maintenance of Motor Vehicle,Services,242583.7949,3.8729,0.0,0
-5,71,Petroleum products,Petroleum,216512.6816,3.4566,2806.0606,607547706
-6,74,Organic chemicals,Petroleum,180166.684,2.8764,0.0915,16490
-7,113,Construction and construction services,Manufacturing,164721.4894,2.6298,0.0,0
-8,132,Research & Development Services,Services,152574.5076,2.4359,0.0,0
-9,114,Electricity,Electricity,146539.0271,2.3395,5017.9965,735332319
-10,122,Air transport,Services,138750.6811,2.2152,0.0,0
-11,44,Processed fruits & Processed Vegetables,Manufacturing,136876.4607,2.1852,181.8701,24893732
-12,112,Miscellaneous manufacturing,Manufacturing,133877.8497,2.1374,0.0,0
-13,134,Other Business services,Services,124038.0756,1.9803,0.0,0
-14,126,Communication services,Services,118910.3894,1.8984,0.0,0
-15,30,Coal and Lignite,Mining,116794.6526,1.8646,0.0,0
-16,61,Ready made garments,Manufacturing,107863.2223,1.722,246.9644,26638380
-17,119,Hotels & Restaurant,Services,71266.6481,1.1378,0.0,0
-18,46,Edible Oils and Fats,Manufacturing,70342.3308,1.123,32.108,2258549
-19,84,Iron and steel Ferro alloys,Manufacturing,66218.3612,1.0572,0.0,0
-20,66,"Paper, Paper products and newsprint",Manufacturing,62841.6701,1.0033,1822.6095,114535825
-21,135,Computer related services,Services,49061.1829,0.7833,0.0,0
-22,31,Natural Gas,Mining,46173.2996,0.7372,0.0,0
-23,73,Inorganic chemicals,Petroleum,39955.4167,0.6379,0.0915,3657
-24,137,Education services,Services,39852.6204,0.6362,0.0,0
-25,85,Iron and steel casting and forging,Manufacturing,38374.527,0.6127,0.0,0
-26,131,Renting of machinery & equipment,Services,38241.9609,0.6105,0.0,0
-27,86,Iron and steel foundries,Manufacturing,36422.1752,0.5815,0.0,0
-28,70,Plastic products,Manufacturing,35883.5896,0.5729,2330.4242,83623987
-29,51,Alcoholic beverages,Manufacturing,35493.4017,0.5667,6.6431,235785
-30,88,"Hand tools, hardware",Manufacturing,35257.7784,0.5629,0.0,0
-31,65,Wood and wood products except furniture,Manufacturing,35205.3389,0.5621,42.9739,1512912
-32,25,Industry Wood,Agriculture,35058.9924,0.5597,0.0,0
-33,140,"Recreation, entertainment and radio & TV broadcasting and other services",Services,34689.1202,0.5538,0.0,0
-34,40,Other non metallic minerals,Mining,33883.1333,0.5409,0.0,0
-35,56,Cotton Yarn and Cotton Textiles,Manufacturing,33390.7901,0.5331,57.6432,1924752
-36,87,Non ferrous basic metals (including alloys),Manufacturing,32863.0503,0.5247,0.0,0
-37,75,Fertilizers,Petroleum,32742.0046,0.5227,6.3756,208750
-38,52,Non alcoholic beverages,Manufacturing,31541.9932,0.5036,6.6431,209535
-39,89,Miscellaneous metal products,Manufacturing,28202.8199,0.4503,0.0,0
-40,121,Land transport,Services,27035.5311,0.4316,0.0,0
-41,63,Leather footwear,Manufacturing,26300.0407,0.4199,36.5093,960196
-42,136,Public administration and defence,Services,24735.6858,0.3949,0.0,0
-43,67,"Publishing, printing and allied activities",Manufacturing,24377.364,0.3892,640.7454,15619684
-44,20,Other food crops,Agriculture,24078.3237,0.3844,13037.7532,313927243
-45,77,"Paints, varnishes and lacquers",Petroleum,23843.0584,0.3807,0.0915,2182
-46,133,Legal services,Services,22846.6615,0.3647,0.0,0
-47,9,Other oil seeds,Agriculture,22515.0814,0.3595,14048.8608,316311244
-48,128,Insurance services,Services,22360.3388,0.357,0.0,0
-49,116,Water Supply,Services,21738.9138,0.3471,0.0,0
-50,81,Other chemicals and chemical products,Manufacturing,21616.6033,0.3451,0.0915,1978
-51,80,"Synthetic fibres, resin",Petroleum,20527.1442,0.3277,0.0915,1879
-52,76,Pesticides,Petroleum,20273.2982,0.3237,0.0915,1856
-53,106,Motor vehicles,Manufacturing,19813.3226,0.3163,0.0,0
-54,124,Supportive and Auxiliary transport activities,Services,19647.4339,0.3137,0.0,0
-55,82,Cement,Manufacturing,19388.2321,0.3095,0.0,0
-56,130,Real estate services,Services,18435.4051,0.2943,0.0,0
-57,10,kapas,Agriculture,17472.7874,0.279,123.5709,2159128
-58,83,Non metallic mineral products,Manufacturing,16069.7937,0.2566,0.0,0
-59,33,Iron ore,Mining,15870.0095,0.2534,0.0,0
-60,139,"Community, social and personal services",Services,14849.9239,0.2371,0.0,0
-61,47,"Grain Mill products, starch and starch products",Manufacturing,14816.5597,0.2365,4.3815,64918
-62,78,Drugs and medicine,Petroleum,14176.7989,0.2263,0.0915,1298
-63,93,Machine tools,Manufacturing,13744.5899,0.2194,0.0,0
-64,8,Rapeseed and mustard,Agriculture,13498.7925,0.2155,14048.8608,189642656
-65,21,Milk,Agriculture,13337.7425,0.2129,0.0,0
-66,138,Human health and social care services,Services,12366.1738,0.1974,0.0,0
-67,69,Rubber products,Manufacturing,11902.4092,0.19,2330.4242,27737663
-68,62,Misc. textile products,Manufacturing,11561.881,0.1846,57.6432,666464
-69,100,Other electrical machinery,Manufacturing,11414.5848,0.1822,0.0,0
-70,72,Coal tar products,Petroleum,11206.4999,0.1789,2806.0606,31446118
-71,79,"Soaps, cosmetics and glycerin",Petroleum,10909.2123,0.1742,0.0915,998
-72,28,Inland Fish,Agriculture,10872.5576,0.1736,0.0,0
-73,107,Motor cycles and scooters,Manufacturing,10153.7184,0.1621,0.0,0
-74,115,Gas,Services,9850.2109,0.1573,0.0,0
-75,24,Other livestock products,Agriculture,9463.5839,0.1511,6890.521,65209024
-76,125,Storage and warehousing,Services,9435.8326,0.1506,0.0,0
-77,57,Synthetic yarn and synthetic textiles,Manufacturing,9054.8775,0.1446,57.6432,521952
-78,95,Electrical industrial machinery,Manufacturing,8871.2895,0.1416,0.0,0
-79,1,Paddy,Agriculture,8640.8137,0.138,180219.7884,1557245611
-80,98,Electrical appliances,Manufacturing,8576.1453,0.1369,0.0,0
-81,19,Vegetables,Agriculture,8395.4497,0.134,16089.4759,135078385
-82,68,Furniture & Fixtures,Manufacturing,7804.7983,0.1246,42.9739,335403
-83,29,Marine Fish,Agriculture,7310.7135,0.1167,0.0,0
-84,37,Other Metallic minerals,Mining,7302.131,0.1166,0.0,0
-85,110,Other transport equipment,Manufacturing,7003.7925,0.1118,0.0,0
-86,2,Wheat,Agriculture,6670.7365,0.1065,137923.1038,920048683
-87,96,"Electrical cables, wires",Manufacturing,6378.7839,0.1018,0.0,0
-88,97,Batteries,Manufacturing,5904.0308,0.0943,0.0,0
-89,38,Limestone,Mining,5193.5329,0.0829,0.0,0
-90,48,Sugar,Manufacturing,5131.7927,0.0819,18.0391,92573
-91,7,Groundnut,Agriculture,5086.4843,0.0812,14048.8608,71459309
-92,55,Tobacco Products,Manufacturing,4543.0181,0.0725,0.9133,4149
-93,12,Sugarcane,Agriculture,4094.9469,0.0654,85956.1605,351985910
-94,94,Other non electrical machinery,Manufacturing,4082.9383,0.0652,0.0,0
-95,18,Fruits,Agriculture,3995.3735,0.0638,16089.4759,64283466
-96,64,Leather and leather products except footwear,Manufacturing,3874.5909,0.0619,0.0,0
-97,43,Processed fish & fish products,Manufacturing,3441.5666,0.0549,503.9568,1734401
-98,102,"Medical precision, optical instrument",Manufacturing,3420.9656,0.0546,0.0,0
-99,3,Coarse cereals,Agriculture,3227.5854,0.0515,3668.3235,11839827
-100,49,Bread & Bakery products,Manufacturing,3148.0728,0.0503,4.3815,13793
-101,109,Aircrafts & Spacecrafts,Manufacturing,3063.8052,0.0489,0.0,0
-102,123,Water Transport,Services,3044.6104,0.0486,0.0,0
-103,101,Electronic equipment including T.V,Manufacturing,2981.0084,0.0476,0.0,0
-104,23,Egg and poultry,Agriculture,2667.4188,0.0426,79.1536,211136
-105,108,"Bicycles, cycle-rickshaw",Manufacturing,2653.2491,0.0424,0.0,0
-106,105,Rail equipment,Manufacturing,2456.6353,0.0392,0.0,0
-107,58,Wool yarn and woolen textiles,Manufacturing,2413.5402,0.0385,57.6432,139124
-108,27,Other forestry products,Agriculture,2202.8373,0.0352,0.0,0
-109,4,Gram,Agriculture,2181.5751,0.0348,3668.3235,8002723
-110,111,Gems & jewellery,Manufacturing,2101.9108,0.0336,0.0,0
-111,103,Watches and clocks,Manufacturing,2088.212,0.0333,0.0,0
-112,13,Coconut,Agriculture,2047.4957,0.0327,16089.4759,32943132
-113,60,Carpet weaving,Manufacturing,1938.322,0.0309,57.6432,111731
-114,34,Manganese ore,Mining,1917.096,0.0306,0.0,0
-115,59,Silk yarn and silk textiles,Manufacturing,1773.4559,0.0283,57.6432,102228
-116,90,Tractors and other agricultural implements,Manufacturing,1637.5418,0.0261,0.0,0
-117,91,Industrial machinery for food and textile industry,Manufacturing,1519.0366,0.0243,0.0,0
-118,11,"jute, hemp and mesta",Agriculture,1524.5648,0.0243,123.5709,188392
-119,50,Miscellaneous food products,Manufacturing,1501.1899,0.024,0.0,0
-120,36,Copper ore,Mining,1399.3913,0.0223,0.0,0
-121,17,Rubber,Agriculture,1340.3671,0.0214,13037.7532,17475375
-122,92,Industrial machinery (except food and textile),Manufacturing,1225.8729,0.0196,0.0,0
-123,35,Bauxite,Mining,1139.6811,0.0182,0.0,0
-124,6,Other pulses,Agriculture,1109.5807,0.0177,3668.3235,4070301
-125,99,Communication equipment,Manufacturing,1064.3648,0.017,0.0,0
-126,15,Tea,Agriculture,916.3271,0.0146,13037.7532,11946846
-127,53,Tea processed,Manufacturing,668.0859,0.0107,0.0,0
-128,42,Processed other meat & meat products,Manufacturing,574.412,0.0092,12.9566,7442
-129,104,Ships and boats,Manufacturing,536.2228,0.0086,0.0,0
-130,45,Dairy products,Manufacturing,483.7295,0.0077,29.0656,14060
-131,26,Firewood,Agriculture,474.6908,0.0076,0.0,0
-132,5,Arhar,Agriculture,438.02,0.007,3668.3235,1606799
-133,22,Wool,Agriculture,350.9199,0.0056,0.0,0
-134,16,Coffee,Agriculture,317.2621,0.0051,13037.7532,4136385
-135,54,Coffee processed,Manufacturing,206.4914,0.0033,0.0,0
-136,14,Tobacco,Agriculture,193.5917,0.0031,13037.7532,2524001
-137,41,Processed poultry meat & poultry meat products,Manufacturing,142.3787,0.0023,3.5053,499
-138,39,Mica,Mining,52.1545,0.0008,0.0,0
-139,129,Ownership of dwellings,Services,0.0,0.0,0.0,0
-140,117,Trade,Services,0.0,0.0,0.0,0
+Rank,Product_ID,Product_Name,Source_Group,Dependency_Index,Tourism_Water_m3
+1,32,Product 32,Mining,30.5192,0
+2,120,Product 120,Services,4.9084,0
+3,127,Product 127,Services,4.3652,0
+4,118,Product 118,Services,3.8729,0
+5,71,Product 71,Petroleum,3.4566,607547706
+6,74,Product 74,Petroleum,2.8764,16490
+7,113,Product 113,Manufacturing,2.6298,0
+8,132,Product 132,Services,2.4359,0
+9,114,Product 114,Electricity,2.3395,735332319
+10,122,Product 122,Services,2.2152,0
+11,44,Product 44,Manufacturing,2.1852,24893732
+12,112,Product 112,Manufacturing,2.1374,0
+13,134,Product 134,Services,1.9803,0
+14,126,Product 126,Services,1.8984,0
+15,30,Product 30,Mining,1.8646,0
+16,61,Product 61,Manufacturing,1.722,26638380
+17,119,Product 119,Services,1.1378,0
+18,46,Product 46,Manufacturing,1.123,2258549
+19,84,Product 84,Manufacturing,1.0572,0
+20,66,Product 66,Manufacturing,1.0033,114535825
+21,135,Product 135,Services,0.7833,0
+22,31,Product 31,Mining,0.7372,0
+23,73,Product 73,Petroleum,0.6379,3657
+24,137,Product 137,Services,0.6362,0
+25,85,Product 85,Manufacturing,0.6127,0
+26,131,Product 131,Services,0.6105,0
+27,86,Product 86,Manufacturing,0.5815,0
+28,70,Product 70,Manufacturing,0.5729,83623987
+29,51,Product 51,Manufacturing,0.5667,235785
+30,88,Product 88,Manufacturing,0.5629,0
+31,65,Product 65,Manufacturing,0.5621,1512912
+32,25,Product 25,Agriculture,0.5597,0
+33,140,Product 140,Services,0.5538,0
+34,40,Product 40,Mining,0.5409,0
+35,56,Product 56,Manufacturing,0.5331,1924752
+36,87,Product 87,Manufacturing,0.5247,0
+37,75,Product 75,Petroleum,0.5227,208750
+38,52,Product 52,Manufacturing,0.5036,209535
+39,89,Product 89,Manufacturing,0.4503,0
+40,121,Product 121,Services,0.4316,0
+41,63,Product 63,Manufacturing,0.4199,960196
+42,136,Product 136,Services,0.3949,0
+43,67,Product 67,Manufacturing,0.3892,15619684
+44,20,Product 20,Agriculture,0.3844,313927243
+45,77,Product 77,Petroleum,0.3807,2182
+46,133,Product 133,Services,0.3647,0
+47,9,Product 9,Agriculture,0.3595,316311244
+48,128,Product 128,Services,0.357,0
+49,116,Product 116,Electricity,0.3471,0
+50,81,Product 81,Manufacturing,0.3451,1978
+51,80,Product 80,Petroleum,0.3277,1879
+52,76,Product 76,Petroleum,0.3237,1856
+53,106,Product 106,Manufacturing,0.3163,0
+54,124,Product 124,Services,0.3137,0
+55,82,Product 82,Manufacturing,0.3095,0
+56,130,Product 130,Services,0.2943,0
+57,10,Product 10,Agriculture,0.279,2159128
+58,83,Product 83,Manufacturing,0.2566,0
+59,33,Product 33,Mining,0.2534,0
+60,139,Product 139,Services,0.2371,0
+61,47,Product 47,Manufacturing,0.2365,64918
+62,78,Product 78,Petroleum,0.2263,1298
+63,93,Product 93,Manufacturing,0.2194,0
+64,8,Product 8,Agriculture,0.2155,189642656
+65,21,Product 21,Agriculture,0.2129,0
+66,138,Product 138,Services,0.1974,0
+67,69,Product 69,Manufacturing,0.19,27737663
+68,62,Product 62,Manufacturing,0.1846,666464
+69,100,Product 100,Manufacturing,0.1822,0
+70,72,Product 72,Petroleum,0.1789,31446118
+71,79,Product 79,Petroleum,0.1742,998
+72,28,Product 28,Agriculture,0.1736,0
+73,107,Product 107,Manufacturing,0.1621,0
+74,115,Product 115,Electricity,0.1573,0
+75,24,Product 24,Agriculture,0.1511,65209024
+76,125,Product 125,Services,0.1506,0
+77,57,Product 57,Manufacturing,0.1446,521952
+78,95,Product 95,Manufacturing,0.1416,0
+79,1,Product 1,Agriculture,0.138,1557245611
+80,98,Product 98,Manufacturing,0.1369,0
+81,19,Product 19,Agriculture,0.134,135078385
+82,68,Product 68,Manufacturing,0.1246,335403
+83,29,Product 29,Agriculture,0.1167,0
+84,37,Product 37,Mining,0.1166,0
+85,110,Product 110,Manufacturing,0.1118,0
+86,2,Product 2,Agriculture,0.1065,920048683
+87,96,Product 96,Manufacturing,0.1018,0
+88,97,Product 97,Manufacturing,0.0943,0
+89,38,Product 38,Mining,0.0829,0
+90,48,Product 48,Manufacturing,0.0819,92573
+91,7,Product 7,Agriculture,0.0812,71459309
+92,55,Product 55,Manufacturing,0.0725,4149
+93,12,Product 12,Agriculture,0.0654,351985910
+94,94,Product 94,Manufacturing,0.0652,0
+95,18,Product 18,Agriculture,0.0638,64283466
+96,64,Product 64,Manufacturing,0.0619,0
+97,43,Product 43,Manufacturing,0.0549,1734401
+98,102,Product 102,Manufacturing,0.0546,0
+99,3,Product 3,Agriculture,0.0515,11839827
+100,49,Product 49,Manufacturing,0.0503,13793
+101,109,Product 109,Manufacturing,0.0489,0
+102,123,Product 123,Services,0.0486,0
+103,101,Product 101,Manufacturing,0.0476,0
+104,23,Product 23,Agriculture,0.0426,211136
+105,108,Product 108,Manufacturing,0.0424,0
+106,105,Product 105,Manufacturing,0.0392,0
+107,58,Product 58,Manufacturing,0.0385,139124
+108,27,Product 27,Agriculture,0.0352,0
+109,4,Product 4,Agriculture,0.0348,8002723
+110,111,Product 111,Manufacturing,0.0336,0
+111,103,Product 103,Manufacturing,0.0333,0
+112,13,Product 13,Agriculture,0.0327,32943132
+113,60,Product 60,Manufacturing,0.0309,111731
+114,34,Product 34,Mining,0.0306,0
+115,59,Product 59,Manufacturing,0.0283,102228
+116,90,Product 90,Manufacturing,0.0261,0
+117,91,Product 91,Manufacturing,0.0243,0
+118,11,Product 11,Agriculture,0.0243,188392
+119,50,Product 50,Manufacturing,0.024,0
+120,36,Product 36,Mining,0.0223,0
+121,17,Product 17,Agriculture,0.0214,17475375
+122,92,Product 92,Manufacturing,0.0196,0
+123,35,Product 35,Mining,0.0182,0
+124,6,Product 6,Agriculture,0.0177,4070301
+125,99,Product 99,Manufacturing,0.017,0
+126,15,Product 15,Agriculture,0.0146,11946846
+127,53,Product 53,Manufacturing,0.0107,0
+128,42,Product 42,Manufacturing,0.0092,7442
+129,104,Product 104,Manufacturing,0.0086,0
+130,45,Product 45,Manufacturing,0.0077,14060
+131,26,Product 26,Agriculture,0.0076,0
+132,5,Product 5,Agriculture,0.007,1606799
+133,22,Product 22,Agriculture,0.0056,0
+134,16,Product 16,Agriculture,0.0051,4136385
+135,54,Product 54,Manufacturing,0.0033,0
+136,14,Product 14,Agriculture,0.0031,2524001
+137,41,Product 41,Manufacturing,0.0023,499
+138,39,Product 39,Mining,0.0008,0
+139,129,Product 129,Services,0.0,0
+140,117,Product 117,Services,0.0,0

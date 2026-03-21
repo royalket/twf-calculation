@@ -407,3 +407,85 @@
 
 - ⚠  Figure 7 — SDA waterfall (million m³) — ERROR: 'steps-post' is not a valid value for ls; supported values are '-', '--', '-.', ':', 'None', ' ', '', 'solid', 'dashed', 'dashdot', 'dotted'
 - ⚠  FAILED: Figure 7 — SDA waterfall (million m³)
+
+## visualise_results  (2026-03-19 16:47)
+
+- ⚠  Missing: mc_results_2015.csv — using fallback data
+- ⚠  2015: <50 MC samples — Gaussian approximation shown
+- ⚠  Missing: mc_results_2019.csv — using fallback data
+- ⚠  2019: <50 MC samples — Gaussian approximation shown
+- ⚠  Missing: mc_results_2022.csv — using fallback data
+- ⚠  2022: <50 MC samples — Gaussian approximation shown
+
+## visualise_results  (2026-03-19 17:07)
+
+- ⚠  Missing: mc_results_2015.csv — using fallback data
+- ⚠  2015: <50 MC samples — Gaussian approximation shown
+- ⚠  Missing: mc_results_2019.csv — using fallback data
+- ⚠  2019: <50 MC samples — Gaussian approximation shown
+- ⚠  Missing: mc_results_2022.csv — using fallback data
+- ⚠  2022: <50 MC samples — Gaussian approximation shown
+
+## visualise_results  (2026-03-19 17:09)
+
+- ⚠  Missing: mc_results_2015.csv — using fallback data
+- ⚠  2015: <50 MC samples — Gaussian approximation shown
+- ⚠  Missing: mc_results_2019.csv — using fallback data
+- ⚠  2019: <50 MC samples — Gaussian approximation shown
+- ⚠  Missing: mc_results_2022.csv — using fallback data
+- ⚠  2022: <50 MC samples — Gaussian approximation shown
+
+## visualise_results  (2026-03-19 20:48)
+
+- ⚠  Missing: mc_results_2015.csv — using fallback data
+- ⚠  2015: <50 MC samples — Gaussian approximation shown
+- ⚠  Missing: mc_results_2019.csv — using fallback data
+- ⚠  2019: <50 MC samples — Gaussian approximation shown
+- ⚠  Missing: mc_results_2022.csv — using fallback data
+- ⚠  2022: <50 MC samples — Gaussian approximation shown
+
+## visualise_results  (2026-03-20 07:43)
+
+- ⚠  Missing: mc_results_2015.csv — using fallback data
+- ⚠  2015: <50 MC samples — Gaussian approximation shown
+- ⚠  Missing: mc_results_2019.csv — using fallback data
+- ⚠  2019: <50 MC samples — Gaussian approximation shown
+- ⚠  Missing: mc_results_2022.csv — using fallback data
+- ⚠  2022: <50 MC samples — Gaussian approximation shown
+
+## visualise_results  (2026-03-20 08:15)
+
+- ⚠  Missing: mc_results_2015.csv — using fallback data
+- ⚠  2015: <50 MC samples — Gaussian approximation shown
+- ⚠  Missing: mc_results_2019.csv — using fallback data
+- ⚠  2019: <50 MC samples — Gaussian approximation shown
+- ⚠  Missing: mc_results_2022.csv — using fallback data
+- ⚠  2022: <50 MC samples — Gaussian approximation shown
+
+## visualise_results  (2026-03-20 10:44)
+
+- ⚠  Missing: mc_results_2015.csv — using fallback data
+- ⚠  Missing: mc_results_2019.csv — using fallback data
+- ⚠  Missing: mc_results_2022.csv — using fallback data
+
+## visualise_results  (2026-03-20 10:57)
+
+- ⚠  Missing: mc_results_2015.csv — using fallback data
+- ⚠  Missing: mc_results_2019.csv — using fallback data
+- ⚠  Missing: mc_results_2022.csv — using fallback data
+
+## visualise_results  (2026-03-20 11:06)
+
+- ⚠  Missing: mc_results_2015.csv — using fallback data
+- ⚠  Missing: mc_results_2019.csv — using fallback data
+- ⚠  Missing: mc_results_2022.csv — using fallback data
+
+## visualise_results  (2026-03-20 13:56)
+
+- ⚠  Figure 8 — Per-year KDE uncertainty strip — ERROR: 'str' object is not callable
+- ⚠  FAILED: Figure 8 — Per-year KDE uncertainty strip
+
+## visualise_results  (2026-03-20 14:00)
+
+- ⚠  Figure 8 — Per-year KDE uncertainty strip — ERROR: 'str' object is not callable
+- ⚠  FAILED: Figure 8 — Per-year KDE uncertainty strip

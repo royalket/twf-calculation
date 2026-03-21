@@ -20,6 +20,9 @@ Changes vs previous version
 - Added OUTBOUND_TWF_DATA and OUTBOUND_TOURIST_COUNTS loaders for net TWF module.
 - _build_wsi_weights() now reads 'wsi_weight' column (backward-compatible);
   also exposes WSI_RAW_SCORES dict for reporting.
+- UNIT_RENTS and NAS_MACRO moved from hardcoded dicts to reference_data.md loaders.
+- indirect_dir(stressor) universal accessor added for cross-file directory resolution.
+- New DIRS entries for per-stressor SDA/MC output directories.
 """
 
 from pathlib import Path
@@ -53,10 +56,46 @@ DIRS = {
     "outbound":         BASE_DIR / "3-final-results" / "outbound-twf",
     "indirect_energy":  BASE_DIR / "3-final-results" / "indirect-energy",
     "direct_energy":    BASE_DIR / "3-final-results" / "direct-energy",
-    "outbound_energy":  BASE_DIR / "3-final-results" / "outbound-energy",
-    "visualisation": BASE_DIR / "3-final-results" / "visualisation",
-    "logs":          BASE_DIR / "logs",
+    "outbound_energy":      BASE_DIR / "3-final-results" / "outbound-energy",
+    "indirect_depletion":   BASE_DIR / "3-final-results" / "indirect-depletion",
+    "monetary_depletion":   BASE_DIR / "3-final-results" / "monetary-depletion",
+    "ndp":                  BASE_DIR / "3-final-results" / "ndp",
+    "visualisation":        BASE_DIR / "3-final-results" / "visualisation",
+    "logs":                 BASE_DIR / "logs",
+    "sda_energy":              BASE_DIR / "3-final-results" / "sda-energy",
+    "sda_depletion":           BASE_DIR / "3-final-results" / "sda-depletion",
+    "sda_emissions":           BASE_DIR / "3-final-results" / "sda-emissions",
+    "monte_carlo_energy":      BASE_DIR / "3-final-results" / "monte-carlo-energy",
+    "monte_carlo_depletion":   BASE_DIR / "3-final-results" / "monte-carlo-depletion",
+    "monte_carlo_emissions":   BASE_DIR / "3-final-results" / "monte-carlo-emissions",
+    "indirect_emissions":      BASE_DIR / "3-final-results" / "indirect-emissions",
 }
+
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# UNIVERSAL STRESSOR DIRECTORY ACCESSOR
+# ══════════════════════════════════════════════════════════════════════════════
+
+_INDIRECT_DIR_MAP: dict[str, str] = {
+    "water":     "indirect",
+    "energy":    "indirect_energy",
+    "depletion": "indirect_depletion",
+    "emissions": "indirect_emissions",
+}
+
+def indirect_dir(stressor: str) -> "Path":
+    """
+    Return the output directory Path for a given stressor's indirect results.
+
+    Usage (in compare.py, postprocess.py, decompose.py, validate):
+        from config import indirect_dir
+        path = indirect_dir("water") / "indirect_water_all_years.csv"
+
+    Adding a new stressor: add one entry to _INDIRECT_DIR_MAP and DIRS above.
+    """
+    key = _INDIRECT_DIR_MAP.get(stressor, f"indirect_{stressor}")
+    return DIRS[key]
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -209,12 +248,19 @@ WSI_RAW_SCORES: dict = _build_wsi_raw_scores()
 # Source: Hadjikakou et al. (2015); Li (2018); Lee et al. (2021).
 TOURIST_WF_MULTIPLIER: float = 1.5
 
+# FIX-3c: separate energy multiplier — the 1.5× water multiplier is grounded in
+# Hadjikakou et al. (2015), Li (2018), Lee et al. (2021) all of which are water studies.
+# No equivalent literature consensus exists for energy. Default = 1.0 (neutral assumption).
+# Update when a suitable energy-specific citation is identified.
+# Source: Gössling (2002) provides hotel energy benchmarks but no multiplicative factor.
+TOURIST_ENERGY_MULTIPLIER: float = 1.0
+
 
 # ══════════════════════════════════════════════════════════════════════════════
 # STRESSORS  (registered stressor IDs for the dual-stressor pipeline)
 # ══════════════════════════════════════════════════════════════════════════════
 
-STRESSORS: tuple = ("water", "energy")
+STRESSORS: tuple = ("water", "energy", "depletion")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -230,8 +276,108 @@ TJ_TO_KWH: float = 277_777.78      # 1 TJ = 277,777.78 kWh
 # "Emission" = combustion-based energy (fossil-related rows); used to
 #              compute the Emission/Final ratio as a carbon-intensity proxy.
 # These must match the exact row strings in the EXIOBASE satellite file.
-ENERGY_ROW_FINAL:    str = "Energy Carrier Net Total"
-ENERGY_ROW_EMISSION: str = "Energy Carrier Net Fossil"
+# EXIOBASE F.txt (energy satellite) rows use the labels below in the
+# copies included in this workspace.
+# EXIOBASE 3.8 energy/F.txt row selection — confirmed from first-principles analysis
+# of IOT_2015_ixi/energy/F.txt row values (see project notes, 2026-03).
+#
+# Row meanings (Stadler et al. 2018, J.Ind.Ecol.; Rasul et al. 2024, J.Ind.Ecol.):
+#   Gross  = total energy supply incl. transformation double-counting (Rasul 2024:
+#             "gross accounts double count energy before and after transformation steps")
+#   Final  = purchased/consumed energy inputs per sector — the correct EEIO intensity:
+#             coal power → fuel burned (30 TJ/M-EUR) ✓; hydro → pumps only (1 TJ/M-EUR) ✓
+#   Net    = Gross minus own-use; still inflated for electricity sectors (coal 772 TJ/M-EUR)
+#             because it counts the electricity carrier flow, not just fuel input
+#   Emission relevant = fossil/emission subset; can exceed Final at India total level
+#             because India is a net energy exporter in EXIOBASE (produces more
+#             emission-relevant energy than it domestically consumes in Final terms).
+#             Emission/Final = 1.365 at India total → fossil share reported as min(ratio,1.0)
+#
+# DECISION: Final as primary (correct sector intensities), Emission relevant as secondary.
+# Fossil share = Emission_total / Final_total, capped at 100% in compare.py reporting.
+# Reference: Rasul et al. (2024) https://doi.org/10.1111/jiec.13563
+#            Stadler et al. (2018) https://doi.org/10.1111/jiec.12715
+ENERGY_ROW_FINAL:    str = "Energy use - Final"             # direct energy inputs (primary)
+ENERGY_ROW_EMISSION: str = "Energy use - Emission relevant" # fossil/emission subset (secondary)
+ENERGY_ROW_GROSS:    str = "Energy use - Gross"             # available as reference only
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# DEPLETION ROW PREFIXES  (material/F.txt — confirmed from Exiobase 3 ixi)
+# ══════════════════════════════════════════════════════════════════════════════
+# All Domestic Extraction Used rows live in material/F.txt (NOT energy/F.txt).
+# These prefixes are used by build_coefficients.py STRESSOR_CFG["depletion"].
+
+DEPLETION_ROW_FOSSIL:    str = "Domestic Extraction Used - Fossil Fuels"
+DEPLETION_ROW_METAL:     str = "Domestic Extraction Used - Metal Ores"
+DEPLETION_ROW_NONMETAL:  str = "Domestic Extraction Used - Non-Metallic Minerals"
+DEPLETION_ROW_FORESTRY:  str = "Domestic Extraction Used - Forestry"
+DEPLETION_ROW_FISHERY:   str = "Domestic Extraction Used - Fishery"
+DEPLETION_ROW_CROPS:     str = "Domestic Extraction Used - Primary Crops"
+DEPLETION_ROW_RESIDUES:  str = "Domestic Extraction Used - Crop residues"
+DEPLETION_ROW_GRAZED:    str = "Domestic Extraction Used - Grazed biomass"
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# UNIT RENTS  (₹ crore per physical unit — for NDP monetary valuation)
+# ══════════════════════════════════════════════════════════════════════════════
+# Source: reference_data.md § UNIT_RENTS (World Bank Wealth Accounts 2021 +
+# IBM/MoM royalty data + FAO unit values).  Hardcoded fallback kept for
+# backward compatibility if reference_data.md is missing the section.
+
+def _build_unit_rents() -> dict:
+    """Return {study_year: {fossil, metal, nonmetal, biomass}} from reference_data.md."""
+    rows = _rows("UNIT_RENTS")
+    if rows:
+        return {
+            str(int(float(r["study_year"]))): {
+                k: float(r[k]) for k in ("fossil", "metal", "nonmetal", "biomass")
+            }
+            for r in rows
+        }
+    import warnings
+    warnings.warn(
+        "config: UNIT_RENTS section missing from reference_data.md — using hardcoded fallback.",
+        UserWarning, stacklevel=2,
+    )
+    return {
+        "2015": {"fossil": 0.00038, "metal": 0.00012, "nonmetal": 0.000035, "biomass": 0.000080},
+        "2019": {"fossil": 0.00051, "metal": 0.00015, "nonmetal": 0.000045, "biomass": 0.000095},
+        "2022": {"fossil": 0.00072, "metal": 0.00019, "nonmetal": 0.000058, "biomass": 0.000110},
+    }
+
+UNIT_RENTS: dict = _build_unit_rents()
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# NAS MACRO AGGREGATES  (for NDP computation)
+# ══════════════════════════════════════════════════════════════════════════════
+# Source: reference_data.md § NAS_MACRO (MoSPI NAS 2023, Statements 1 & 2).
+# Hardcoded fallback kept for backward compatibility.
+
+def _build_nas_macro() -> dict:
+    """Return {study_year: {gdp_crore, cfc_crore}} from reference_data.md."""
+    rows = _rows("NAS_MACRO")
+    if rows:
+        return {
+            str(int(float(r["study_year"]))): {
+                "gdp_crore": float(r["gdp_crore"]),
+                "cfc_crore": float(r["cfc_crore"]),
+            }
+            for r in rows
+        }
+    import warnings
+    warnings.warn(
+        "config: NAS_MACRO section missing from reference_data.md — using hardcoded fallback.",
+        UserWarning, stacklevel=2,
+    )
+    return {
+        "2015": {"gdp_crore": 13576086, "cfc_crore": 1847000},
+        "2019": {"gdp_crore": 20033022, "cfc_crore": 2980000},
+        "2022": {"gdp_crore": 23652441, "cfc_crore": 3724000},
+    }
+
+NAS_MACRO: dict = _build_nas_macro()
 
 
 # ══════════════════════════════════════════════════════════════════════════════

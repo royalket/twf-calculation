@@ -99,7 +99,12 @@ STRESSOR_CFG: dict[str, dict] = {
         "col_suffix_raw":       "Final_TJ_per_EUR_million",
         "col_suffix_raw_sec":   "Emission_TJ_per_EUR_million",
         "unit_label":           "MJ/crore",
-        "conv_fn": lambda eur_inr: TJ_TO_MJ * 100.0 / eur_inr,  # TJ/EUR-M → MJ/₹cr
+        "conv_fn": lambda eur_inr: TJ_TO_MJ * 10.0 / eur_inr,   # TJ/M-EUR → MJ/₹cr
+        # Unit derivation: 1 M-EUR = EUR_INR × 1e6 INR = EUR_INR/10 crore
+        # → 1 crore = 10/EUR_INR M-EUR
+        # → coeff [TJ/M-EUR] × TJ_TO_MJ [MJ/TJ] × (10/EUR_INR) [M-EUR/crore] = MJ/crore
+        # Water uses 100/EUR_INR because water F.txt is in m³ per 0.1 M-EUR (100k EUR)
+        # Energy F.txt is in TJ per M-EUR (standard EXIOBASE unit) → needs 10/EUR_INR
         "concordance_file":     "concordance_energy_{io_tag}.csv",
         "sut_file":             "energy_coefficients_140_{io_tag}.csv",
         "audit_file":           "India_Energy_Coefficients_{year}.csv",
@@ -444,14 +449,25 @@ def extract_stressor(f_path: Path, year: str, stressor: Stressor,
     if len(india_cols) != 163:
         warn(f"Expected 163 India sectors, found {len(india_cols)}", log)
 
+    # FIX-energy-B3: energy/F.txt has two leading metadata rows ('sector', 'stressor').
+    # The 'sector' row values are the EXIOBASE sector names for each column — capture
+    # this mapping BEFORE dropping the rows because we need it for the x.txt join (B2).
+    sector_names: "pd.Series | None" = None
+    if "sector" in raw.index:
+        sector_names = raw.loc["sector", india_cols]
+    meta_rows = [r for r in raw.index if str(r).lower() in ("sector", "stressor")]
+    if meta_rows:
+        raw = raw.drop(index=meta_rows)
+        ok(f"Dropped {len(meta_rows)} metadata rows; sector name map captured for x.txt join", log)
+
     conv = cfg["conv_fn"](EUR_INR[year])
 
     def _sum_rows(prefix: str) -> pd.Series:
         matched = [r for r in raw.index if str(r).startswith(prefix)]
         if not matched:
-            warn(f"No '{prefix}' rows found in F.txt — setting to zero", log)
+            warn(f"No \'{prefix}\' rows found in F.txt — setting to zero", log)
             return pd.Series(0.0, index=india_cols)
-        ok(f"'{prefix}' matched ({len(matched)}): {matched[:3]}"
+        ok(f"\'{prefix}\' matched ({len(matched)}): {matched[:3]}"
            + (" …" if len(matched) > 3 else ""), log)
         return (
             raw.loc[matched, india_cols]
@@ -462,6 +478,62 @@ def extract_stressor(f_path: Path, year: str, stressor: Stressor,
 
     primary_raw   = _sum_rows(cfg["row_prefixes"]["primary"])
     secondary_raw = _sum_rows(cfg["row_prefixes"]["secondary"])
+
+    # FIX-energy-B2: energy/F.txt stores absolute flows (total TJ consumed),
+    # NOT intensities (TJ per M-EUR of output). Divide by x.txt sector output.
+    #
+    # CRITICAL: positional alignment is WRONG — x.txt India rows and F.txt India
+    # columns are in different sector orders. The correct join key is the sector
+    # name string: F.txt 'sector' metadata row gives the name for each column code,
+    # and x.txt India block has 'sector' (name) + 'indout' (M-EUR output).
+    # Join on exact sector name to get the right output value per F.txt column.
+    if stressor == "energy":
+        x_path = f_path.parent.parent / "x.txt"
+        if not x_path.exists():
+            x_path = f_path.parent.parent.parent / "x.txt"
+        if x_path.exists() and sector_names is not None:
+            x_raw      = pd.read_csv(x_path, sep="\t", header=0, index_col=0,
+                                     low_memory=False)
+            india_x    = x_raw.loc["IN"].copy()
+            india_x["indout"] = pd.to_numeric(india_x["indout"],
+                                              errors="coerce").fillna(0)
+            name_to_output = dict(zip(india_x["sector"], india_x["indout"]))
+
+            x_vals = []
+            matched_names = 0
+            for code in india_cols:
+                name = str(sector_names.get(code, ""))
+                out  = name_to_output.get(name, 0.0)
+                if out > 0:
+                    matched_names += 1
+                x_vals.append(out)
+
+            x_india = pd.Series(x_vals, index=india_cols, dtype=float)
+            # FIX: apply minimum output threshold before dividing.
+            # Sectors where India has negligible actual production (tidal, geothermal,
+            # wave power etc.) produce enormous F/x ratios from near-zero denominators
+            # that are physically meaningless. Threshold = 0.01% of total India output,
+            # scaled per year so it works for both 2015 and 2019 x.txt scales.
+            # For 2015: 3,756,577 M-EUR × 0.0001 = 376 M-EUR (~₹3,000 crore minimum)
+            # For 2019: 5,016,810 M-EUR × 0.0001 = 502 M-EUR
+            x_total = x_india.sum()
+            X_MIN_MEUR = x_total * 0.0001   # 0.01% of total India output
+            x_india_thresholded = x_india.where(x_india >= X_MIN_MEUR, other=float("nan"))
+            x_safe  = x_india_thresholded.replace(0, float("nan"))
+            primary_raw   = (primary_raw   / x_safe).fillna(0)
+            secondary_raw = (secondary_raw / x_safe).fillna(0)
+            n_below = int((x_india > 0).sum() - (x_india >= X_MIN_MEUR).sum())
+            ok(f"Normalised energy by x.txt (name-join, threshold={X_MIN_MEUR:.0f} M-EUR) — "
+               f"matched {matched_names}/163, "
+               f"{n_below} sectors below threshold → zeroed, "
+               f"non-zero primary: {(primary_raw > 0).sum()}/163", log)
+        elif sector_names is None:
+            warn("'sector' row missing from F.txt — cannot name-join x.txt. "
+                 "Energy coefficients are absolute flows, not intensities.", log)
+        else:
+            warn(f"x.txt not found at {x_path} — energy will be absolute flows, "
+                 f"~100,000× too large.", log)
+
     primary_conv   = primary_raw   * conv
     secondary_conv = secondary_raw * conv
 

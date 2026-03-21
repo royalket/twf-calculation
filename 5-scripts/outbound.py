@@ -56,7 +56,7 @@ import pandas as pd
 sys.path.insert(0, str(Path(__file__).parent))   # TODO-1: remove after packaging
 from config import (
     DIRS, STUDY_YEARS, OUTBOUND_DESTINATIONS, OUTBOUND_COUNTS,
-    OUTBOUND_ENERGY_DESTINATIONS, TOURIST_WF_MULTIPLIER,
+    OUTBOUND_ENERGY_DESTINATIONS, TOURIST_WF_MULTIPLIER, TOURIST_ENERGY_MULTIPLIER,
 )
 from utils import (
     ok, warn, save_csv, safe_csv, compare_across_years,
@@ -158,11 +158,14 @@ def compute_outbound(year: str, stressor: Stressor,
     rate_key       = cfg["rate_key"]
     dest_rows: list[dict] = []
     total = 0.0
+    # FIX-3c: use stressor-specific tourist multiplier.
+    # Water: 1.5× (Hadjikakou 2015; Li 2018; Lee 2021). Energy: 1.0× (no literature basis yet).
+    tourist_mult = TOURIST_WF_MULTIPLIER if stressor == "water" else TOURIST_ENERGY_MULTIPLIER
 
     for dest in dests:
         tourists_d  = total_tourists * dest["dest_share"]
         daily_rate  = dest[rate_key] / DAYS_PER_YEAR
-        footprint_d = tourists_d * avg_stay * daily_rate * TOURIST_WF_MULTIPLIER
+        footprint_d = tourists_d * avg_stay * daily_rate * tourist_mult
         total      += footprint_d
 
         row: dict = {
@@ -290,7 +293,8 @@ def run(stressor: Stressor = "water", **kwargs):
         log.info(cfg["data_note"])
         if cfg["placeholder_warn"]:
             log.info(cfg["placeholder_warn"])
-        log.info(f"Tourist multiplier = {TOURIST_WF_MULTIPLIER}")
+        _mult = TOURIST_WF_MULTIPLIER if stressor == "water" else TOURIST_ENERGY_MULTIPLIER
+        log.info(f"Tourist multiplier = {_mult} ({'water literature' if stressor == 'water' else 'neutral — no energy literature yet'})")
 
         all_year_rows: list[dict] = []
         all_dest_rows: list[pd.DataFrame] = []
@@ -354,10 +358,11 @@ def run(stressor: Stressor = "water", **kwargs):
                 "Inbound_bn":               round(inbound_total / cfg["bn_divisor"], 5),
                 "Net":                      round(net_tourism),
                 "Net_bn":                   round(net_tourism / cfg["bn_divisor"], 5),
+                "Net_bn_m3":                round(net_tourism / cfg["bn_divisor"], 5),  # alias for compare.py
                 "Net_M_m3":                 round(net_tourism / 1e6, 2),
                 "Outbound_to_Inbound_Ratio": round(safe_divide(outbound_tourism, max(inbound_total, 1)), 3),
                 "Net_Direction":            "exporter" if net_tourism < 0 else "importer",
-                "Tourist_Multiplier":       TOURIST_WF_MULTIPLIER,
+                "Tourist_Multiplier":       TOURIST_WF_MULTIPLIER if stressor == "water" else TOURIST_ENERGY_MULTIPLIER,
                 # Water-specific scarce footprint
                 **({
                     "Outbound_Scarce":          round(sum(r.get("Scarce_m3", 0) for r in dest_rows_t)),

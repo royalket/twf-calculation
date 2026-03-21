@@ -88,7 +88,7 @@ from utils import (
     crore_to_usd_m, classify_source_group, safe_divide,
 )
 
-Stressor = Literal["water", "energy"]
+Stressor = Literal["water", "energy", "depletion"]
 
 # ── Per-stressor configuration ────────────────────────────────────────────────
 _CFG: dict[str, dict] = {
@@ -115,6 +115,18 @@ _CFG: dict[str, dict] = {
         "section_title":    "CALCULATE INDIRECT ENERGY FOOTPRINT  (E × L × Y)",
         "split_val_col":    "Final_Primary_MJ",
         "split_sec_col":    "Emission_MJ",
+    },
+    "depletion": {
+        "coeff_file":       "depletion_coefficients_140_{io_tag}.csv",
+        "coeff_col_fn":     lambda wy: f"Depletion_{wy}_t_per_crore",
+        "coeff_col_sec_fn": lambda wy: f"Depletion_{wy}_t_per_crore_sec",
+        "unit":             "t",
+        "bn_label":         "M tonnes",
+        "out_dir_key":      "indirect_depletion",
+        "log_name":         "calculate_indirect_depletion",
+        "section_title":    "CALCULATE INDIRECT DEPLETION  (D × L × Y)",
+        "split_val_col":    "Total_Depletion_t",
+        "split_sec_col":    "Fossil_Total_t",
     },
 }
 
@@ -389,6 +401,9 @@ def aggregate_to_categories(sut_results: pd.DataFrame,
     """
     rows = []
     seen_product_ids: set[int] = set()   # FIX-2: each SUT product counted once
+    # FIX-3b: track skipped water/energy so data loss is quantified, not just logged
+    skipped_primary = 0.0
+    primary_col_name = "Total_Water_m3" if stressor == "water" else "Final_Primary_MJ"
 
     for _, crow in concordance.iterrows():
         sut_str = str(crow.get("SUT_Product_IDs", ""))
@@ -399,6 +414,10 @@ def aggregate_to_categories(sut_results: pd.DataFrame,
         new_ids = [pid for pid in all_ids if pid not in seen_product_ids]
         if all_ids and len(new_ids) < len(all_ids):
             skipped = sorted(set(all_ids) - set(new_ids))
+            # FIX-3b: accumulate skipped footprint volume
+            skipped_sub = sut_results[sut_results["Product_ID"].isin(skipped)]
+            if primary_col_name in skipped_sub.columns:
+                skipped_primary += float(skipped_sub[primary_col_name].sum())
             warn(f"aggregate_to_categories: Product_IDs {skipped} already attributed "
                  f"to a prior category — skipping duplicates for "
                  f"'{crow.get('Category_Name', crow.get('Category_ID', '?'))}'")
@@ -434,6 +453,18 @@ def aggregate_to_categories(sut_results: pd.DataFrame,
                 "Demand_crore":     demand,
                 "Energy_pct":       0.0,  # filled below
             })
+
+    # FIX-3b: quantified conservation check — warn if skipped footprint is material
+    if skipped_primary > 0:
+        sut_total_primary = float(sut_results[primary_col_name].sum()) if primary_col_name in sut_results.columns else 0.0
+        if sut_total_primary > 0:
+            skip_pct = 100 * skipped_primary / sut_total_primary
+            if skip_pct > 0.1:
+                warn(f"aggregate_to_categories: {skip_pct:.2f}% of total {stressor} footprint "
+                     f"({skipped_primary:,.0f} units) skipped due to duplicate SUT_Product_IDs "
+                     "in concordance — review get_concordance() in build_coefficients.py")
+            else:
+                ok(f"aggregate_to_categories: {skip_pct:.4f}% skipped (< 0.1% — negligible)")
 
     df = pd.DataFrame(rows)
 
@@ -989,6 +1020,22 @@ def _process_year(year: str, stressor: Stressor,
     save_csv(sut_results, out_dir / f"indirect_{stressor}_{year}_by_sut.csv",
              f"Indirect {stressor} SUT {year}", log=log)
 
+    # ── Water multiplier ratio file — written separately so compare.py can read it
+    # without loading the full SUT results frame.  compare.py expects:
+    #   water_multiplier_ratio_{year}.csv with columns:
+    #   Product_ID, Product_Name, Water_Multiplier_m3_per_crore, Multiplier_Ratio
+    if stressor == "water" and "Multiplier_Ratio" in sut_results.columns:
+        ratio_cols = [c for c in
+                      ("Product_ID", "Product_Name", "Water_Multiplier_m3_per_crore",
+                       "Multiplier_Ratio", "Source_Group")
+                      if c in sut_results.columns]
+        ratio_df = (sut_results[ratio_cols]
+                    .sort_values("Multiplier_Ratio", ascending=False)
+                    .reset_index(drop=True))
+        save_csv(ratio_df,
+                 out_dir / f"water_multiplier_ratio_{year}.csv",
+                 f"Water multiplier ratio {year}", log=log)
+
     # ── Category-level results ───────────────────────────────────────────────
     cat_results = aggregate_to_categories(sut_results, concordance, stressor)
     save_csv(cat_results, out_dir / f"indirect_{stressor}_{year}_by_category.csv",
@@ -1180,5 +1227,5 @@ def run(stressor: Stressor = "water", **kwargs):
 if __name__ == "__main__":
     import argparse
     ap = argparse.ArgumentParser()
-    ap.add_argument("--stressor", choices=["water", "energy"], default="water")
+    ap.add_argument("--stressor", choices=["water", "energy", "depletion"], default="water")
     run(stressor=ap.parse_args().stressor)

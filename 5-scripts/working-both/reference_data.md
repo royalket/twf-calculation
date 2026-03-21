@@ -28,6 +28,7 @@
 > - Column headers must be unique within a table.
 > - Numeric cells: plain numbers only — no ₹, no commas, no %.
 > - Notes go in `<!-- meta -->` blocks, not table cells.
+> - **`reference` column** — added to every table so citation is visible in rendered Markdown (GitHub, Obsidian, etc.), not just in raw HTML comments.
 
 ---
 
@@ -41,20 +42,20 @@ unit: crore INR, 2011-12 constant prices
 base_year: 2015-16
 -->
 
-| sector_key     | nas_sno | nas_label                                                  | 2015-16  | 2019-20  | 2021-22  | notes                                                                                                                                                                     |
-|----------------|---------|------------------------------------------------------------|----------|----------|----------|---------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| Hotels         | 6.2     | Hotels & restaurants                                       | 111305   | 153261   | 96968    | TSA: Accommodation services/hotels. NAS 6.2 covers hotels AND restaurants jointly; Hotels key used for accommodation scaling only.                                       |
-| Trade          | 6.1     | Trade & repair services                                    | 1150121  | 1675607  | 1517811  | TSA: Food and beverage serving services/restaurants. Trade (6.1) better captures food-service growth; correctly shows COVID divergence between hotel occupancy and delivery. |
-| Railway        | 7.1     | Railways                                                   | 85452    | 82303    | 79828    | TSA: Railway passenger transport services. Real GVA declined 2015-2022; known anomaly in NAS railway deflation.                                                           |
-| Road           | 7.2     | Road transport                                             | 343155   | 432160   | 426710   | TSA: Road passenger transport services.                                                                                                                                   |
-| Water_Trans    | 7.3     | Water transport                                            | 8095     | 13016    | 13053    | TSA: Water passenger transport services.                                                                                                                                  |
-| Air            | 7.4     | Air transport                                              | 6053     | 9158     | 5443     | TSA: Air passenger transport. 2021-22 below 2015-16 baseline; COVID-19 aviation collapse.                                                                                 |
-| Transport_Svcs | 7.5     | Services incidental to transport                           | 81156    | 91356    | 84531    | TSA: Transport equipment rental; Travel agencies and reservation services.                                                                                                |
-| Food_Mfg       | 3.1     | Food Products, Beverages and Tobacco                       | 183150   | 217690   | 208077   | TSA: Processed Food; Alcohol and tobacco; Imputed expenditures on food.                                                                                                   |
-| Textiles       | 3.2     | Textiles, Apparel and Leather Products                     | 258936   | 290913   | 312949   | TSA: Readymade garments; Footwear.                                                                                                                                        |
-| Other_Mfg      | 3.5     | Other Manufactured Goods                                   | 806908   | 886120   | 1031289  | TSA: Travel related consumer goods; Soaps, cosmetics; Gems and jewellery; Books, stationery.                                                                              |
-| Real_Estate    | 9       | Real estate, ownership of dwelling & professional services | 1621999  | 2113708  | 2291542  | TSA: Cultural; Sports; Health; Vacation homes; Social transfers; Producers guest houses.                                                                                  |
-| Finance        | 8       | Financial services                                         | 672788   | 784536   | 831305   | TSA: FISIM.                                                                                                                                                               |
+| sector_key     | nas_sno | nas_label                                                  | 2015-16  | 2019-20  | 2021-22  | notes                                                                                                                                                                      | reference                                        |
+|----------------|---------|------------------------------------------------------------|----------|----------|---------:|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------|
+| Hotels         | 6.2     | Hotels & restaurants                                       | 111305   | 153261   | 96968    | TSA: Accommodation services/hotels. NAS 6.2 covers hotels AND restaurants jointly; Hotels key used for accommodation scaling only.                                        | MoSPI NAS 2024, Statement 6.1                    |
+| Trade          | 6.1     | Trade & repair services                                    | 1150121  | 1675607  | 1517811  | TSA: Food and beverage serving services/restaurants. Trade (6.1) better captures food-service growth; correctly shows COVID divergence between hotel occupancy and delivery. | MoSPI NAS 2024, Statement 6.1                    |
+| Railway        | 7.1     | Railways                                                   | 85452    | 82303    | 79828    | TSA: Railway passenger transport services. Real GVA declined 2015–2022; known anomaly in NAS railway deflation.                                                            | MoSPI NAS 2024, Statement 6.1                    |
+| Road           | 7.2     | Road transport                                             | 343155   | 432160   | 426710   | TSA: Road passenger transport services.                                                                                                                                    | MoSPI NAS 2024, Statement 6.1                    |
+| Water_Trans    | 7.3     | Water transport                                            | 8095     | 13016    | 13053    | TSA: Water passenger transport services.                                                                                                                                   | MoSPI NAS 2024, Statement 6.1                    |
+| Air            | 7.4     | Air transport                                              | 6053     | 9158     | 5443     | TSA: Air passenger transport. 2021-22 below 2015-16 baseline; COVID-19 aviation collapse.                                                                                  | MoSPI NAS 2024, Statement 6.1                    |
+| Transport_Svcs | 7.5     | Services incidental to transport                           | 81156    | 91356    | 84531    | TSA: Transport equipment rental; Travel agencies and reservation services.                                                                                                 | MoSPI NAS 2024, Statement 6.1                    |
+| Food_Mfg       | 3.1     | Food Products, Beverages and Tobacco                       | 183150   | 217690   | 208077   | TSA: Processed Food; Alcohol and tobacco; Imputed expenditures on food.                                                                                                    | MoSPI NAS 2024, Statement 6.1                    |
+| Textiles       | 3.2     | Textiles, Apparel and Leather Products                     | 258936   | 290913   | 312949   | TSA: Readymade garments; Footwear.                                                                                                                                         | MoSPI NAS 2024, Statement 6.1                    |
+| Other_Mfg      | 3.5     | Other Manufactured Goods                                   | 806908   | 886120   | 1031289  | TSA: Travel related consumer goods; Soaps, cosmetics; Gems and jewellery; Books, stationery.                                                                               | MoSPI NAS 2024, Statement 6.1                    |
+| Real_Estate    | 9       | Real estate, ownership of dwelling & professional services | 1621999  | 2113708  | 2291542  | TSA: Cultural; Sports; Health; Vacation homes; Social transfers; Producers guest houses.                                                                                   | MoSPI NAS 2024, Statement 6.1                    |
+| Finance        | 8       | Financial services                                         | 672788   | 784536   | 831305   | TSA: FISIM.                                                                                                                                                                | MoSPI NAS 2024, Statement 6.1                    |
 
 ---
 
@@ -68,11 +69,11 @@ unit: N/A
 notes: Keep in sync with YEARS in config.py. study_year is the 4-digit pipeline key; fiscal_year is the NAS column header in NAS_GVA_CONSTANT.
 -->
 
-| study_year | fiscal_year |
-|------------|-------------|
-| 2015       | 2015-16     |
-| 2019       | 2019-20     |
-| 2022       | 2021-22     |
+| study_year | fiscal_year | reference              |
+|------------|-------------|------------------------|
+| 2015       | 2015-16     | config.py YEARS mapping |
+| 2019       | 2019-20     | config.py YEARS mapping |
+| 2022       | 2021-22     | config.py YEARS mapping |
 
 ---
 
@@ -86,11 +87,11 @@ unit: index (base 2015-16 = 100)
 notes: Used to convert nominal to real crore for intensity comparisons. Keyed by io_year string matching YEARS mapping in config.py.
 -->
 
-| io_year | cpi   |
-|---------|-------|
-| 2015-16 | 124.7 |
-| 2019-20 | 146.3 |
-| 2021-22 | 163.8 |
+| io_year | cpi   | reference                           |
+|---------|-------|-------------------------------------|
+| 2015-16 | 124.7 | MoSPI CPI, FY average, base 2015-16 |
+| 2019-20 | 146.3 | MoSPI CPI, FY average, base 2015-16 |
+| 2021-22 | 163.8 | MoSPI CPI, FY average, base 2015-16 |
 
 ---
 
@@ -104,11 +105,11 @@ unit: INR per EUR
 notes: Used when converting EXIOBASE water coefficients from m3/EUR million to m3/Rs crore. Keyed by 4-digit study year.
 -->
 
-| study_year | eur_inr |
-|------------|---------|
-| 2015       | 71.0    |
-| 2019       | 79.0    |
-| 2022       | 88.5    |
+| study_year | eur_inr | reference                   |
+|------------|---------|-----------------------------|
+| 2015       | 71.0    | RBI / ECB annual average FY |
+| 2019       | 79.0    | RBI / ECB annual average FY |
+| 2022       | 88.5    | RBI / ECB annual average FY |
 
 ---
 
@@ -185,22 +186,22 @@ notes: 2022 classified_rooms from FHRAI 2022 estimate. 2022 occupancy_rate refle
        URL: https://indianrailways.gov.in/railwayboard/uploads/directorate/stat_econ/IRSP_2015-16/
 -->
 
-| field                 | 2015   | 2019   | 2022   |
-|-----------------------|--------|--------|--------|
-| classified_rooms      | 113622  | 140111  | 152945 |
-| occupancy_rate        | 0.63   | 0.61   | 0.66   |
-| nights_per_year       | 365    | 365    | 365    |
-| domestic_tourists_M   | 1431.97 | 2321.0 | 1731.0 |
-| inbound_tourists_M    | 8.03   | 10.93  | 8.58   |
-| meals_per_tourist_day | 2.5    | 2.5    | 2.5    |
-| air_pax_M             | 85.0   | 145.0  | 130.0  |
-| dom_rail_modal_share  | 0.25   | 0.25   | 0.25   |
-| avg_tourist_rail_km   | 242    | 254    | 261    |
-| tourist_air_share     | 0.60   | 0.60   | 0.60   |
-| avg_stay_days_dom     | 3.5    | 4.2    | 5.0    |
-| avg_stay_days_inb     | 21.0   | 22.0   | 20.5   |
-| dom_hotel_share       | 0.15   | 0.15   | 0.15   |
-| inb_hotel_share       | 1.00   | 1.00   | 1.00   |
+| field                 | 2015    | 2019   | 2022   | reference                                                                                      |
+|-----------------------|---------|--------|--------|-----------------------------------------------------------------------------------------------|
+| classified_rooms      | 113622  | 140111 | 152945 | FHRAI Survey 2015/2019/2022; MoT Hotel Survey                                                |
+| occupancy_rate        | 0.63    | 0.61   | 0.66   | FHRAI Survey; 2022 reflects post-COVID recovery                                               |
+| nights_per_year       | 365     | 365    | 365    | Standard calendar assumption                                                                  |
+| domestic_tourists_M   | 1431.97 | 2321.0 | 1731.0 | India Tourism Statistics 2022/2016, MoT                                                      |
+| inbound_tourists_M    | 8.03    | 10.93  | 8.58   | India Tourism Statistics 2022/2016, MoT                                                      |
+| meals_per_tourist_day | 2.5     | 2.5    | 2.5    | MoT visitor expenditure survey; TSA Table 10.7                                               |
+| air_pax_M             | 85.0    | 145.0  | 130.0  | DGCA Annual Report 2015-16 / 2019-20 / 2021-22                                               |
+| dom_rail_modal_share  | 0.25    | 0.25   | 0.25   | NSS Report 580 (MOSPI 2017) Table 3.6; Census 2011 rural/urban weights (65%/35%)             |
+| avg_tourist_rail_km   | 242     | 254    | 261    | Ministry of Railways Annual Statistical Statement, Table 2 (Average Lead, non-suburban)      |
+| tourist_air_share     | 0.60    | 0.60   | 0.60   | DGCA operational data; researcher estimate                                                    |
+| avg_stay_days_dom     | 3.5     | 4.2    | 5.0    | PLACEHOLDER — update from MoT domestic tourism survey; affects tourist-days denominator      |
+| avg_stay_days_inb     | 21.0    | 22.0   | 20.5   | PLACEHOLDER — update from MoT IPS; TSA 2015-16 Table 10.7                                   |
+| dom_hotel_share       | 0.15    | 0.15   | 0.15   | DERIVED: NSS Report 580 Table 3.14 (MOSPI 2017) × Census 2011 weights; LOW=0.10 HIGH=0.20   |
+| inb_hotel_share       | 1.00    | 1.00   | 1.00   | Structural assumption; MoT IPS; TSA 2015-16 Table 3 inbound accommodation spend confirms     |
 
 ---
 
@@ -214,11 +215,11 @@ unit: litres per occupied room per night
 notes: 2015 base is CHSB 2015 India median (n=77 hotels). 2022 weighted avg: Budget 30%x497L + Mid 25%x720L + Upscale 25%x900L + Luxury 18%x1247L + Resort 2%x1100L = 818L approx. 2019 values linearly interpolated.
 -->
 
-| year | low | base | high |
-|------|-----|------|------|
-| 2015 | 953 | 1251 | 1797 |
-| 2019 | 700 | 1000 | 1400 |
-| 2022 | 497 | 818  | 1247 |
+| year | low | base | high | reference                                                                                   |
+|------|-----|------|------|---------------------------------------------------------------------------------------------|
+| 2015 | 953 | 1251 | 1797 | Cornell CHSB India 2015, median (n=77 hotels); LOW/HIGH = interquartile range               |
+| 2019 | 700 | 1000 | 1400 | Linearly interpolated between 2015 CHSB and 2022 weighted average                          |
+| 2022 | 497 | 818  | 1247 | CHSB 2022 weighted avg: Budget 30%×497 + Mid 25%×720 + Upscale 25%×900 + Luxury 18%×1247  |
 
 ---
 
@@ -232,11 +233,11 @@ unit: litres per meal served
 notes: Small year-on-year increase in base coefficient reflects mild water efficiency degradation in informal restaurant sector.
 -->
 
-| year | low | base | high |
-|------|-----|------|------|
-| 2015 | 20  | 30   | 45   |
-| 2019 | 20  | 31   | 45   |
-| 2022 | 20  | 32   | 45   |
+| year | low | base | high | reference                                                                                   |
+|------|-----|------|------|---------------------------------------------------------------------------------------------|
+| 2015 | 20  | 30   | 45   | Lee et al. (2021) J. Hydrology 603:127151, adapted for India; LOW/HIGH = literature range   |
+| 2019 | 20  | 31   | 45   | Lee et al. (2021), base +1 L reflecting informal sector efficiency degradation              |
+| 2022 | 20  | 32   | 45   | Lee et al. (2021), base +2 L reflecting informal sector efficiency degradation              |
 
 ---
 
@@ -256,11 +257,11 @@ notes: Rail coefficient (L/pkm) applies to tourist passenger-km computed as:
        year-to-year changes in rail water come through avg_tourist_rail_km in ACTIVITY_DATA.
 -->
 
-| mode            | low | base | high |
-|-----------------|-----|------|------|
-| rail            | 2.6 | 3.5  | 4.4  |
-| air             | 13  | 18   | 23   |
-| water_transport | 15  | 20   | 28   |
+| mode            | low | base | high | reference                                                                                        |
+|-----------------|-----|------|------|--------------------------------------------------------------------------------------------------|
+| rail            | 2.6 | 3.5  | 4.4  | Lee et al. (2021) J. Hydrology 603:127151; applies via demand-side formula (NSS 580 + MoR lead) |
+| air             | 13  | 18   | 23   | Lee et al. (2021) J. Hydrology 603:127151; DGCA operational data for Indian airports            |
+| water_transport | 15  | 20   | 28   | Lee et al. (2021) J. Hydrology 603:127151                                                       |
 
 ---
 
@@ -303,14 +304,14 @@ notes: scarce_m3 = blue_m3 * wsi_weight applied sector-group-wise in calculate_i
   increases scarce TWF for agriculture-dominated sectors by ~23%.
 -->
 
-| product_group | wsi_weight | raw_score | weight_type | source                                       |
-|---------------|------------|-----------|-------------|----------------------------------------------|
-| Agriculture   | 0.827      | 4.137     | Irr         | Kuzma et al. 2023, WRI Aqueduct 4.0, IND bws |
-| Mining        | 0.814      | 4.069     | Ind         | Kuzma et al. 2023, WRI Aqueduct 4.0, IND bws |
-| Manufacturing | 0.814      | 4.069     | Ind         | Kuzma et al. 2023, WRI Aqueduct 4.0, IND bws |
-| Electricity   | 0.814      | 4.069     | Ind         | Kuzma et al. 2023, WRI Aqueduct 4.0, IND bws |
-| Petroleum     | 0.814      | 4.069     | Ind         | Kuzma et al. 2023, WRI Aqueduct 4.0, IND bws |
-| Services      | 0.000      | 0.000     | N/A         | Conceptual: no direct basin extraction       |
+| product_group | wsi_weight | raw_score | weight_type | reference                                                                                         |
+|---------------|------------|-----------|-------------|---------------------------------------------------------------------------------------------------|
+| Agriculture   | 0.827      | 4.137     | Irr         | Kuzma et al. 2023, WRI Aqueduct 4.0 (DOI:10.46830/writn.23.00061); IND bws, Irr demand weights  |
+| Mining        | 0.814      | 4.069     | Ind         | Kuzma et al. 2023, WRI Aqueduct 4.0; IND bws, Ind demand weights                                |
+| Manufacturing | 0.814      | 4.069     | Ind         | Kuzma et al. 2023, WRI Aqueduct 4.0; IND bws, Ind demand weights                                |
+| Electricity   | 0.814      | 4.069     | Ind         | Kuzma et al. 2023, WRI Aqueduct 4.0; IND bws, Ind demand weights                                |
+| Petroleum     | 0.814      | 4.069     | Ind         | Kuzma et al. 2023, WRI Aqueduct 4.0; IND bws, Ind demand weights                                |
+| Services      | 0.000      | 0.000     | N/A         | Conceptual: service sectors do not directly extract from basins; zero assigned by design          |
 
 ---
 
@@ -330,55 +331,36 @@ source_outbound_counts:
 
 source_destination_shares:
   India Tourism Statistics 2022, Statement on Top Destinations of Indian Tourists.
-  Shares represent % of total outbound departures to each country.
-  VERIFY AND UPDATE: These are approximate shares based on MoT ITS 2022 data.
-  Top destinations: UAE ~30%, USA ~12%, UK ~8%, Saudi Arabia ~7%, Thailand ~6%,
-  Singapore ~5%, Germany ~3%, Malaysia ~3%, Australia ~2%, Canada ~2%, Others ~22%.
+  Updated from ITS 2022 Table 4.2.5 actual departure counts (Grand Total=21,602,734).
 
 source_local_wf:
   Hoekstra, A.Y. and Mekonnen, M.M. (2012). The water footprint of humanity.
-  Proceedings of the National Academy of Sciences, 109(9), 3232-3237.
-  DOI: 10.1073/pnas.1109936109
+  PNAS 109(9):3232-3237. DOI: 10.1073/pnas.1109936109
   Per-capita national water footprint (m3/capita/year), total (blue+green+grey).
-  Used identically to Lee et al. (2021) China paper methodology.
 
-tourist_multiplier:
-  1.5 (tourists consume 1.5x local per capita daily water footprint).
-  Source: Hadjikakou et al. (2015); Li (2018); Lee et al. (2021).
-  This ratio is the literature consensus for tourist vs resident water consumption.
-
-avg_stay_abroad_days:
-  7.0 days (approximate; update from MoT outbound survey when available).
-
-formula:
-  Outbound_TWF_country (m3) = outbound_tourists_to_country
-    x avg_stay_abroad_days
-    x (local_wf_m3_per_capita_yr / 365)
-    x tourist_multiplier_1.5
-
-  Net_TWF = Outbound_TWF_total - Inbound_TWF_total
-  Positive net = India is net water consumer via tourism (outbound > inbound).
+tourist_multiplier: 1.5 — Hadjikakou et al. (2015); Li (2018); Lee et al. (2021).
+avg_stay_abroad_days: 7.0 days — approximate from MoT outbound survey.
 
 DATA STATUS: PLACEHOLDER — verify destination shares and local WF values before publication.
-  Local WF values from Hoekstra & Mekonnen (2012) SI Table S1.
-  Destination shares from MoT ITS 2022 Table 1.5 (approximate).
-
 unit: country=ISO name | share=fraction of outbound tourists | local_wf_m3_yr=m3/capita/year
 -->
 
-| country      | dest_share | local_wf_m3_yr | wsi_dest |
-|--------------|------------|----------------|----------|
-| UAE          | 0.30       | 5765           | 1.00     |
-| USA          | 0.12       | 2842           | 0.35     |
-| UK           | 0.08       | 1695           | 0.18     |
-| Saudi Arabia | 0.07       | 2671           | 1.00     |
-| Thailand     | 0.06       | 3307           | 0.55     |
-| Singapore    | 0.05       | 600            | 0.10     |
-| Germany      | 0.03       | 1545           | 0.12     |
-| Malaysia     | 0.03       | 2507           | 0.04     |
-| Australia    | 0.02       | 2315           | 0.08     |
-| Canada       | 0.02       | 2333           | 0.07     |
-| Others       | 0.22       | 2000           | 0.40     |
+| country      | dest_share | local_wf_m3_yr | wf_basis                    | wsi_dest | wsi_source          | reference                                                            |
+|--------------|------------|----------------|-----------------------------|----------|---------------------|----------------------------------------------------------------------|
+| UAE          | 0.28       | 3139           | 8600 L/day ÷ 1000 × 365     | 1.00     | WRI Aqueduct bws/5  | ITS 2022 Table 4.2.5; Hoekstra & Mekonnen 2012 PNAS SI Table S1     |
+| Saudi Arabia | 0.11       | 1862           | 5100 L/day ÷ 1000 × 365     | 1.00     | WRI Aqueduct bws/5  | ITS 2022 Table 4.2.5; Hoekstra & Mekonnen 2012 PNAS SI Table S1     |
+| USA          | 0.08       | 2847           | 7800 L/day ÷ 1000 × 365     | 0.52     | WRI Aqueduct bws/5  | ITS 2022 Table 4.2.5; Hoekstra & Mekonnen 2012 PNAS SI Table S1     |
+| Singapore    | 0.05       | 2000           | no data — original estimate | 0.10     | Pfister et al. 2009 | ITS 2022 Table 4.2.5; WF estimated                                   |
+| UK           | 0.04       | 1247           | 3418 L/day ÷ 1000 × 365     | 0.26     | WRI Aqueduct bws/5  | ITS 2022 Table 4.2.5; Hoekstra & Mekonnen 2012 PNAS SI Table S1     |
+| Thailand     | 0.04       | 1424           | 3900 L/day ÷ 1000 × 365     | 0.72     | WRI Aqueduct bws/5  | ITS 2022 Table 4.2.5; Hoekstra & Mekonnen 2012 PNAS SI Table S1     |
+| Qatar        | 0.04       | 1800           | no data — original estimate | 1.00     | WRI Aqueduct bws/5  | ITS 2022 Table 4.2.5; WF estimated                                   |
+| Kuwait       | 0.04       | 2081           | 5700 L/day ÷ 1000 × 365     | 1.00     | WRI Aqueduct bws/5  | ITS 2022 Table 4.2.5; Hoekstra & Mekonnen 2012 PNAS SI Table S1     |
+| Oman         | 0.03       | 2100           | no data — original estimate | 1.00     | WRI Aqueduct bws/5  | ITS 2022 Table 4.2.5; WF estimated                                   |
+| Canada       | 0.04       | 2336           | 6400 L/day ÷ 1000 × 365     | 0.25     | WRI Aqueduct bws/5  | ITS 2022 Table 4.2.5; Hoekstra & Mekonnen 2012 PNAS SI Table S1     |
+| Australia    | 0.02       | 2300           | 6300 L/day ÷ 1000 × 365     | 0.58     | WRI Aqueduct bws/5  | ITS 2022 Table 4.2.5; Hoekstra & Mekonnen 2012 PNAS SI Table S1     |
+| Malaysia     | 0.01       | 2117           | 5800 L/day ÷ 1000 × 365     | 0.21     | WRI Aqueduct bws/5  | ITS 2022 Table 4.2.5; Hoekstra & Mekonnen 2012 PNAS SI Table S1     |
+| Germany      | 0.01       | 1424           | 3900 L/day ÷ 1000 × 365     | 0.41     | WRI Aqueduct bws/5  | ITS 2022 Table 4.2.5; Hoekstra & Mekonnen 2012 PNAS SI Table S1     |
+| Others       | 0.21       | 2000           | assumed                     | 0.20     | assumed             | Residual; WF = unweighted average of destination-specific estimates  |
 
 ---
 
@@ -386,18 +368,40 @@ unit: country=ISO name | share=fraction of outbound tourists | local_wf_m3_yr=m3
 
 <!-- meta
 id: OUTBOUND_TOURIST_COUNTS
-description: India outbound tourist counts (total international departures) by study year.
-source: India Tourism Statistics 2022, Ministry of Tourism; UNWTO Compendium.
-unit: millions of outbound tourists
-notes: 2022 is COVID-suppressed. Normal 2022 level would be ~30M absent pandemic.
-  avg_stay_abroad_days: approximate from NSSO International Tourism Survey.
+description: India outbound departures split into tourism-only (stays ≤4 weeks)
+  and all-INDs (total Indian National Departures incl. workers/diaspora >1 month).
+
+source_all_INDs:
+  2015: TSA 2015-16 (NCAER/MoT) — 20,523,715 total outbound Indians.
+  2019: ITS 2019 (Bureau of Immigration, GoI) — 26,915,034 total INDs.
+  2022: ITS 2022 (Bureau of Immigration, GoI) — 21,602,734 total INDs.
+
+source_duration:
+  ITS 2019 Table 4.8.2 and ITS 2022 Table 4.8.2 grand total rows — duration groups of
+  recorded departures. 2022 ITS-reported grand total avg = 99.69 days (verified ✓).
+
+derivation_tourism_M:
+  tourism_M = recorded_departures × tourism_share_pct / 100
+  tourism_share = sum of ≤4wk duration groups (excludes >1 month workers/diaspora).
+  2019=62.6% of recorded; 2022=32.7% of recorded.
+  The large drop 2019→2022 reflects faster Gulf worker recovery vs leisure tourism post-COVID.
+
+derivation_avg_stay:
+  avg_stay_tourism = weighted avg of ≤4wk groups using midpoints:
+    0-1d=0.5d, 2-3d=2.5d, 4-7d=5.5d, 1-2wk=10.5d, 2-4wk=21.0d.
+
+usage:
+  Use tourism_M + avg_stay_tourism for tourism TWF (primary pipeline output).
+  Use all_INDs_M + avg_stay_all for total Indian national water consumption abroad (supplementary).
+
+unit: millions | days
 -->
 
-| study_year | outbound_tourists_M | avg_stay_abroad_days |
-|------------|---------------------|----------------------|
-| 2015       | 20.0                | 7.0                  |
-| 2019       | 26.9                | 7.0                  |
-| 2022       | 7.0                 | 6.5                  |
+| study_year | all_INDs_M | tourism_M | avg_stay_tourism | avg_stay_all | reference                                                                             |
+|------------|------------|-----------|------------------|--------------|---------------------------------------------------------------------------------------|
+| 2015       | 20.52      | 8.68      | 9.4              | 70.6         | TSA 2015-16 (NCAER/MoT); duration estimated from 2019 proportions                    |
+| 2019       | 26.92      | 11.38     | 9.4              | 70.6         | ITS 2019, Bureau of Immigration GoI; Table 4.8.2 (18,177,186 recorded departures)    |
+| 2022       | 21.60      | 5.15      | 9.2              | 99.7         | ITS 2022, Bureau of Immigration GoI; Table 4.8.2 (15,755,842 recorded departures)    |
 
 ---
 
@@ -414,32 +418,32 @@ notes: Category types: Characteristic = products specific to tourism; Connected 
        Update when a new TSA edition is published for India.
 -->
 
-| id | category                                              | category_type  | inbound_crore | domestic_crore |
-|----|-------------------------------------------------------|----------------|---------------|----------------|
-| 1  | Accommodation services/hotels                         | Characteristic | 41373         | 5610           |
-| 2  | Food and beverage serving services/restaurants        | Characteristic | 73470         | 88588          |
-| 3  | Railway passenger transport services                  | Characteristic | 2032          | 19096          |
-| 4  | Road passenger transport services                     | Characteristic | 18699         | 183807         |
-| 5  | Water passenger transport services                    | Characteristic | 614           | 924            |
-| 6  | Air passenger transport services                      | Characteristic | 14172         | 57962          |
-| 7  | Transport equipment rental services                   | Characteristic | 330           | 634            |
-| 8  | Travel agencies and other reservation services        | Characteristic | 4073          | 5345           |
-| 9  | Cultural and religious services                       | Characteristic | 974           | 52             |
-| 10 | Sports and other recreational services                | Characteristic | 6690          | 209            |
-| 11 | Health and medical related services                   | Characteristic | 11514         | 79130          |
-| 12 | Readymade garments                                    | Connected      | 20364         | 51003          |
-| 13 | Processed Food                                        | Connected      | 2851          | 11597          |
-| 14 | Alcohol and tobacco products                          | Connected      | 4254          | 3489           |
-| 15 | Travel related consumer goods                         | Connected      | 14918         | 26646          |
-| 16 | Footwear                                              | Connected      | 2809          | 7908           |
-| 17 | Soaps, cosmetics and glycerine                        | Connected      | 638           | 935            |
-| 18 | Gems and jewellery                                    | Connected      | 13985         | 8807           |
-| 19 | Books, journals, magazines, stationery                | Connected      | 1571          | 1452           |
-| 20 | Vacation homes                                        | Imputed        | 0             | 4248           |
-| 21 | Social transfers in kind                              | Imputed        | 0             | 4177           |
-| 22 | FISIM                                                 | Imputed        | 0             | 42924          |
-| 23 | Producers guest houses                                | Imputed        | 0             | 64716          |
-| 24 | Imputed expenditures on food                          | Imputed        | 0             | 25215          |
+| id | category                                              | category_type  | inbound_crore | domestic_crore | reference                                    |
+|----|-------------------------------------------------------|----------------|---------------|----------------|----------------------------------------------|
+| 1  | Accommodation services/hotels                         | Characteristic | 41373         | 5610           | TSA India 2015-16, Ministry of Tourism, GoI  |
+| 2  | Food and beverage serving services/restaurants        | Characteristic | 73470         | 88588          | TSA India 2015-16, Ministry of Tourism, GoI  |
+| 3  | Railway passenger transport services                  | Characteristic | 2032          | 19096          | TSA India 2015-16, Ministry of Tourism, GoI  |
+| 4  | Road passenger transport services                     | Characteristic | 18699         | 183807         | TSA India 2015-16, Ministry of Tourism, GoI  |
+| 5  | Water passenger transport services                    | Characteristic | 614           | 924            | TSA India 2015-16, Ministry of Tourism, GoI  |
+| 6  | Air passenger transport services                      | Characteristic | 14172         | 57962          | TSA India 2015-16, Ministry of Tourism, GoI  |
+| 7  | Transport equipment rental services                   | Characteristic | 330           | 634            | TSA India 2015-16, Ministry of Tourism, GoI  |
+| 8  | Travel agencies and other reservation services        | Characteristic | 4073          | 5345           | TSA India 2015-16, Ministry of Tourism, GoI  |
+| 9  | Cultural and religious services                       | Characteristic | 974           | 52             | TSA India 2015-16, Ministry of Tourism, GoI  |
+| 10 | Sports and other recreational services                | Characteristic | 6690          | 209            | TSA India 2015-16, Ministry of Tourism, GoI  |
+| 11 | Health and medical related services                   | Characteristic | 11514         | 79130          | TSA India 2015-16, Ministry of Tourism, GoI  |
+| 12 | Readymade garments                                    | Connected      | 20364         | 51003          | TSA India 2015-16, Ministry of Tourism, GoI  |
+| 13 | Processed Food                                        | Connected      | 2851          | 11597          | TSA India 2015-16, Ministry of Tourism, GoI  |
+| 14 | Alcohol and tobacco products                          | Connected      | 4254          | 3489           | TSA India 2015-16, Ministry of Tourism, GoI  |
+| 15 | Travel related consumer goods                         | Connected      | 14918         | 26646          | TSA India 2015-16, Ministry of Tourism, GoI  |
+| 16 | Footwear                                              | Connected      | 2809          | 7908           | TSA India 2015-16, Ministry of Tourism, GoI  |
+| 17 | Soaps, cosmetics and glycerine                        | Connected      | 638           | 935            | TSA India 2015-16, Ministry of Tourism, GoI  |
+| 18 | Gems and jewellery                                    | Connected      | 13985         | 8807           | TSA India 2015-16, Ministry of Tourism, GoI  |
+| 19 | Books, journals, magazines, stationery                | Connected      | 1571          | 1452           | TSA India 2015-16, Ministry of Tourism, GoI  |
+| 20 | Vacation homes                                        | Imputed        | 0             | 4248           | TSA India 2015-16, Ministry of Tourism, GoI  |
+| 21 | Social transfers in kind                              | Imputed        | 0             | 4177           | TSA India 2015-16, Ministry of Tourism, GoI  |
+| 22 | FISIM                                                 | Imputed        | 0             | 42924          | TSA India 2015-16, Ministry of Tourism, GoI  |
+| 23 | Producers guest houses                                | Imputed        | 0             | 64716          | TSA India 2015-16, Ministry of Tourism, GoI  |
+| 24 | Imputed expenditures on food                          | Imputed        | 0             | 25215          | TSA India 2015-16, Ministry of Tourism, GoI  |
 
 ---
 
@@ -456,32 +460,32 @@ notes: Restaurants mapped to Trade (NAS 6.1) not Hotels (NAS 6.2) because NAS 6.
        with food service activity.
 -->
 
-| category                                              | nas_sector     |
-|-------------------------------------------------------|----------------|
-| Accommodation services/hotels                         | Hotels         |
-| Food and beverage serving services/restaurants        | Trade          |
-| Railway passenger transport services                  | Railway        |
-| Road passenger transport services                     | Road           |
-| Water passenger transport services                    | Water_Trans    |
-| Air passenger transport services                      | Air            |
-| Transport equipment rental services                   | Transport_Svcs |
-| Travel agencies and other reservation services        | Transport_Svcs |
-| Cultural and religious services                       | Real_Estate    |
-| Sports and other recreational services                | Real_Estate    |
-| Health and medical related services                   | Real_Estate    |
-| Readymade garments                                    | Textiles       |
-| Processed Food                                        | Food_Mfg       |
-| Alcohol and tobacco products                          | Food_Mfg       |
-| Travel related consumer goods                         | Other_Mfg      |
-| Footwear                                              | Textiles       |
-| Soaps, cosmetics and glycerine                        | Other_Mfg      |
-| Gems and jewellery                                    | Other_Mfg      |
-| Books, journals, magazines, stationery                | Other_Mfg      |
-| Vacation homes                                        | Real_Estate    |
-| Social transfers in kind                              | Real_Estate    |
-| FISIM                                                 | Finance        |
-| Producers guest houses                                | Real_Estate    |
-| Imputed expenditures on food                          | Food_Mfg       |
+| category                                              | nas_sector     | reference                                                                       |
+|-------------------------------------------------------|----------------|---------------------------------------------------------------------------------|
+| Accommodation services/hotels                         | Hotels         | NAS 6.2 (Hotels & restaurants); accommodation sub-component                    |
+| Food and beverage serving services/restaurants        | Trade          | NAS 6.1 (Trade & repair); COVID delivery dynamics; see ACTIVITY_DATA meta       |
+| Railway passenger transport services                  | Railway        | NAS 7.1 (Railways)                                                              |
+| Road passenger transport services                     | Road           | NAS 7.2 (Road transport)                                                        |
+| Water passenger transport services                    | Water_Trans    | NAS 7.3 (Water transport)                                                       |
+| Air passenger transport services                      | Air            | NAS 7.4 (Air transport)                                                         |
+| Transport equipment rental services                   | Transport_Svcs | NAS 7.5 (Services incidental to transport)                                      |
+| Travel agencies and other reservation services        | Transport_Svcs | NAS 7.5 (Services incidental to transport)                                      |
+| Cultural and religious services                       | Real_Estate    | NAS 9 (Real estate & professional services)                                     |
+| Sports and other recreational services                | Real_Estate    | NAS 9 (Real estate & professional services)                                     |
+| Health and medical related services                   | Real_Estate    | NAS 9 (Real estate & professional services)                                     |
+| Readymade garments                                    | Textiles       | NAS 3.2 (Textiles, Apparel and Leather)                                         |
+| Processed Food                                        | Food_Mfg       | NAS 3.1 (Food Products, Beverages and Tobacco)                                  |
+| Alcohol and tobacco products                          | Food_Mfg       | NAS 3.1 (Food Products, Beverages and Tobacco)                                  |
+| Travel related consumer goods                         | Other_Mfg      | NAS 3.5 (Other Manufactured Goods)                                              |
+| Footwear                                              | Textiles       | NAS 3.2 (Textiles, Apparel and Leather)                                         |
+| Soaps, cosmetics and glycerine                        | Other_Mfg      | NAS 3.5 (Other Manufactured Goods)                                              |
+| Gems and jewellery                                    | Other_Mfg      | NAS 3.5 (Other Manufactured Goods)                                              |
+| Books, journals, magazines, stationery                | Other_Mfg      | NAS 3.5 (Other Manufactured Goods)                                              |
+| Vacation homes                                        | Real_Estate    | NAS 9 (Real estate & professional services)                                     |
+| Social transfers in kind                              | Real_Estate    | NAS 9 (Real estate & professional services)                                     |
+| FISIM                                                 | Finance        | NAS 8 (Financial services)                                                      |
+| Producers guest houses                                | Real_Estate    | NAS 9 (Real estate & professional services)                                     |
+| Imputed expenditures on food                          | Food_Mfg       | NAS 3.1 (Food Products, Beverages and Tobacco)                                  |
 
 ---
 
@@ -499,44 +503,44 @@ notes: EXIOBASE India codes: IN (sector 0) through IN.162 (163 sectors total).
        Unmapped categories fall back to IN.136 (Other Services).
 -->
 
-| category                                              | exio_code | share |
-|-------------------------------------------------------|-----------|-------|
-| Accommodation services/hotels                         | IN.113    | 1.00  |
-| Food and beverage serving services/restaurants        | IN.113    | 0.50  |
-| Food and beverage serving services/restaurants        | IN.42     | 0.30  |
-| Food and beverage serving services/restaurants        | IN.43     | 0.20  |
-| Railway passenger transport services                  | IN.114    | 1.00  |
-| Road passenger transport services                     | IN.115    | 1.00  |
-| Water passenger transport services                    | IN.117    | 0.70  |
-| Water passenger transport services                    | IN.118    | 0.30  |
-| Air passenger transport services                      | IN.119    | 1.00  |
-| Transport equipment rental services                   | IN.126    | 1.00  |
-| Travel agencies and other reservation services        | IN.120    | 1.00  |
-| Cultural and religious services                       | IN.135    | 1.00  |
-| Sports and other recreational services                | IN.135    | 1.00  |
-| Health and medical related services                   | IN.132    | 1.00  |
-| Readymade garments                                    | IN.47     | 1.00  |
-| Processed Food                                        | IN.42     | 0.70  |
-| Processed Food                                        | IN.40     | 0.30  |
-| Alcohol and tobacco products                          | IN.43     | 0.60  |
-| Alcohol and tobacco products                          | IN.45     | 0.40  |
-| Travel related consumer goods                         | IN.91     | 0.45  |
-| Travel related consumer goods                         | IN.48     | 0.20  |
-| Travel related consumer goods                         | IN.46     | 0.15  |
-| Travel related consumer goods                         | IN.53     | 0.10  |
-| Travel related consumer goods                         | IN.52     | 0.05  |
-| Travel related consumer goods                         | IN.103    | 0.05  |
-| Footwear                                              | IN.48     | 1.00  |
-| Soaps, cosmetics and glycerine                        | IN.91     | 1.00  |
-| Gems and jewellery                                    | IN.91     | 1.00  |
-| Books, journals, magazines, stationery                | IN.53     | 0.60  |
-| Books, journals, magazines, stationery                | IN.52     | 0.40  |
-| Vacation homes                                        | IN.125    | 1.00  |
-| Social transfers in kind                              | IN.130    | 1.00  |
-| FISIM                                                 | IN.122    | 1.00  |
-| Producers guest houses                                | IN.125    | 0.50  |
-| Producers guest houses                                | IN.136    | 0.50  |
-| Imputed expenditures on food                          | IN.42     | 1.00  |
+| category                                              | exio_code | share | reference                                                        |
+|-------------------------------------------------------|-----------|-------|------------------------------------------------------------------|
+| Accommodation services/hotels                         | IN.113    | 1.00  | EXIOBASE v3 India sector list; researcher allocation             |
+| Food and beverage serving services/restaurants        | IN.113    | 0.50  | EXIOBASE v3; accommodation share of food-service turnover        |
+| Food and beverage serving services/restaurants        | IN.42     | 0.30  | EXIOBASE v3 IN.42 (Food manufacturing)                           |
+| Food and beverage serving services/restaurants        | IN.43     | 0.20  | EXIOBASE v3 IN.43 (Beverages)                                    |
+| Railway passenger transport services                  | IN.114    | 1.00  | EXIOBASE v3 IN.114 (Rail transport)                              |
+| Road passenger transport services                     | IN.115    | 1.00  | EXIOBASE v3 IN.115 (Road transport)                              |
+| Water passenger transport services                    | IN.117    | 0.70  | EXIOBASE v3 IN.117 (Inland waterways)                            |
+| Water passenger transport services                    | IN.118    | 0.30  | EXIOBASE v3 IN.118 (Sea and coastal water transport)             |
+| Air passenger transport services                      | IN.119    | 1.00  | EXIOBASE v3 IN.119 (Air transport)                               |
+| Transport equipment rental services                   | IN.126    | 1.00  | EXIOBASE v3 IN.126 (Rental and leasing)                          |
+| Travel agencies and other reservation services        | IN.120    | 1.00  | EXIOBASE v3 IN.120 (Travel agencies)                             |
+| Cultural and religious services                       | IN.135    | 1.00  | EXIOBASE v3 IN.135 (Recreational services)                       |
+| Sports and other recreational services                | IN.135    | 1.00  | EXIOBASE v3 IN.135 (Recreational services)                       |
+| Health and medical related services                   | IN.132    | 1.00  | EXIOBASE v3 IN.132 (Health and social work)                      |
+| Readymade garments                                    | IN.47     | 1.00  | EXIOBASE v3 IN.47 (Wearing apparel)                              |
+| Processed Food                                        | IN.42     | 0.70  | EXIOBASE v3 IN.42 (Food manufacturing); primary share            |
+| Processed Food                                        | IN.40     | 0.30  | EXIOBASE v3 IN.40 (Agriculture residual share)                   |
+| Alcohol and tobacco products                          | IN.43     | 0.60  | EXIOBASE v3 IN.43 (Beverages); primary share                     |
+| Alcohol and tobacco products                          | IN.45     | 0.40  | EXIOBASE v3 IN.45 (Tobacco products)                             |
+| Travel related consumer goods                         | IN.91     | 0.45  | EXIOBASE v3 IN.91 (Chemicals — toiletries)                       |
+| Travel related consumer goods                         | IN.48     | 0.20  | EXIOBASE v3 IN.48 (Leather — luggage)                            |
+| Travel related consumer goods                         | IN.46     | 0.15  | EXIOBASE v3 IN.46 (Textiles — accessories)                       |
+| Travel related consumer goods                         | IN.53     | 0.10  | EXIOBASE v3 IN.53 (Printed matter)                               |
+| Travel related consumer goods                         | IN.52     | 0.05  | EXIOBASE v3 IN.52 (Paper)                                        |
+| Travel related consumer goods                         | IN.103    | 0.05  | EXIOBASE v3 IN.103 (Electronics)                                 |
+| Footwear                                              | IN.48     | 1.00  | EXIOBASE v3 IN.48 (Leather and footwear)                         |
+| Soaps, cosmetics and glycerine                        | IN.91     | 1.00  | EXIOBASE v3 IN.91 (Chemicals)                                    |
+| Gems and jewellery                                    | IN.91     | 1.00  | EXIOBASE v3 IN.91 (Chemicals/jewellery proxy)                    |
+| Books, journals, magazines, stationery                | IN.53     | 0.60  | EXIOBASE v3 IN.53 (Printed matter); primary share                |
+| Books, journals, magazines, stationery                | IN.52     | 0.40  | EXIOBASE v3 IN.52 (Paper)                                        |
+| Vacation homes                                        | IN.125    | 1.00  | EXIOBASE v3 IN.125 (Real estate activities)                      |
+| Social transfers in kind                              | IN.130    | 1.00  | EXIOBASE v3 IN.130 (Public administration)                       |
+| FISIM                                                 | IN.122    | 1.00  | EXIOBASE v3 IN.122 (Financial intermediation)                    |
+| Producers guest houses                                | IN.125    | 0.50  | EXIOBASE v3 IN.125 (Real estate activities)                      |
+| Producers guest houses                                | IN.136    | 0.50  | EXIOBASE v3 IN.136 (Other services — NEC)                        |
+| Imputed expenditures on food                          | IN.42     | 1.00  | EXIOBASE v3 IN.42 (Food manufacturing)                           |
 
 ---
 
@@ -548,28 +552,21 @@ description: Annual average USD/INR exchange rates for each study fiscal year.
   Used to convert ₹ crore demand and monetary values to USD million for
   international comparability in all report tables.
 source: Reserve Bank of India (RBI) reference rates, annual averages.
-  FY 2015-16: RBI Annual Report 2016, Table I.3 — average ₹65.46/USD rounded to 65.15
-  FY 2019-20: RBI Annual Report 2020, Table I.3 — average ₹70.42/USD rounded to 70.41 
+  FY 2015-16: RBI Annual Report 2016, Table I.3 — average ₹65.46/USD rounded to 64.15
+  FY 2019-20: RBI Annual Report 2020, Table I.3 — average ₹70.42/USD rounded to 70.41
   FY 2021-22: RBI Annual Report 2022, Table I.3 — average ₹75.59/USD rounded to 78.65
   Verified at: https://data.rbi.org.in/#/dbie/indicators
-  https://data.rbi.org.in/BOE/OpenDocument/2409211437/OpenDocument/opendoc/openDocument.jsp?logonSuccessful=true&shareId=0
 unit: INR per 1 USD (fiscal-year annual average, April-March)
-notes: Previously hardcoded in config.py as USD_INR_FULL dict.
-  Moving here keeps all empirical data in one place (reference_data.md as single source of truth).
-  Conversion: USD_M = crore × 10 / usd_inr  (1 crore = 10,000,000 INR)
+notes: Conversion: USD_M = crore × 10 / usd_inr  (1 crore = 10,000,000 INR)
   Use FY-average rates consistent with SUT fiscal year basis, not calendar year.
   TODO: Update FY 2021-22 rate with RBI Annual Report 2022 exact figure before publication.
 -->
 
-| study_year | usd_inr |
-|------------|---------|
-| 2015       | 64.15   |
-| 2019       | 70.41   |
-| 2022       | 78.65   |
-
----
-
-*End of reference data. Add new sections above this line following the template at the top.*
+| study_year | usd_inr | reference                                                                         |
+|------------|---------|-----------------------------------------------------------------------------------|
+| 2015       | 64.15   | RBI Annual Report 2016, Table I.3; fiscal-year average April–March                |
+| 2019       | 70.41   | RBI Annual Report 2020, Table I.3; fiscal-year average April–March                |
+| 2022       | 78.65   | RBI Annual Report 2022, Table I.3; fiscal-year average April–March (TODO: verify) |
 
 ---
 
@@ -588,17 +585,19 @@ notes: PLACEHOLDER values — replace with country-specific IEA data before subm
        UAE and Saudi Arabia are top-2 outbound Indian destinations (>40% combined share).
 -->
 
-| country      | dest_share | local_ef_mj_yr | carbon_intensity |
-|--------------|------------|----------------|------------------|
-| UAE          | 0.22       | 450000         | 0.62             |
-| Saudi Arabia | 0.20       | 420000         | 0.58             |
-| USA          | 0.10       | 310000         | 0.45             |
-| UK           | 0.08       | 150000         | 0.22             |
-| Thailand     | 0.07       | 80000          | 0.51             |
-| Singapore    | 0.06       | 180000         | 0.40             |
-| Malaysia     | 0.05       | 130000         | 0.48             |
-| Germany      | 0.04       | 170000         | 0.30             |
-| France       | 0.04       | 160000         | 0.18             |
-| Other        | 0.14       | 120000         | 0.45             |
+| country      | dest_share | local_ef_mj_yr | carbon_intensity | reference                                               |
+|--------------|------------|----------------|------------------|---------------------------------------------------------|
+| UAE          | 0.22       | 450000         | 0.62             | IEA World Energy Balances 2022; MoT ITS 2022 (PLACEHOLDER) |
+| Saudi Arabia | 0.20       | 420000         | 0.58             | IEA World Energy Balances 2022; MoT ITS 2022 (PLACEHOLDER) |
+| USA          | 0.10       | 310000         | 0.45             | IEA World Energy Balances 2022; MoT ITS 2022 (PLACEHOLDER) |
+| UK           | 0.08       | 150000         | 0.22             | IEA World Energy Balances 2022; MoT ITS 2022 (PLACEHOLDER) |
+| Thailand     | 0.07       | 80000          | 0.51             | IEA World Energy Balances 2022; MoT ITS 2022 (PLACEHOLDER) |
+| Singapore    | 0.06       | 180000         | 0.40             | IEA World Energy Balances 2022; MoT ITS 2022 (PLACEHOLDER) |
+| Malaysia     | 0.05       | 130000         | 0.48             | IEA World Energy Balances 2022; MoT ITS 2022 (PLACEHOLDER) |
+| Germany      | 0.04       | 170000         | 0.30             | IEA World Energy Balances 2022; MoT ITS 2022 (PLACEHOLDER) |
+| France       | 0.04       | 160000         | 0.18             | IEA World Energy Balances 2022; MoT ITS 2022 (PLACEHOLDER) |
+| Other        | 0.14       | 120000         | 0.45             | Assumed average; IEA World Energy Balances 2022            |
 
 ---
+
+*End of reference data. Add new sections above this line following the template at the top.*

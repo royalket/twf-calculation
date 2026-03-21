@@ -15,63 +15,61 @@ SERV_005,Financial Services,Services,54796691.63067004,70069203.68148735,0.0,696
 TEXT_M01,Textiles,Textiles,48414438.93283689,120521203.6645565,39409353.29132923,10466.762722542104,0.8991279438445995,1.3753979194437558,4625.540887495947,3765.1902824217
 SERV_006,Real Estate,Services,38609051.956661314,60819632.60017845,0.0,67932.41032196632,0.7170273634223043,0.0,568.3450914471213,0.0
 SERV_M03,Support & Travel Agencies,Services,31856673.416041106,38173749.11263108,0.0,12885.512034890136,0.5916256781583149,0.0,2472.2861869813714,0.0
-WOOD_M03,Printing/Publishing,Manufacturing,26203508.097313065,24270830.26134803,21329655.591212835,10022.883072870893,0.48663801288158126,0.7444111986750269,2614.3683316269094,2128.095821944304
+WOOD_M03,Printing/Publishing,Wood & Paper,26203508.097313065,24270830.26134803,21329655.591212835,10022.883072870893,0.48663801288158126,0.7444111986750269,2614.3683316269094,2128.095821944304
 UTIL_M01,"Electricity, Heat & Energy",Utilities,19130387.419053033,12596025.553459477,15572135.359109167,3488.9209075140348,0.35527967036663244,0.5434720640018119,5483.181741911149,4463.309937915675
-WOOD_M02,Paper Products,Manufacturing,19094896.417938624,14920533.512992106,15543245.684202038,5518.948412742584,0.3546205498323378,0.54246380592493,3459.8794896960476,2816.3419046125823
+WOOD_M02,Paper Products,Wood & Paper,19094896.417938624,14920533.512992106,15543245.684202038,5518.948412742584,0.3546205498323378,0.54246380592493,3459.8794896960476,2816.3419046125823
 FOOD_005,Tobacco Products,Food Mfg,9136119.141953353,36589072.69485111,7436800.981550029,4622.043398065117,0.16967128401961767,0.2595465224137961,1976.6407095567129,1608.9855375791642
 SERV_010,Public Admin & Education,Services,6634184.659370635,10762125.701734493,0.0,7751.561982048116,0.12320664957287317,0.0,855.8513335421659,0.0
 SERV_017,Cultural & Rec Services,Services,4537954.862668048,6269776.95511354,0.0,14706.99753596632,0.08427655292237504,0.0,308.5575319891343,0.0
 SERV_M04,Machinery Rental,Services,1564127.9817910693,2986494.806086123,0.0,1318.9247825052123,0.029048176683996542,0.0,1185.911435237504,0.0
 SERV_M02,Pipeline/Water Transport,Services,1087683.0329954647,1830746.0807367498,0.0,3257.5966378412195,0.020199887276780324,0.0,333.8912560139007,0.0
-FOOD_003,Dairy Products,Food Mfg,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-SERV_007,Computer & R&D,Services,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-MISC_M02,Misc Manufacturing,Manufacturing,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-AGR_M08,Fishing,Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-UTIL_M02,Water Supply,Utilities,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-CONS_M01,Construction,Manufacturing,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-AGR_M07,Forestry,Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-AGR_M06,Other Livestock,Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-AGR_M05,Other Crops,Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-AGR_M04,Fruits & Vegetables,Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-AGR_M03,Cotton & Jute,Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-AGR_M02,Oil Seeds,Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-SERV_008,Trade (Retail & Wholesale),Services,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-MACH_M04,Transport Equipment,Manufacturing,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-SERV_009,Business Services,Services,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-AGR_M01,Cereals & Pulses,Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-SERV_011,Defence,Services,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-AGR_006,Egg & Poultry (Live),Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-SERV_013,Sewage/Waste Mgmt,Services,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-SERV_016,Waste Management,Services,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-AGR_005,Wool/Silk,Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-AGR_004,Milk (Raw),Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-SERV_019,Post & Telecom,Services,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-AGR_003,Sugarcane,Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
 MISC_M01,Gems & Jewellery,Manufacturing,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-MACH_M03,Electronics,Manufacturing,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-FOOD_004,Sugar,Food Mfg,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-MACH_M02,Electrical Machinery,Manufacturing,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-FOOD_002,Processed Fish,Food Mfg,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-FOOD_M01,Processed Meat,Food Mfg,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-FOOD_001,Processed Poultry,Food Mfg,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-FOOD_M03,Edible Oils,Food Mfg,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-MIN_M03,Non-Metallic Minerals,Mining,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-FOOD_M05,Misc Food Products,Food Mfg,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-MIN_M02,Other Metallic Minerals,Mining,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-FOOD_M07,Processed Tea/Coffee,Food Mfg,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-MIN_M01,Coal & Lignite,Mining,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-MIN_004,Copper Ore,Mining,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-MIN_003,Iron Ore,Mining,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-TEXT_M02,Leather (excl. Ftwr),Textiles,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-WOOD_M01,Wood & Furniture,Manufacturing,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-AGR_002,Wheat,Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-MIN_002,Natural Gas,Mining,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-CHEM_M01,Rubber & Plastics,Manufacturing,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-CHEM_M02,Petroleum Products,Manufacturing,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-CHEM_M03,Fertilizers,Manufacturing,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
-MIN_001,Crude Petroleum,Mining,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+MACH_M04,Transport Equipment,Manufacturing,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+SERV_019,Post & Telecom,Services,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
 METAL_M01,Cement & Non-Metallic,Manufacturing,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
 METAL_M02,Iron & Steel,Manufacturing,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+SERV_013,Sewage/Waste Mgmt,Services,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+SERV_009,Business Services,Services,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+SERV_008,Trade (Retail & Wholesale),Services,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
 METAL_M03,Non-Ferrous Metals,Manufacturing,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+SERV_007,Computer & R&D,Services,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
 MACH_M01,Machinery,Manufacturing,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+CONS_M01,Construction,Utilities,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+MACH_M02,Electrical Machinery,Manufacturing,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+CHEM_M03,Fertilizers,Manufacturing,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+MACH_M03,Electronics,Manufacturing,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+MISC_M02,Misc Manufacturing,Manufacturing,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+UTIL_M02,Water Supply,Utilities,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
 AGR_001,Paddy,Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+CHEM_M02,Petroleum Products,Manufacturing,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+CHEM_M01,Rubber & Plastics,Manufacturing,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+AGR_003,Sugarcane,Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+AGR_004,Milk (Raw),Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+AGR_005,Wool/Silk,Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+AGR_006,Egg & Poultry (Live),Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+AGR_M01,Cereals & Pulses,Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+AGR_M02,Oil Seeds,Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+AGR_M03,Cotton & Jute,Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+AGR_M04,Fruits & Vegetables,Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+AGR_M05,Other Crops,Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+AGR_M06,Other Livestock,Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+AGR_M07,Forestry,Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+AGR_M08,Fishing,Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+MIN_001,Crude Petroleum,Mining,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+MIN_002,Natural Gas,Mining,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+MIN_003,Iron Ore,Mining,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+MIN_004,Copper Ore,Mining,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+MIN_M01,Coal & Lignite,Mining,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+MIN_M02,Other Metallic Minerals,Mining,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+MIN_M03,Non-Metallic Minerals,Mining,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+FOOD_001,Processed Poultry,Food Mfg,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+FOOD_002,Processed Fish,Food Mfg,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+FOOD_003,Dairy Products,Food Mfg,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+FOOD_004,Sugar,Food Mfg,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+FOOD_M01,Processed Meat,Food Mfg,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+FOOD_M03,Edible Oils,Food Mfg,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+FOOD_M05,Misc Food Products,Food Mfg,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+FOOD_M07,Processed Tea/Coffee,Food Mfg,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+TEXT_M02,Leather (excl. Ftwr),Textiles,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+AGR_002,Wheat,Agriculture,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0
+WOOD_M01,Wood & Furniture,Wood & Paper,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0

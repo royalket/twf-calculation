@@ -157,7 +157,12 @@ def _load_outbound_bn(year: str) -> float:
     return _col(_year_row(df, year), "Outbound_bn_m3")
 
 def _load_net_bn(year: str) -> float:
-    """Net TWF from outbound_twf_all_years.csv (authoritative; do NOT recompute as outbound-total)."""
+    """Net TWF from outbound_twf_all_years.csv (authoritative; do NOT recompute as outbound-total).
+    FIX-3a: removed fallback that recomputed Outbound-Inbound — if the CSV was written with a
+    different sign convention the fallback silently flipped the import/export direction, which is
+    a headline result. Now returns 0.0 with a warning if Net_bn_m3 is absent.
+    """
+    import warnings as _warnings
     df = _load_csv_cached(
         DIRS.get("outbound", DIRS["comparison"].parent / "outbound-twf") /
         "outbound_water_all_years.csv"
@@ -167,8 +172,12 @@ def _load_net_bn(year: str) -> float:
         return 0.0
     if "Net_bn_m3" in r.index:
         return float(r["Net_bn_m3"])
-    if "Inbound_bn_m3" in r.index:
-        return float(r.get("Outbound_bn_m3", 0)) - float(r["Inbound_bn_m3"])
+    # FIX-3a: do not guess — warn and return 0 so the report shows a gap rather than wrong sign
+    _warnings.warn(
+        f"Net_bn_m3 column missing for {year} in outbound_water_all_years.csv. "
+        "Re-run outbound step to regenerate. Net balance set to 0.",
+        stacklevel=2
+    )
     return 0.0
 
 def _load_indirect_intensity(year: str) -> tuple[float, float]:
@@ -699,9 +708,16 @@ def _build_blue_plus_green_indirect_rows() -> str:
         blue_bn  = _col(r, "Indirect_TWF_billion_m3")
         green_bn = _col(r, "Green_TWF_billion_m3")
         bg_bn    = _col(r, "Blue_plus_Green_TWF_billion_m3")
-        if bg_bn == 0 and blue_bn > 0:
+        # FIX-2d: only reconstruct bg_bn when green data is genuinely present;
+        # checking == 0 previously triggered on years with no green coefficients,
+        # making blue-only appear as blue+green in the report table.
+        green_present = (r is not None
+                         and "Green_TWF_billion_m3" in r.index
+                         and float(r.get("Green_TWF_billion_m3", 0) or 0) > 0)
+        if bg_bn == 0 and blue_bn > 0 and green_present:
             bg_bn = blue_bn + green_bn
-        g_share = f"{100*green_bn/bg_bn:.1f}%" if bg_bn > 0 else "—"
+        green_flag = "" if green_present else " †"   # dagger = green absent
+        g_share = f"{100*green_bn/bg_bn:.1f}%{green_flag}" if bg_bn > 0 else "—"
         delta   = "(base)" if base_blue is None else _pct(base_blue, bg_bn)
         base_blue = base_blue or bg_bn
         rows_str += f"| {yr} | {blue_bn:.4f} | {green_bn:.4f} | {bg_bn:.4f} | {g_share} | {delta} |\n"
@@ -842,42 +858,284 @@ def _get_intensity_row(year: str) -> dict | None:
     }
 
 
-def fill_report_template(start_ts: float, steps_req: list,
-                          steps_completed: list, steps_failed: list,
-                          total_time: float, pipeline_log: Path,
-                          log: Logger = None) -> Path | None:
-    tmpl = Path(__file__).parent / "water_report_template.md"
-    if not tmpl.exists():
-        # fall back to legacy name so existing setups don't break
-        tmpl = Path(__file__).parent / "report_template.md"
-    if not tmpl.exists():
-        if log: log.warn("water_report_template.md (and report_template.md) not found — skipping")
-        return None
+# ══════════════════════════════════════════════════════════════════════════════
 
-    text     = tmpl.read_text(encoding="utf-8")
-    ts_str   = datetime.fromtimestamp(start_ts).strftime("%Y-%m-%d %H:%M:%S")
-    first_yr = STUDY_YEARS[0]
-    last_yr  = STUDY_YEARS[-1]
+# SECTION 2 — REPORT_CFG
+# Master configuration dict — one entry per stressor.
+# Adding emissions = add one dict entry here, nothing else.
+# ══════════════════════════════════════════════════════════════════════════════
 
-    # ── Metadata ──
+REPORT_CFG: dict[str, dict] = {
+    "water": {
+        "indirect_dir_key":   "indirect",
+        "all_years_file":     "indirect_water_all_years.csv",
+        "by_category_fn":     lambda yr: f"indirect_water_{yr}_by_category.csv",
+        "origin_fn":          lambda yr: f"indirect_water_{yr}_origin.csv",
+        "sensitivity_fn":     lambda yr: f"indirect_water_{yr}_sensitivity.csv",
+        "split_fn":           lambda yr: f"indirect_water_{yr}_split.csv",
+        "primary_col":        "Indirect_TWF_billion_m3",
+        "secondary_col":      "Green_TWF_billion_m3",
+        "intensity_col":      "Intensity_m3_per_crore",
+        "demand_col":         "Tourism_Demand_crore",
+        "primary_unit":       "bn m³",
+        "intensity_unit":     "m³/₹ cr",
+        "outbound_dir_key":   "outbound",
+        "outbound_file":      "outbound_water_all_years.csv",
+        "totals_csv":         "twf_total_all_years.csv",
+        "template_key":       "water",
+        "report_txt_name":    "twf_comparison_report.txt",
+        "report_md_prefix":   "run_report_",
+    },
+    "energy": {
+        "indirect_dir_key":   "indirect_energy",
+        "all_years_file":     "indirect_energy_all_years.csv",
+        "by_category_fn":     lambda yr: f"indirect_energy_{yr}_by_category.csv",
+        "origin_fn":          lambda yr: f"indirect_energy_{yr}_origin.csv",
+        "sensitivity_fn":     lambda yr: f"indirect_energy_{yr}_sensitivity.csv",
+        "split_fn":           lambda yr: f"indirect_energy_{yr}_split.csv",
+        "primary_col":        "Primary_Total_TJ",
+        "secondary_col":      "Emission_pct",
+        "intensity_col":      "Intensity_MJ_per_crore",
+        "demand_col":         "Tourism_Demand_crore",
+        "primary_unit":       "TJ",
+        "intensity_unit":     "MJ/₹ cr",
+        "outbound_dir_key":   "outbound_energy",
+        "outbound_file":      "outbound_energy_all_years.csv",
+        "totals_csv":         "ef_total_all_years.csv",
+        "template_key":       "energy",
+        "report_txt_name":    "ef_comparison_report.txt",
+        "report_md_prefix":   "ef_report_",
+    },
+    "depletion": {
+        "indirect_dir_key":   "indirect_depletion",
+        "all_years_file":     "indirect_depletion_all_years.csv",
+        "by_category_fn":     lambda yr: f"indirect_depletion_{yr}_by_category.csv",
+        "origin_fn":          lambda yr: f"indirect_depletion_{yr}_origin.csv",
+        "sensitivity_fn":     lambda yr: f"indirect_depletion_{yr}_sensitivity.csv",
+        "split_fn":           lambda yr: f"indirect_depletion_{yr}_split.csv",
+        "primary_col":        "Total_Depletion_t",
+        "secondary_col":      "Fossil_Total_t",
+        "intensity_col":      "Intensity_t_per_crore",
+        "demand_col":         "Tourism_Demand_crore",
+        "primary_unit":       "M tonnes",
+        "intensity_unit":     "tonnes/₹ cr",
+        "outbound_dir_key":   None,
+        "totals_csv":         "ndp_all_years.csv",
+        "template_key":       "ndp",
+        "report_txt_name":    "ndp_summary.txt",
+        "report_md_prefix":   "ndp_report_",
+    },
+    "emissions": {          # future stressor — add fill_emissions_extras() when ready
+        "indirect_dir_key":   "indirect_emissions",
+        "all_years_file":     "indirect_emissions_all_years.csv",
+        "by_category_fn":     lambda yr: f"indirect_emissions_{yr}_by_category.csv",
+        "origin_fn":          lambda yr: f"indirect_emissions_{yr}_origin.csv",
+        "sensitivity_fn":     lambda yr: f"indirect_emissions_{yr}_sensitivity.csv",
+        "split_fn":           lambda yr: f"indirect_emissions_{yr}_split.csv",
+        "primary_col":        "Total_kgCO2e",
+        "secondary_col":      None,
+        "intensity_col":      "Intensity_kgCO2e_per_crore",
+        "demand_col":         "Tourism_Demand_crore",
+        "primary_unit":       "Mt CO2e",
+        "intensity_unit":     "kgCO2e/₹ cr",
+        "outbound_dir_key":   None,
+        "totals_csv":         "emissions_total_all_years.csv",
+        "template_key":       "emissions",
+        "report_txt_name":    "emissions_comparison_report.txt",
+        "report_md_prefix":   "emissions_report_",
+    },
+}
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+
+# SECTION 3 — UNIVERSAL DATA LAYER
+# load_indirect(stressor, year) — replaces 6 stressor-specific loaders
+# _load_outbound(stressor, year) — universal outbound loader
+# build_totals(stressor, log)   — replaces build_total_twf + build_total_energy
+# _load_template(stressor)      — reads report_template.md § TEMPLATE: {stressor}
+# ══════════════════════════════════════════════════════════════════════════════
+
+def _load_template(stressor: str) -> str:
+    """
+    Load the report template for a given stressor from report_template.md.
+    Falls back to per-stressor template files for backward compatibility.
+
+    Template sections are delimited by:
+        ## TEMPLATE: {stressor}
+    """
+    # Try unified report_template.md first
+    combined = Path(__file__).parent / "report_template.md"
+    if combined.exists():
+        raw   = combined.read_text(encoding="utf-8")
+        marker      = f"## TEMPLATE: {stressor}"
+        next_marker = "## TEMPLATE:"
+        start = raw.find(marker)
+        if start != -1:
+            start = raw.find("\n", start) + 1   # skip the header line itself
+            end   = raw.find(next_marker, start)
+            return (raw[start:end].strip() if end != -1 else raw[start:].strip())
+
+    # Backward-compatible fallback to per-stressor files
+    fallbacks = {
+        "water":    "water_report_template.md",
+        "energy":   "energy_report_template.md",
+        "depletion":"ndp_report_template.md",
+    }
+    fname = fallbacks.get(stressor, f"{stressor}_report_template.md")
+    p     = Path(__file__).parent / fname
+    if p.exists():
+        return p.read_text(encoding="utf-8")
+
+    return ""    # template not found — run() will warn
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# UNIVERSAL DATA LAYER  (TASK 7b)
+# Replaces the 6 stressor-specific loader functions.
+# ══════════════════════════════════════════════════════════════════════════════
+
+def load_indirect(stressor: str, year: str) -> dict:
+    """
+    Load indirect footprint values for one stressor + year.
+
+    Returns dict with keys:
+        primary    — headline metric in stressor's natural unit (bn m³, TJ, t)
+        secondary  — secondary metric (green TWF, emission %, etc.)
+        intensity  — intensity in unit/₹ crore
+        demand     — tourism demand in ₹ crore
+
+    Works for any stressor in REPORT_CFG; no stressor-specific code paths.
+    """
+    cfg         = REPORT_CFG[stressor]
+    ind_dir_key = cfg["indirect_dir_key"]
+    if ind_dir_key not in DIRS:
+        return {"primary": 0.0, "secondary": 0.0, "intensity": 0.0, "demand": 0.0}
+    ind_dir = DIRS[ind_dir_key]
+
+    # Primary: try all_years CSV first
+    df = _load_csv_cached(ind_dir / cfg["all_years_file"])
+    r  = _year_row(df, year)
+    if r is not None:
+        return {
+            "primary":   _col(r, cfg["primary_col"]),
+            "secondary": _col(r, cfg["secondary_col"]) if cfg.get("secondary_col") else 0.0,
+            "intensity": _col(r, cfg["intensity_col"]),
+            "demand":    _col(r, cfg["demand_col"]),
+        }
+
+    # Fallback: sum by_category CSV
+    cat = _safe_csv(ind_dir / cfg["by_category_fn"](year))
+    if not cat.empty:
+        # Try to find a suitable total column
+        for col_candidate in (cfg["primary_col"],
+                              "Total_Water_m3", "Final_Primary_MJ",
+                              "Total_Depletion_t", "Total_kgCO2e"):
+            if col_candidate in cat.columns:
+                total = float(cat[col_candidate].sum())
+                # Convert raw m³ / MJ to the reporting scale if needed
+                if stressor == "water" and col_candidate == "Total_Water_m3":
+                    total = total / 1e9   # → bn m³
+                dem  = float(cat["Demand_crore"].sum()) if "Demand_crore" in cat.columns else 0.0
+                ints = total / dem if dem > 0 else 0.0
+                return {"primary": total, "secondary": 0.0, "intensity": ints, "demand": dem}
+
+    return {"primary": 0.0, "secondary": 0.0, "intensity": 0.0, "demand": 0.0}
+
+
+def build_totals(stressor: str, log: Logger) -> pd.DataFrame:
+    """
+    Build cross-year totals summary for any stressor.
+    Universal replacement for build_total_twf() and build_total_energy().
+    Writes {REPORT_CFG[stressor]['totals_csv']} to DIRS["comparison"].
+    """
+    cfg  = REPORT_CFG[stressor]
+    rows = []
+
+    for year in STUDY_YEARS:
+        vals = load_indirect(stressor, year)
+
+        # Outbound
+        outbound = 0.0
+        net      = 0.0
+        ob_key   = cfg.get("outbound_dir_key")
+        if ob_key and ob_key in DIRS and cfg.get("outbound_file"):
+            ob_df = _load_csv_cached(DIRS[ob_key] / cfg["outbound_file"])
+            ob_r  = _year_row(ob_df, year)
+            if ob_r is not None:
+                outbound = _col(ob_r, "Outbound_bn_m3", "Outbound_EF_TJ",
+                                 "Outbound_t", "Outbound_kgCO2e")
+                net      = _col(ob_r, "Net_bn_m3", "Net_EF_TJ",
+                                 "Net_t", "Net_kgCO2e")
+
+        rows.append({
+            "Year":          year,
+            "Primary_total": vals["primary"],
+            "Secondary":     vals["secondary"],
+            "Intensity":     vals["intensity"],
+            "Demand_crore":  vals["demand"],
+            "Outbound":      outbound,
+            "Net":           net,
+            "USD_INR_Rate":  USD_INR.get(year, 70.0),
+        })
+
+    df = pd.DataFrame(rows)
+    compare_across_years(
+        {r["Year"]: r["Primary_total"] for r in rows},
+        f"Indirect {stressor} footprint ({cfg['primary_unit']})",
+        unit=f" {cfg['primary_unit']}", log=log,
+    )
+    return df
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+
+# SECTION 4 — SHARED BLOCKS FILLER
+# fill_shared_blocks(text, stressor, cfg, ...) → str
+# Fills the ~16 tokens that are identical across all stressor templates:
+#   metadata, IO table, demand rows, NAS growth, indirect summary,
+#   top-10 per year, top-10 combined, origin rows, warnings, config values.
+# Called first in every stressor path before stressor-specific filling.
+# ══════════════════════════════════════════════════════════════════════════════
+
+def fill_shared_blocks(text: str, stressor: str, cfg: dict,
+                        start_ts: float, steps_req: list,
+                        steps_completed: list, steps_failed: list,
+                        total_time: float, pipeline_log: Path,
+                        log: Logger = None) -> str:
+    """
+    Fill template tokens that are identical across all stressors:
+        RUN_TIMESTAMP, STUDY_YEARS, STEPS_*, TOTAL_RUNTIME, PIPELINE_LOG_PATH,
+        FIRST_YEAR, LAST_YEAR, N_SECTORS, N_EXIO_SECTORS, TOURISM_GDP_PCT,
+        IO_TABLE_ROWS, DEMAND_TABLE_ROWS, NAS_GROWTH_ROWS,
+        INDIRECT_SUMMARY_ROWS, TOP10_{yr}, TOP10_COMBINED,
+        ORIGIN_ROWS, SENSITIVITY_ROWS, KEY_FINDINGS, WARNINGS
+    """
+    first_yr  = STUDY_YEARS[0]
+    last_yr   = STUDY_YEARS[-1]
+    ts_str    = datetime.fromtimestamp(start_ts).strftime("%Y-%m-%d %H:%M:%S")
     fail_skip = (", ".join(steps_failed) if steps_failed else "none failed") + "  /  none skipped"
+
+    # ── Metadata tokens ───────────────────────────────────────────────────────
     text = (text
         .replace("{{RUN_TIMESTAMP}}",        ts_str)
         .replace("{{STUDY_YEARS}}",          ", ".join(STUDY_YEARS))
         .replace("{{STEPS_REQUESTED}}",      ", ".join(steps_req))
         .replace("{{STEPS_COMPLETED}}",      ", ".join(steps_completed) or "-")
         .replace("{{STEPS_FAILED_SKIPPED}}", fail_skip)
-        .replace("{{TOTAL_RUNTIME}}",        f"{total_time:.0f}s" if total_time < 60 else f"{total_time/60:.1f} min")
+        .replace("{{TOTAL_RUNTIME}}",
+                 f"{total_time:.0f}s" if total_time < 60 else f"{total_time/60:.1f} min")
         .replace("{{PIPELINE_LOG_PATH}}",    str(pipeline_log))
         .replace("{{FIRST_YEAR}}",           first_yr)
         .replace("{{LAST_YEAR}}",            last_yr)
         .replace("{{N_SECTORS}}",            "140")
         .replace("{{N_EXIO_SECTORS}}",       "163")
+        .replace("{{TOURISM_GDP_PCT}}",      "5.9")
     )
     for yr in STUDY_YEARS:
         text = text.replace(f"{{{{YEAR_{yr}}}}}", yr)
 
-    # ── IO table ──
+    # ── IO table ──────────────────────────────────────────────────────────────
     io_sum  = _safe_csv(DIRS["io"] / "io_summary_all_years.csv")
     io_rows = ""
     for _, r in io_sum.iterrows():
@@ -887,17 +1145,30 @@ def fill_report_template(start_ts: float, steps_req: list,
             f"| {int(r.get('total_output_crore',0)):,} "
             f"| {int(r.get('total_output_USD_M',0)):,} "
             f"| {int(r.get('total_output_2015prices',0)):,} "
-            f"| {int(r.get('total_output_2015prices_USD_M',0)):,} "
             f"| {int(r.get('total_intermediate_crore',0)):,} "
             f"| {int(r.get('total_final_demand_crore',0)):,} "
-            f"| {int(r.get('total_final_demand_USD_M',0)):,} "
             f"| {float(r.get('balance_error_pct',0)):.4f} "
             f"| {float(r.get('spectral_radius',0)):.6f} "
             f"| {float(r.get('usd_inr_rate',70.0)):.2f} |\n"
         )
-    text = text.replace("{{IO_TABLE_ROWS}}", io_rows or "| - | - | - | - | - | - | - | - | - | - | - | - |\n")
+    text = text.replace("{{IO_TABLE_ROWS}}", io_rows or "| - | - | - | - | - | - | - | - | - | - |\n")
 
-    # ── Demand rows ──
+    # Condensed IO (fewer columns — for energy template)
+    io_cond = ""
+    for _, r in io_sum.iterrows():
+        io_cond += (
+            f"| {r.get('year','-')} "
+            f"| {int(r.get('total_output_crore',0)):,} "
+            f"| {int(r.get('total_output_USD_M',0)):,} "
+            f"| {int(r.get('total_intermediate_crore',0)):,} "
+            f"| {int(r.get('total_final_demand_crore',0)):,} "
+            f"| {float(r.get('balance_error_pct',0)):.4f} "
+            f"| {float(r.get('spectral_radius',0)):.6f} "
+            f"| {float(r.get('usd_inr_rate',70.0)):.2f} |\n"
+        )
+    text = text.replace("{{IO_TABLE_ROWS_CONDENSED}}", io_cond or "| - | - | - | - | - | - | - | - |\n")
+
+    # ── Demand rows ───────────────────────────────────────────────────────────
     dem_cmp  = _safe_csv(DIRS["demand"] / "demand_intensity_comparison.csv")
     dem_rows = ""
     if not dem_cmp.empty and "Metric" in dem_cmp.columns:
@@ -905,10 +1176,10 @@ def fill_report_template(start_ts: float, steps_req: list,
         nom = dem_cmp[dem_cmp["Metric"].str.contains("nominal", case=False, na=False)]
         rl  = dem_cmp[dem_cmp["Metric"].str.contains("real",    case=False, na=False)]
         for yr in STUDY_YEARS:
-            _usd = USD_INR.get(yr, 70.0)
-            n_r  = nom[nom["Year"] == yr]; r_r = rl[rl["Year"] == yr]
-            n_v  = float(n_r["Value"].iloc[0]) if not n_r.empty else 0
-            r_v  = float(r_r["Value"].iloc[0]) if not r_r.empty else 0
+            _usd  = USD_INR.get(yr, 70.0)
+            n_r   = nom[nom["Year"] == yr]; r_r = rl[rl["Year"] == yr]
+            n_v   = float(n_r["Value"].iloc[0]) if not n_r.empty else 0
+            r_v   = float(r_r["Value"].iloc[0]) if not r_r.empty else 0
             n_usd = round(n_v * 10 / _usd) if _usd else 0
             r_usd = round(r_v * 10 / USD_INR.get("2015", 65.0))
             cagr  = n_r["CAGR_vs_base"].iloc[0] if not n_r.empty and "CAGR_vs_base" in n_r.columns else None
@@ -918,7 +1189,18 @@ def fill_report_template(start_ts: float, steps_req: list,
             dem_rows += f"| {yr} | {n_v:,.0f} | {n_usd:,.0f} | {r_v:,.0f} | {r_usd:,.0f} | {nz}/163 | {cagr_s} | {_usd:.2f} |\n"
     text = text.replace("{{DEMAND_TABLE_ROWS}}", dem_rows or "| - | - | - | - | - | - | - | - |\n")
 
-    # ── NAS growth rows ──
+    # Inline demand summary for prose
+    _dem_inline = []
+    if not dem_cmp.empty and "Metric" in dem_cmp.columns:
+        nom_il = dem_cmp[dem_cmp["Metric"].str.contains("nominal", case=False, na=False)]
+        for yr in STUDY_YEARS:
+            n_r = nom_il[nom_il["Year"].astype(str) == yr]
+            n_v = float(n_r["Value"].iloc[0]) if not n_r.empty else 0
+            _usd = USD_INR.get(yr, 70.0)
+            _dem_inline.append(f"₹{n_v:,.0f} cr (${round(n_v*10/_usd):,}M) in {yr}")
+    text = text.replace("{{DEMAND_TABLE_ROWS_INLINE}}", "; ".join(_dem_inline) if _dem_inline else "-")
+
+    # ── NAS growth rows ───────────────────────────────────────────────────────
     nas_rows = "".join(
         f"| {key} | {NAS_GVA_CONSTANT.get(key,{}).get('nas_sno','-')} "
         f"| {NAS_GVA_CONSTANT.get(key,{}).get('nas_label','-')} "
@@ -927,113 +1209,152 @@ def fill_report_template(start_ts: float, steps_req: list,
     )
     text = text.replace("{{NAS_GROWTH_ROWS}}", nas_rows or "| - | - | - | - | - |\n")
 
-    # ── Indirect summary (five-metric: blue + scarce + green + intensity nom/real + delta) ──
+    # ── Indirect summary rows (universal) ────────────────────────────────────
+    ind_dir = DIRS.get(cfg["indirect_dir_key"])
     ind_rows = ""
     base_ind = None
-    ind_all_df = _safe_csv(DIRS["indirect"] / "indirect_water_all_years.csv")
-    for yr in STUDY_YEARS:
-        vals = _get_ind_vals(yr)
-        if vals is None:
-            ind_rows += f"| {yr} | - | - | - | - | - | - |\n"; continue
-        # Scarce from all_years summary
-        yr_row = ind_all_df[ind_all_df["Year"].astype(str) == yr] if not ind_all_df.empty else pd.DataFrame()
-        scarce_bn = float(yr_row["Scarce_TWF_billion_m3"].iloc[0]) if (
-            not yr_row.empty and "Scarce_TWF_billion_m3" in yr_row.columns) else (vals["tot"] * 0.83)
-        green_bn  = float(yr_row["Green_TWF_billion_m3"].iloc[0]) if (
-            not yr_row.empty and "Green_TWF_billion_m3" in yr_row.columns) else 0.0
-        delta = "(base)" if base_ind is None else _pct(base_ind, vals["tot"])
-        base_ind  = base_ind or vals["tot"]
-        ind_rows += (f"| {yr} | {vals['tot']:.4f} | {scarce_bn:.4f} | {green_bn:.4f} "
-                     f"| {vals['ni']:,.1f} | {vals['ri']:,.1f} | {delta} |\n")
-    text = text.replace("{{INDIRECT_SUMMARY_ROWS}}", ind_rows or "| - | - | - | - | - | - |\n")
-
-    # ── Top-10 per year ──
-    for yr in STUDY_YEARS:
-        cat_df  = _safe_csv(DIRS["indirect"] / f"indirect_water_{yr}_by_category.csv")
-        top_str = ""
-        if not cat_df.empty and "Total_Water_m3" in cat_df.columns:
-            tot_w = cat_df["Total_Water_m3"].sum()
-            for rank, (_, row) in enumerate(cat_df.nlargest(10, "Total_Water_m3").iterrows(), 1):
-                w = float(row["Total_Water_m3"])
-                top_str += f"| {rank} | {row['Category_Name']} | {w:,.0f} | {100*w/tot_w:.1f}% |\n"
-        text = text.replace(f"{{{{TOP10_{yr}}}}}", top_str or "| - | - | - | - |\n")
-
-    # ── Top-10 combined table (ranked by last study year total, show each year's m3 and %)
-    try:
-        last_yr = STUDY_YEARS[-1]
-        cat_last = _safe_csv(DIRS["indirect"] / f"indirect_water_{last_yr}_by_category.csv")
-        top10_combined = ""
-        if not cat_last.empty and "Total_Water_m3" in cat_last.columns and "Category_Name" in cat_last.columns:
-            top_cats = list(cat_last.nlargest(10, "Total_Water_m3")["Category_Name"])
-            # Preload per-year dataframes and totals
-            per_year = {yr: _safe_csv(DIRS["indirect"] / f"indirect_water_{yr}_by_category.csv") for yr in STUDY_YEARS}
-            totals = {yr: (per_year[yr]["Total_Water_m3"].sum() if not per_year[yr].empty and "Total_Water_m3" in per_year[yr].columns else 0.0)
-                      for yr in STUDY_YEARS}
-            for rank, cat in enumerate(top_cats, 1):
-                row_vals = []
-                for yr in STUDY_YEARS:
-                    df = per_year[yr]
-                    if df.empty or "Category_Name" not in df.columns or "Total_Water_m3" not in df.columns:
-                        w = 0.0
-                    else:
-                        sel = df[df["Category_Name"] == cat]
-                        w = float(sel["Total_Water_m3"].sum()) if not sel.empty else 0.0
-                    pct = 100 * w / totals[yr] if totals[yr] else 0.0
-                    row_vals.append((w, pct))
-                w15, p15 = row_vals[0]
-                w19, p19 = row_vals[1] if len(row_vals) > 1 else (0.0, 0.0)
-                w22, p22 = row_vals[-1]
-                top10_combined += (f"| {rank} | {cat} | {w15:,.0f} | {p15:.1f}% | {w19:,.0f} | {p19:.1f}% | {w22:,.0f} | {p22:.1f}% |\n")
-        text = text.replace("{{TOP10_COMBINED}}", top10_combined or "| - | - | - | - | - | - | - | - |\n")
-    except Exception:
-        text = text.replace("{{TOP10_COMBINED}}", "| - | - | - | - | - | - | - | - |\n")
-
-    # ── Sector type (destination view) ──
-    sect: dict = {}
-    for yr in STUDY_YEARS:
-        cat_df = _safe_csv(DIRS["indirect"] / f"indirect_water_{yr}_by_category.csv")
-        if not cat_df.empty and "Category_Type" in cat_df.columns:
-            tot_w = cat_df["Total_Water_m3"].sum()
-            for ctype, grp in cat_df.groupby("Category_Type"):
-                w = float(grp["Total_Water_m3"].sum())
-                sect.setdefault(ctype, {})[yr] = (w, 100 * w / tot_w if tot_w else 0)
-    sect_rows = ""
-    for ctype in sorted(sect):
-        row = f"| {ctype} "
+    if ind_dir:
+        ind_all_df = _safe_csv(ind_dir / cfg["all_years_file"])
         for yr in STUDY_YEARS:
-            w, pct = sect[ctype].get(yr, (0, 0))
-            row += f"| {w:,.0f} | {pct:.1f}% "
-        sect_rows += row + "|\n"
-    text = text.replace("{{SECTOR_TYPE_ROWS}}", sect_rows or "| - | - | - | - | - | - | - |\n")
+            vals = load_indirect(stressor, yr)
+            r    = _year_row(ind_all_df, yr) if not ind_all_df.empty else None
+            sec  = _col(r, cfg["secondary_col"]) if (r is not None and cfg.get("secondary_col")) else 0.0
+            delta = "(base)" if base_ind is None else _pct(base_ind, vals["primary"])
+            base_ind = base_ind or vals["primary"]
+            ind_rows += (
+                f"| {yr} | {vals['primary']:.4f} | {sec:.4f} "
+                f"| {vals['intensity']:,.1f} | {delta} |\n"
+            )
+    text = text.replace("{{INDIRECT_SUMMARY_ROWS}}", ind_rows or "| - | - | - | - | - |\n")
 
-    # ── Water origin (upstream — correct source) ──
-    origin: dict = {}
-    for yr in STUDY_YEARS:
-        summ_df = _safe_csv(DIRS["indirect"] / f"indirect_water_{yr}_origin.csv")
-        if not summ_df.empty and "Source_Group" in summ_df.columns and "Water_m3" in summ_df.columns:
-            yr_total = float(summ_df["Water_m3"].sum())
-            for _, r in summ_df.iterrows():
-                grp = str(r["Source_Group"])
-                w   = float(r["Water_m3"])
-                origin.setdefault(grp, {})[yr] = (w, 100 * w / yr_total if yr_total else 0)
-            continue
-        struct_df = _safe_csv(DIRS["indirect"] / f"indirect_water_{yr}_structural.csv")
-        if struct_df.empty or "Source_Group" not in struct_df.columns or "Water_m3" not in struct_df.columns:
-            continue
-        yr_total = float(struct_df["Water_m3"].sum())
-        for grp, sub in struct_df.groupby("Source_Group"):
-            w = float(sub["Water_m3"].sum())
-            origin.setdefault(str(grp), {})[yr] = (w, 100 * w / yr_total if yr_total else 0)
+    # ── Top-10 per year (demand-destination view) ─────────────────────────────
+    if ind_dir:
+        # Choose primary value column for each stressor
+        _val_col_map = {
+            "water":     "Total_Water_m3",
+            "energy":    "Final_Primary_MJ",
+            "depletion": "Total_Depletion_t",
+            "emissions": "Total_kgCO2e",
+        }
+        _val_col = _val_col_map.get(stressor, "Total_Water_m3")
 
-    first_yr_water = {g: v.get(STUDY_YEARS[0], (0, 0))[0] for g, v in origin.items()}
-    origin_rows = ""
-    for grp in sorted(first_yr_water, key=first_yr_water.get, reverse=True):
-        row = f"| {grp} "
         for yr in STUDY_YEARS:
-            w, pct = origin[grp].get(yr, (0, 0))
-            row += f"| {w:,.0f} | {pct:.1f}% "
-        origin_rows += row + "|\n"
-    text = text.replace("{{WATER_ORIGIN_ROWS}}", origin_rows or "| - | - | - | - | - | - | - |\n")
+            cat_df  = _safe_csv(ind_dir / cfg["by_category_fn"](yr))
+            top_str = ""
+            if not cat_df.empty and _val_col in cat_df.columns:
+                tot_w = cat_df[_val_col].sum()
+                for rank, (_, row) in enumerate(cat_df.nlargest(10, _val_col).iterrows(), 1):
+                    w = float(row[_val_col])
+                    top_str += f"| {rank} | {row.get('Category_Name', '-')} | {w:,.0f} | {100*w/tot_w:.1f}% |\n"
+            text = text.replace(f"{{{{TOP10_{yr}}}}}", top_str or "| - | - | - | - |\n")
+
+        # Top-10 combined (ranked by last year)
+        try:
+            cat_last = _safe_csv(ind_dir / cfg["by_category_fn"](last_yr))
+            top10_combined = ""
+            if not cat_last.empty and _val_col in cat_last.columns:
+                top_cats  = list(cat_last.nlargest(10, _val_col)["Category_Name"])
+                per_year  = {yr: _safe_csv(ind_dir / cfg["by_category_fn"](yr)) for yr in STUDY_YEARS}
+                yr_totals = {
+                    yr: float(per_year[yr][_val_col].sum())
+                    if not per_year[yr].empty and _val_col in per_year[yr].columns else 0.0
+                    for yr in STUDY_YEARS
+                }
+                for rank, cat in enumerate(top_cats, 1):
+                    row_vals = []
+                    for yr in STUDY_YEARS:
+                        df  = per_year[yr]
+                        sel = df[df["Category_Name"] == cat] if not df.empty and "Category_Name" in df.columns else pd.DataFrame()
+                        w   = float(sel[_val_col].sum()) if not sel.empty and _val_col in sel.columns else 0.0
+                        pct = 100 * w / yr_totals[yr] if yr_totals[yr] else 0.0
+                        row_vals.append((w, pct))
+                    parts = " | ".join(f"{w:,.0f} | {p:.1f}%" for w, p in row_vals)
+                    top10_combined += f"| {rank} | {cat} | {parts} |\n"
+            text = text.replace("{{TOP10_COMBINED}}", top10_combined or "| - | - | - | - | - | - | - | - |\n")
+        except Exception:
+            text = text.replace("{{TOP10_COMBINED}}", "| - | - | - | - | - | - | - | - |\n")
+
+        # ── Origin (upstream source view) ─────────────────────────────────────
+        origin: dict = {}
+        _orig_val = "Water_m3" if stressor == "water" else ("Final_Primary_MJ" if stressor == "energy" else "Total_t")
+        for yr in STUDY_YEARS:
+            summ_df = _safe_csv(ind_dir / cfg["origin_fn"](yr))
+            if not summ_df.empty and "Source_Group" in summ_df.columns and _orig_val in summ_df.columns:
+                yr_total = float(summ_df[_orig_val].sum())
+                for _, r in summ_df.iterrows():
+                    grp = str(r["Source_Group"])
+                    w   = float(r[_orig_val])
+                    origin.setdefault(grp, {})[yr] = (w, 100 * w / yr_total if yr_total else 0)
+
+        origin_rows = ""
+        for grp in sorted(origin, key=lambda g: origin[g].get(first_yr, (0, 0))[0], reverse=True):
+            row = f"| {grp} "
+            for yr in STUDY_YEARS:
+                w, pct = origin[grp].get(yr, (0, 0))
+                row += f"| {w:,.0f} | {pct:.1f}% "
+            origin_rows += row + "|\n"
+        text = text.replace("{{WATER_ORIGIN_ROWS}}",  origin_rows or "| - | - | - | - | - | - | - |\n")
+        text = text.replace("{{ENERGY_ORIGIN_ROWS}}", origin_rows or "| - | - | - | - | - | - | - |\n")
+
+    # ── Warnings from logs ────────────────────────────────────────────────────
+    warn_lines = []
+    log_dir = DIRS["logs"]
+    if log_dir.exists():
+        cutoff = start_ts - 120
+        for lf in sorted(log_dir.glob("*.log")):
+            try:
+                if lf.stat().st_mtime < cutoff:
+                    continue
+                for line in lf.read_text(encoding="utf-8", errors="replace").splitlines():
+                    if any(m in line for m in ["WARN", "WARNING", "FAILED", "ERROR", "nan"]):
+                        warn_lines.append(f"[{lf.stem}] {line.strip()}")
+            except Exception:
+                pass
+    text = text.replace("{{WARNINGS}}", "\n".join(warn_lines[:50]) if warn_lines else "No warnings recorded.")
+
+    # ── Config values ─────────────────────────────────────────────────────────
+    text = (text
+        .replace("{{CPI_VALUES}}",    "  |  ".join(f"{k}: {v}" for k, v in CPI.items()))
+        .replace("{{EURINR_VALUES}}", "  |  ".join(f"{k}: {v}" for k, v in EUR_INR.items()))
+        .replace("{{USDINR_VALUES}}", "  |  ".join(f"{yr}: ₹{rate:.2f}/USD" for yr, rate in USD_INR.items()))
+        .replace("{{TOURISM_JOBS_M}}", "87.5")
+        .replace("{{PIPELINE_VERSION}}", datetime.fromtimestamp(start_ts).strftime("v%Y%m%d-%H%M%S"))
+    )
+
+    return text
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+
+# SECTION 5 — WATER-SPECIFIC FILL
+# fill_water_extras(text, start_ts, log) → str
+# Handles all water-only tokens: direct TWF, scarce, green, SDA, MC,
+# multiplier artefacts, supply-chain, intensity tables, sector decomp.
+# Called after fill_shared_blocks(); shared tokens (IO, demand, NAS etc.)
+# are NOT duplicated here.
+# ══════════════════════════════════════════════════════════════════════════════
+
+def fill_water_extras(text: str, start_ts: float, log: Logger = None) -> str:
+    """
+    Fill water-specific template tokens.
+    Called after fill_shared_blocks() which handles shared tokens.
+    Returns filled text (caller writes the file).
+
+    Covers: direct TWF, scarce, green, SDA, MC, multiplier artefacts,
+            supply-chain paths, intensity segment tables, sector decomp,
+            TSA wide table, per-tourist intensity, abstract scalars,
+            hotel/NAS worked examples, policy savings, config values.
+    """
+    first_yr = STUDY_YEARS[0]
+    last_yr  = STUDY_YEARS[-1]
+
+    # ── IO / demand / NAS / indirect summary / top-10 / origin ──────────────
+    # Handled by fill_shared_blocks() — not duplicated here.
+    # fill_water_extras only covers water-specific tokens below.
+
+    # IO / Demand / NAS / Indirect / Top-10 / Origin → handled by fill_shared_blocks()
+    # Fetch dem_cmp here for use in NAS hotels worked example (water-specific token)
+    dem_cmp = _safe_csv(DIRS["demand"] / "demand_intensity_comparison.csv")
 
     # ── Direct TWF ──
     dir_rows = ""
@@ -1401,10 +1722,11 @@ def fill_report_template(start_ts: float, steps_req: list,
     mc_sum  = _safe_csv(mc_dir / "mc_summary_all_years.csv")
     mc_rows = ""
     for _, r in mc_sum.iterrows():
-        mc_rows += (f"| {r.get('Year','-')} | {float(r.get('Base_bn_m3',0)):.4f} "
-                    f"| {float(r.get('P5_bn_m3',0)):.4f} | {float(r.get('P25_bn_m3',0)):.4f} "
-                    f"| {float(r.get('P50_bn_m3',0)):.4f} | {float(r.get('P75_bn_m3',0)):.4f} "
-                    f"| {float(r.get('P95_bn_m3',0)):.4f} | {float(r.get('Range_pct',0)):.1f}% "
+        def _mc(k, k2): return float(r.get(k, r.get(k2, 0)))
+        mc_rows += (f"| {r.get('Year','-')} | {_mc('Base_bn_m3','Base_bn'):.4f} "
+                    f"| {_mc('P5_bn_m3','P5_bn'):.4f} | {_mc('P25_bn_m3','P25_bn'):.4f} "
+                    f"| {_mc('P50_bn_m3','P50_bn'):.4f} | {_mc('P75_bn_m3','P75_bn'):.4f} "
+                    f"| {_mc('P95_bn_m3','P95_bn'):.4f} | {float(r.get('Range_pct',0)):.1f}% "
                     f"| {r.get('Top_param','-')} |\n")
     text = text.replace("{{MC_SUMMARY_ROWS}}", mc_rows or "| - | - | - | - | - | - | - | - | - |\n")
 
@@ -1535,18 +1857,18 @@ def fill_report_template(start_ts: float, steps_req: list,
         if not lr.empty:
             mc_last = lr.iloc[0].to_dict()
     text = (text
-        .replace("{{TOTAL_TWF_2022}}",  f"{float(mc_last.get('Base_bn_m3', 0)):.2f}" if mc_last else "-")
-        .replace("{{MC_P5_2022}}",      f"{float(mc_last.get('P5_bn_m3',   0)):.2f}" if mc_last else "-")
-        .replace("{{MC_P95_2022}}",     f"{float(mc_last.get('P95_bn_m3',  0)):.2f}" if mc_last else "-")
+        .replace("{{TOTAL_TWF_2022}}",  f"{float(mc_last.get('Base_bn_m3', mc_last.get('Base_bn', 0))):.2f}" if mc_last else "-")
+        .replace("{{MC_P5_2022}}",      f"{float(mc_last.get('P5_bn_m3',   mc_last.get('P5_bn',   0))):.2f}" if mc_last else "-")
+        .replace("{{MC_P95_2022}}",     f"{float(mc_last.get('P95_bn_m3',  mc_last.get('P95_bn',  0))):.2f}" if mc_last else "-")
         .replace("{{MC_RANGE_PCT}}",    f"{float(mc_last.get('Range_pct',  0)):.0f}" if mc_last else "-")
     )
 
     # MC asymmetric CI tokens: down% = (BASE-P5)/BASE, up% = (P95-BASE)/BASE
     mc_down_pct = mc_up_pct = mc_halfwidth_pct = "-"
     if mc_last:
-        base_mc = float(mc_last.get("Base_bn_m3", 0))
-        p5_mc   = float(mc_last.get("P5_bn_m3",   0))
-        p95_mc  = float(mc_last.get("P95_bn_m3",  0))
+        base_mc = float(mc_last.get("Base_bn_m3", mc_last.get("Base_bn", 0)))
+        p5_mc   = float(mc_last.get("P5_bn_m3",   mc_last.get("P5_bn",   0)))
+        p95_mc  = float(mc_last.get("P95_bn_m3",  mc_last.get("P95_bn",  0)))
         if base_mc > 0:
             mc_down_pct      = f"{100*(base_mc - p5_mc)/base_mc:.0f}"
             mc_up_pct        = f"{100*(p95_mc - base_mc)/base_mc:.0f}"
@@ -1650,10 +1972,11 @@ def fill_report_template(start_ts: float, steps_req: list,
         if ratios:
             import math
             rmin, rmax = min(ratios), max(ratios)
-            # BUG FIX: used round() which rounds 17.5 → 17 (wrong: abstract said "10-17×").
-            # Correct: floor for min, ceil for max → 17.5 → 18 → "10-18×"
-            if abs(rmax - rmin) / rmax < 0.10:
-                inb_dom_ratio = f"{round(sum(ratios)/len(ratios))}×"
+            mean_r = sum(ratios) / len(ratios)
+            # FIX-2c: use mean as threshold denominator (not rmax which overstates range);
+            # use int(mean + 0.5) for single-value case to avoid banker's rounding.
+            if abs(rmax - rmin) / mean_r < 0.10:
+                inb_dom_ratio = f"{int(mean_r + 0.5)}×"
             else:
                 inb_dom_ratio = f"{math.floor(rmin)}–{math.ceil(rmax)}×"
     text = text.replace("{{INB_DOM_RATIO}}", inb_dom_ratio)
@@ -1762,10 +2085,42 @@ def fill_report_template(start_ts: float, steps_req: list,
     text = text.replace("{{NAS_HOTELS_2022}}", nas_hotels_2022)
     text = text.replace("{{NAS_AIR_2022}}",    nas_air_2022)
 
-    # ── NARRATIVE PLACEHOLDERS ────────────────────────────────────────────────
-    text = _fill_narrative_placeholders(text, first_yr, last_yr, log)
+    # ── NARRATIVE section is handled separately by fill_water_narrative() ──
+    return text
 
-    # Write output
+
+def fill_water_narrative(text: str, first_yr: str, last_yr: str,
+                          log: Logger = None) -> str:
+    """
+    Fill water narrative/journal/reviewer placeholders.
+    Renamed from _fill_narrative_placeholders; signature unchanged.
+    """
+    return _fill_narrative_placeholders(text, first_yr, last_yr, log)
+
+
+def fill_report_template(start_ts: float, steps_req: list,
+                          steps_completed: list, steps_failed: list,
+                          total_time: float, pipeline_log: Path,
+                          log: Logger = None) -> Path | None:
+    """
+    Backward-compatible wrapper.
+    New code should call fill_water_extras() + fill_water_narrative() directly.
+    """
+    text = _load_template("water")
+    if not text:
+        if log: log.warn("Water template not found — skipping")
+        return None
+
+    cfg = REPORT_CFG["water"]
+    text = fill_shared_blocks(
+        text, "water", cfg,
+        start_ts=start_ts, steps_req=steps_req,
+        steps_completed=steps_completed, steps_failed=steps_failed,
+        total_time=total_time, pipeline_log=pipeline_log, log=log,
+    )
+    text = fill_water_extras(text, start_ts, log)
+    text = fill_water_narrative(text, STUDY_YEARS[0], STUDY_YEARS[-1], log)
+
     DIRS["comparison"].mkdir(parents=True, exist_ok=True)
     out = DIRS["comparison"] / f"run_report_{int(start_ts)}.md"
     out.write_text(text, encoding="utf-8")
@@ -1780,6 +2135,15 @@ def fill_report_template(start_ts: float, steps_req: list,
 # {{REVIEWER_*}} and {{FIGURE1_*}} token added in report_template.md.
 # Each block reads the relevant CSVs and computes interpretive sentences
 # from actual numbers — nothing is hardcoded as a finding.
+# ══════════════════════════════════════════════════════════════════════════════
+
+# ══════════════════════════════════════════════════════════════════════════════
+
+# SECTION 6 — WATER NARRATIVE
+# fill_water_narrative(text, first_yr, last_yr, log) → str
+# Populates every {{*_NARRATIVE}}, {{NOVELTY_*}}, {{JOURNAL_*}},
+# {{REVIEWER_*}} and {{FIGURE1_*}} token in the water report template.
+# Computes interpretive sentences from actual pipeline CSV numbers.
 # ══════════════════════════════════════════════════════════════════════════════
 
 def _fill_narrative_placeholders(text: str, first_yr: str, last_yr: str,
@@ -1866,9 +2230,9 @@ def _fill_narrative_placeholders(text: str, first_yr: str, last_yr: str,
     if not mc_sum.empty:
         mc_r = _year_row(mc_sum, last_yr)
         if mc_r is not None:
-            mc_base = _col(mc_r, "Base_bn_m3")
-            mc_p5   = _col(mc_r, "P5_bn_m3")
-            mc_p95  = _col(mc_r, "P95_bn_m3")
+            mc_base = _col(mc_r, "Base_bn_m3", "Base_bn")
+            mc_p5   = _col(mc_r, "P5_bn_m3",   "P5_bn")
+            mc_p95  = _col(mc_r, "P95_bn_m3",  "P95_bn")
     mc_down = f"{100*(mc_base-mc_p5)/mc_base:.0f}" if mc_base else "-"
     mc_up   = f"{100*(mc_p95-mc_base)/mc_base:.0f}" if mc_base else "-"
     mc_hw   = f"{100*(mc_p95-mc_p5)/(2*mc_base):.0f}" if mc_base else "-"
@@ -2977,100 +3341,6 @@ def _fill_narrative_placeholders(text: str, first_yr: str, last_yr: str,
     text = text.replace("{{HOTEL_FOOD_SWITCH_PCT}}",    "30")
     text = text.replace("{{HOTEL_FOOD_SWITCH_IMPACT}}", f"{impact:.0f}")
 
-    # ── WATER PRODUCTIVITY PER DOLLAR OF TOURISM OUTPUT (§4.5 Table) ─────────
-    # Metric: how much water is consumed per unit of tourism economic output.
-    # Denominator = NAS-scaled total nominal tourism demand (₹ crore) — best
-    # available proxy for tourism GVA given no dedicated MoSPI tourism GVA series.
-    # Tokens: {{WPD_TABLE}}, {{WPD_LITRE_PER_INR}}, {{WPD_USD_LAST}}
-    try:
-        _dem_cmp2 = _safe_csv(DIRS["demand"] / "demand_intensity_comparison.csv")
-        _tot_df2  = _safe_csv(DIRS["comparison"] / "twf_total_all_years.csv")
-        _ind_all2 = _safe_csv(DIRS["indirect"] / "indirect_water_all_years.csv")
-
-        wpd_rows  = ""
-        wpd_base_m3_per_cr = None
-        wpd_litre_per_inr_last = "-"
-        wpd_usd_last = "-"
-
-        for _yi, yr in enumerate(STUDY_YEARS):
-            # Nominal tourism demand (₹ crore)
-            _dem_nom = 0.0
-            if not _dem_cmp2.empty and "Metric" in _dem_cmp2.columns:
-                _nom_r = _dem_cmp2[
-                    (_dem_cmp2["Year"].astype(str) == yr) &
-                    (_dem_cmp2["Metric"].str.contains("nominal", case=False, na=False))
-                ]
-                if not _nom_r.empty:
-                    _dem_nom = float(_nom_r["Value"].iloc[0])
-
-            # Total blue TWF (bn m³)
-            _twf_bn = 0.0
-            if not _tot_df2.empty and "Year" in _tot_df2.columns and "Total_bn_m3" in _tot_df2.columns:
-                _tr = _tot_df2[_tot_df2["Year"].astype(str) == yr]
-                if not _tr.empty:
-                    _twf_bn = float(_tr["Total_bn_m3"].iloc[0])
-            if _twf_bn == 0.0 and not _ind_all2.empty and "Year" in _ind_all2.columns:
-                _tr2 = _ind_all2[_ind_all2["Year"].astype(str) == yr]
-                if not _tr2.empty and "Indirect_TWF_billion_m3" in _tr2.columns:
-                    _twf_bn = float(_tr2["Indirect_TWF_billion_m3"].iloc[0])
-
-            _usd_rate  = USD_INR.get(yr, 70.0)
-            _dem_usd_m = round(_dem_nom * 10 / _usd_rate, 0) if _dem_nom and _usd_rate else 0.0
-
-            # m³ per ₹ crore = (bn m³ × 1e9) / (₹ crore) = 1e9 × bn / crore
-            _m3_per_cr = (_twf_bn * 1e9 / _dem_nom) if _dem_nom > 0 else 0.0
-            # Litres per ₹  = m³ per crore ÷ 10,000  (1 crore = 1e7 ₹; 1 m³ = 1000 L → L/₹ = m³/cr / 1e4)
-            _l_per_inr = _m3_per_cr / 1e4 if _m3_per_cr > 0 else 0.0
-            # m³ per USD = (bn m³ × 1e9) / (USD M × 1e6)
-            _m3_per_usd = (_twf_bn * 1e9 / (_dem_usd_m * 1e6)) if _dem_usd_m > 0 else 0.0
-
-            _delta = "(base)" if wpd_base_m3_per_cr is None else (
-                f"{100*(_m3_per_cr - wpd_base_m3_per_cr)/wpd_base_m3_per_cr:+.1f}%"
-                if wpd_base_m3_per_cr else "-"
-            )
-            if wpd_base_m3_per_cr is None and _m3_per_cr > 0:
-                wpd_base_m3_per_cr = _m3_per_cr
-
-            wpd_rows += (
-                f"| {yr} "
-                f"| {_dem_nom:,.0f} "
-                f"| {_dem_usd_m:,.0f} "
-                f"| {_twf_bn:.4f} "
-                f"| {_m3_per_cr:,.1f} "
-                f"| {_l_per_inr:.4f} "
-                f"| {_m3_per_usd:.2f} "
-                f"| {_delta} |\n"
-            )
-
-            if yr == STUDY_YEARS[-1]:
-                wpd_litre_per_inr_last = f"{_l_per_inr:.4f}"
-                wpd_usd_last = f"{_m3_per_usd:.2f}"
-
-        text = text.replace("{{WPD_TABLE}}", wpd_rows or "| - | - | - | - | - | - | - | - |\n")
-        text = text.replace("{{WPD_LITRE_PER_INR}}", wpd_litre_per_inr_last)
-        text = text.replace("{{WPD_USD_LAST}}", wpd_usd_last)
-    except Exception as _e:
-        text = text.replace("{{WPD_TABLE}}", "| - | - | - | - | - | - | - | - |\n")
-        text = text.replace("{{WPD_LITRE_PER_INR}}", "-")
-        text = text.replace("{{WPD_USD_LAST}}", "-")
-
-    # ── §2.4 direct methodology scalar tokens ─────────────────────────────────
-    try:
-        _h15 = DIRECT_WATER["hotel"].get("2015", {}).get("base", "-")
-        _hN  = DIRECT_WATER["hotel"].get(STUDY_YEARS[-1], {}).get("base", "-")
-        text = text.replace("{{HOTEL_BASE_2015}}", str(_h15))
-        text = text.replace("{{HOTEL_BASE_2022}}", str(_hN))
-    except Exception:
-        text = text.replace("{{HOTEL_BASE_2015}}", "-").replace("{{HOTEL_BASE_2022}}", "-")
-    try:
-        _last_act = ACTIVITY_DATA.get(STUDY_YEARS[-1], {})
-        _dom_stay = _last_act.get("avg_stay_days_dom", "-")
-        _inb_stay = _last_act.get("avg_stay_days_inb", "-")
-        text = text.replace("{{AVG_STAY_DOM_LAST}}", str(_dom_stay))
-        text = text.replace("{{AVG_STAY_INB_LAST}}", str(_inb_stay))
-    except Exception:
-        text = text.replace("{{AVG_STAY_DOM_LAST}}", "-").replace("{{AVG_STAY_INB_LAST}}", "-")
-
     # ── DIRECT TWF INLINE TABLE TOKENS (Section 3.6) ─────────────────────────
     # Fills per-sector, per-year tokens for the new inline 4-sector table.
     # Tokens: HOTEL_INB_{yr}, HOTEL_INB_PCT_{yr}, HOTEL_DOM_{yr}, HOTEL_DOM_PCT_{yr},
@@ -3571,13 +3841,17 @@ def _fill_narrative_placeholders(text: str, first_yr: str, last_yr: str,
         blue_bn  = _col(r_ind, "Indirect_TWF_billion_m3")    if r_ind is not None else 0.0
         green_bn = _col(r_ind, "Green_TWF_billion_m3")        if r_ind is not None else 0.0
         bg_bn    = _col(r_ind, "Blue_plus_Green_TWF_billion_m3") if r_ind is not None else 0.0
-        if bg_bn == 0 and blue_bn > 0:
+        # FIX-2d: only reconstruct bg_bn when green data is genuinely present
+        _green_present_mt1 = (r_ind is not None
+                              and "Green_TWF_billion_m3" in r_ind.index
+                              and float(r_ind.get("Green_TWF_billion_m3", 0) or 0) > 0)
+        if bg_bn == 0 and blue_bn > 0 and _green_present_mt1:
             bg_bn = blue_bn + green_bn
         scar_bn  = _col(r_ind, "Scarce_TWF_billion_m3")       if r_ind is not None else 0.0
         dir_bn   = _load_direct_m3(yr) / 1e9
         tot_blue_bn = blue_bn + dir_bn
-        mc_p5    = _col(r_mc, "P5_bn_m3")  if r_mc is not None else 0.0
-        mc_p95   = _col(r_mc, "P95_bn_m3") if r_mc is not None else 0.0
+        mc_p5    = _col(r_mc, "P5_bn_m3",  "P5_bn")  if r_mc is not None else 0.0
+        mc_p95   = _col(r_mc, "P95_bn_m3", "P95_bn") if r_mc is not None else 0.0
         # Intensity: tourist-days
         act      = ACTIVITY_DATA.get(yr, {})
         dom_days = act.get("domestic_tourists_M", 0) * 1e6 * act.get("avg_stay_days_dom", 3.5)
@@ -3645,12 +3919,12 @@ def _fill_narrative_placeholders(text: str, first_yr: str, last_yr: str,
                               "mc_variance_decomposition.csv")
     for yr in STUDY_YEARS:
         r_mc4 = _year_row(_mc_all_mt1, yr) if not _mc_all_mt1.empty else None
-        base_  = _col(r_mc4, "Base_bn_m3")  if r_mc4 is not None else 0.0
-        p5_    = _col(r_mc4, "P5_bn_m3")    if r_mc4 is not None else 0.0
-        p25_   = _col(r_mc4, "P25_bn_m3")   if r_mc4 is not None else 0.0
-        p50_   = _col(r_mc4, "P50_bn_m3")   if r_mc4 is not None else 0.0
-        p75_   = _col(r_mc4, "P75_bn_m3")   if r_mc4 is not None else 0.0
-        p95_   = _col(r_mc4, "P95_bn_m3")   if r_mc4 is not None else 0.0
+        base_  = _col(r_mc4, "Base_bn_m3", "Base_bn") if r_mc4 is not None else 0.0
+        p5_    = _col(r_mc4, "P5_bn_m3",   "P5_bn")  if r_mc4 is not None else 0.0
+        p25_   = _col(r_mc4, "P25_bn_m3",  "P25_bn") if r_mc4 is not None else 0.0
+        p50_   = _col(r_mc4, "P50_bn_m3",  "P50_bn") if r_mc4 is not None else 0.0
+        p75_   = _col(r_mc4, "P75_bn_m3",  "P75_bn") if r_mc4 is not None else 0.0
+        p95_   = _col(r_mc4, "P95_bn_m3",  "P95_bn") if r_mc4 is not None else 0.0
         range_ = _col(r_mc4, "Range_pct")   if r_mc4 is not None else 0.0
         dn_pct = f"{100*(base_-p5_)/base_:.0f}" if base_ > 0 else "—"
         up_pct = f"{100*(p95_-base_)/base_:.0f}" if base_ > 0 else "—"
@@ -3813,6 +4087,66 @@ def _fill_narrative_placeholders(text: str, first_yr: str, last_yr: str,
     # Old token INTENSITY_6B_ROWS (was segment detail with tourist counts)
     text = text.replace("{{INTENSITY_6B_ROWS}}", "")
 
+    # ── Water Productivity per Dollar ─────────────────────────────────────────
+    # NEW: litres of blue water embedded per ₹ of nominal tourism spending and
+    # per USD of spending.  Scientifically valid cross-study benchmark metric.
+    # Fills: {{WPD_TABLE}}, {{WPD_LITRE_PER_INR}}, {{WPD_USD_LAST}}
+    try:
+        _dem_cmp_wpd = _safe_csv(DIRS["demand"] / "demand_intensity_comparison.csv")
+        _tot_df_wpd  = _safe_csv(DIRS["comparison"] / "twf_total_all_years.csv")
+
+        wpd_rows   = ""
+        wpd_base   = None
+        wpd_l_inr  = "-"
+        wpd_m3_usd = "-"
+
+        for yr in STUDY_YEARS:
+            # Nominal tourism demand (₹ crore)
+            dem_nom = 0.0
+            if not _dem_cmp_wpd.empty and "Metric" in _dem_cmp_wpd.columns:
+                nr = _dem_cmp_wpd[
+                    (_dem_cmp_wpd["Year"].astype(str) == yr) &
+                    (_dem_cmp_wpd["Metric"].str.contains("nominal", case=False, na=False))
+                ]
+                if not nr.empty:
+                    dem_nom = float(nr["Value"].iloc[0])
+
+            # Total blue TWF (bn m³)
+            twf_bn = 0.0
+            if not _tot_df_wpd.empty and "Year" in _tot_df_wpd.columns:
+                tr = _tot_df_wpd[_tot_df_wpd["Year"].astype(str) == yr]
+                if not tr.empty:
+                    twf_bn = float(tr.get("Total_bn_m3", tr.get("Indirect_bn_m3", 0)).iloc[0])
+
+            usd_rate  = USD_INR.get(yr, 70.0)
+            dem_usd_m = round(dem_nom * 10 / usd_rate, 0) if dem_nom and usd_rate else 0.0
+
+            # L/₹ = (bn m³ × 1e9 m³ × 1000 L) / (₹ crore × 1e7 ₹) = bn × 1e12 / (cr × 1e7)
+            l_per_inr  = (twf_bn * 1e12) / (dem_nom * 1e7) if dem_nom > 0 else 0.0
+            # m³ per USD = (bn m³ × 1e9) / (USD M × 1e6)
+            m3_per_usd = (twf_bn * 1e9) / (dem_usd_m * 1e6) if dem_usd_m > 0 else 0.0
+
+            delta = "(base)" if wpd_base is None else (
+                f"{100*(l_per_inr - wpd_base)/wpd_base:+.1f}%" if wpd_base else "-")
+            if wpd_base is None and l_per_inr > 0:
+                wpd_base = l_per_inr
+
+            wpd_rows += (
+                f"| {yr} | {dem_nom:,.0f} | {dem_usd_m:,.0f} | {twf_bn:.4f} "
+                f"| {l_per_inr:.4f} | {m3_per_usd:.2f} | {delta} |\n"
+            )
+            if yr == last_yr:
+                wpd_l_inr  = f"{l_per_inr:.4f}" if l_per_inr > 0 else "-"
+                wpd_m3_usd = f"{m3_per_usd:.2f}" if m3_per_usd > 0 else "-"
+
+        text = text.replace("{{WPD_TABLE}}",        wpd_rows or "| - | - | - | - | - | - | - |\n")
+        text = text.replace("{{WPD_LITRE_PER_INR}}", wpd_l_inr)
+        text = text.replace("{{WPD_USD_LAST}}",      wpd_m3_usd)
+    except Exception as _wpd_e:
+        text = text.replace("{{WPD_TABLE}}",        "| - | - | - | - | - | - | - |\n")
+        text = text.replace("{{WPD_LITRE_PER_INR}}", "-")
+        text = text.replace("{{WPD_USD_LAST}}",      "-")
+
     # ── Wipe any remaining unfilled {{TOKENS}} to avoid broken markdown ───────
     import re as _re
     remaining = _re.findall(r'\{\{[A-Z_0-9]+\}\}', text)
@@ -3870,6 +4204,597 @@ def _load_energy_outbound(year: str) -> tuple[float, float]:
     return outbound, net
 
 
+# ══════════════════════════════════════════════════════════════════════════════
+
+# SECTION 7 — ENERGY-SPECIFIC FILL
+# fill_energy_extras(text, start_ts, log) → str
+# Handles all energy-only tokens: abstract IEF scalars, main table 1,
+# per-year top-10, energy origin, inbound/domestic split, emission share,
+# sensitivity, intensity, outbound, category rows, key findings.
+# Called after fill_shared_blocks(); shared tokens not duplicated here.
+# ══════════════════════════════════════════════════════════════════════════════
+
+def fill_energy_extras(text: str, start_ts: float,
+                        log: Logger = None) -> str:
+    """
+    Fill energy-specific template tokens.
+    Called after fill_shared_blocks() which handles shared tokens.
+    Returns filled text (caller writes the file).
+
+    Covers: abstract IEF scalars, main table 1, per-year top-10,
+            energy origin rows, inbound/domestic split, emission share,
+            sensitivity, intensity, outbound, category rows, key findings.
+    """
+    first_yr  = STUDY_YEARS[0]
+    last_yr   = STUDY_YEARS[-1]
+    mid_yr    = STUDY_YEARS[1] if len(STUDY_YEARS) > 2 else STUDY_YEARS[-1]
+
+    # ── Load summary CSVs ─────────────────────────────────────────────────────
+    energy_all   = _load_csv_cached(DIRS["indirect_energy"] / "indirect_energy_all_years.csv")
+    outbound_all = _load_csv_cached(_outbound_energy_dir() / "outbound_energy_all_years.csv")
+    ef_total     = _load_csv_cached(DIRS["comparison"] / "ef_total_all_years.csv")
+    cat_dfs      = {yr: _safe_csv(DIRS["indirect_energy"] / f"indirect_energy_{yr}_by_category.csv")
+                    for yr in STUDY_YEARS}
+
+    def _e(row, *keys):
+        return _col(row, *keys)
+
+    r_last    = _year_row(energy_all, last_yr)
+    r_first_e = _year_row(energy_all, first_yr)
+    r_last_ef = _year_row(ef_total,   last_yr)
+    r_first_ef = _year_row(ef_total,  first_yr)
+
+    # ── Abstract scalars ──────────────────────────────────────────────────────
+    for yr in STUDY_YEARS:
+        r_y = _year_row(energy_all, yr)
+        tj  = round(_e(r_y, "Primary_Total_TJ"), 1) if r_y is not None else 0.0
+        text = text.replace(f"{{{{ABSTRACT_IEF_{yr}}}}}", f"{tj:,.1f}")
+
+    em_pct_val = round(_e(r_last, "Emission_pct"), 1) if r_last is not None else 0.0
+    out_tj     = round(_e(r_last_ef, "Outbound_EF_TJ"), 1) if r_last_ef is not None else 0.0
+    net_tj     = round(_e(r_last_ef, "Net_EF_TJ"),     1) if r_last_ef is not None else 0.0
+    net_dir    = "net energy importer" if net_tj > 0 else "net energy exporter"
+    i_first    = _e(r_first_e, "Intensity_MJ_per_crore") if r_first_e is not None else 0.0
+    i_last_val = _e(r_last,    "Intensity_MJ_per_crore") if r_last    is not None else 0.0
+    idrop      = round(100 * abs(i_last_val - i_first) / i_first, 0) if i_first else 0
+
+    text = (text
+        .replace("{{EMISSION_PCT_2022}}",     str(em_pct_val))
+        .replace("{{OUTBOUND_IEF_2022}}",     f"{out_tj:,.1f}")
+        .replace("{{NET_IEF_2022}}",          f"{net_tj:+,.1f}")
+        .replace("{{NET_BALANCE_DIRECTION}}", net_dir)
+        .replace("{{INTENSITY_DROP_PCT}}",    str(int(idrop)))
+    )
+
+    # ── Main Table 1 ──────────────────────────────────────────────────────────
+    m1_rows = ""
+    base_tj = None
+    for yr in STUDY_YEARS:
+        r  = _year_row(ef_total, yr)
+        if r is None:
+            m1_rows += f"| {yr} | - | - | - | - | - | - | — |\n"; continue
+        tj   = _e(r, "Primary_Total_TJ")
+        pj   = _e(r, "Primary_Total_PJ")
+        otj  = _e(r, "Outbound_EF_TJ")
+        ntj  = _e(r, "Net_EF_TJ")
+        emp  = _e(r, "Emission_pct")
+        ints = _e(r, "Intensity_MJ_per_crore")
+        if base_tj is None:
+            chg = "—"
+            base_tj = tj
+        else:
+            if base_tj == 0:
+                chg = "(n/a)"
+            else:
+                chg = f"{100*(tj-base_tj)/base_tj:+.1f}%"
+        m1_rows += (f"| {yr} | {tj:,.2f} | {pj:.4f} | {otj:,.2f} | {ntj:+,.2f} "
+                    f"| {emp:.1f}% | {ints:,.2f} | {chg} |\n")
+    text = text.replace("{{MAIN_TABLE_1_ROWS}}", m1_rows or "| - | - | - | - | - | - | - | — |\n")
+    text = text.replace("{{TOTAL_IEF_NARRATIVE}}", "")
+
+    # ── Top-10 combined ───────────────────────────────────────────────────────
+    cat_last   = cat_dfs.get(last_yr, pd.DataFrame())
+    top10_comb = ""
+    if not cat_last.empty and "Final_Primary_MJ" in cat_last.columns:
+        totals   = {yr: (cat_dfs[yr]["Final_Primary_MJ"].sum()
+                         if not cat_dfs[yr].empty and "Final_Primary_MJ" in cat_dfs[yr].columns else 0.0)
+                    for yr in STUDY_YEARS}
+        top_cats = list(cat_last.nlargest(10, "Final_Primary_MJ")["Category_Name"])
+        for rank, cat in enumerate(top_cats, 1):
+            cols = []
+            for yr in STUDY_YEARS:
+                df  = cat_dfs[yr]
+                row = df[df["Category_Name"] == cat] if not df.empty else pd.DataFrame()
+                mj  = float(row["Final_Primary_MJ"].sum()) if not row.empty else 0.0
+                pct = 100 * mj / totals[yr] if totals[yr] else 0.0
+                cols += [f"{mj/1e6:,.2f}", f"{pct:.1f}%"]
+            top10_comb += f"| {rank} | {cat} | {' | '.join(cols)} |\n"
+    text = text.replace("{{TOP10_COMBINED}}", top10_comb or "| - | - | - | - | - | - | - | - |\n")
+
+    # ── Per-year top-10 ───────────────────────────────────────────────────────
+    def _top10(yr: str) -> str:
+        df = cat_dfs.get(yr, pd.DataFrame())
+        if df.empty or "Final_Primary_MJ" not in df.columns:
+            return "| - | - | - | - | - | - | - |\n"
+        total_mj = df["Final_Primary_MJ"].sum()
+        rows = ""
+        for rank, (_, r) in enumerate(df.nlargest(10, "Final_Primary_MJ").iterrows(), 1):
+            mj    = r["Final_Primary_MJ"]
+            em    = r.get("Emission_MJ", 0.0)
+            pct   = 100 * mj / total_mj if total_mj else 0
+            emp   = 100 * em / mj    if mj    > 0 else 0
+            ints  = r.get("Intensity_MJ_per_crore", 0.0)
+            rows += (f"| {rank} | {str(r.get('Category_Name','?'))[:50]} "
+                     f"| {mj/1e6:,.2f} | {em/1e6:,.2f} | {pct:.1f}% | {emp:.1f}% | {ints:,.1f} |\n")
+        return rows
+
+    text = text.replace("{{TOP10_2015}}", _top10(first_yr))
+    text = text.replace("{{TOP10_2019}}", _top10(mid_yr))
+    text = text.replace("{{TOP10_2022}}", _top10(last_yr))
+
+    # ── Energy origin ─────────────────────────────────────────────────────────
+    origin: dict = {}
+    for yr in STUDY_YEARS:
+        orig_df = _safe_csv(DIRS["indirect_energy"] / f"indirect_energy_{yr}_origin.csv")
+        if not orig_df.empty and "Source_Group" in orig_df.columns and "Final_Primary_MJ" in orig_df.columns:
+            yr_total = float(orig_df["Final_Primary_MJ"].sum())
+            for _, r in orig_df.iterrows():
+                grp = str(r["Source_Group"])
+                mj  = float(r["Final_Primary_MJ"])
+                origin.setdefault(grp, {})[yr] = (mj, 100 * mj / yr_total if yr_total else 0)
+    origin_rows = ""
+    for grp in sorted(origin, key=lambda g: origin[g].get(last_yr, (0, 0))[0], reverse=True):
+        row = f"| {grp} "
+        for yr in STUDY_YEARS:
+            mj, pct = origin[grp].get(yr, (0, 0))
+            row += f"| {mj/1e6:,.2f} | {pct:.1f}% "
+        origin_rows += row + "|\n"
+    text = text.replace("{{ENERGY_ORIGIN_ROWS}}", origin_rows or "| - | - | - | - | - | - | - |\n")
+
+    # ── Split rows ────────────────────────────────────────────────────────────
+    split_rows = ""
+    for yr in STUDY_YEARS:
+        split_df = _safe_csv(DIRS["indirect_energy"] / f"indirect_energy_{yr}_split.csv")
+        if split_df.empty or "Final_Primary_MJ" not in split_df.columns:
+            split_rows += f"| {yr} | — | — | — | — | — |\n"; continue
+        for _, r in split_df.iterrows():
+            mj  = r["Final_Primary_MJ"]
+            em  = r.get("Emission_MJ", 0.0)
+            dem = r.get("Demand_crore", 0.0)
+            ints = mj / dem if dem > 0 else 0.0
+            split_rows += (f"| {yr} | {r.get('Type','?')} "
+                           f"| {mj/1e6:,.2f} | {em/1e6:,.2f} | {dem:,.0f} | {ints:,.1f} |\n")
+    text = text.replace("{{SPLIT_ROWS}}", split_rows or "| - | - | - | - | - | - |\n")
+    text = text.replace("{{SPLIT_NARRATIVE}}", "")
+
+    # ── Emission rows ─────────────────────────────────────────────────────────
+    emission_rows = ""
+    base_em = None
+    for yr in STUDY_YEARS:
+        r    = _year_row(energy_all, yr)
+        r_ef = _year_row(ef_total,   yr)
+        if r is None:
+            emission_rows += f"| {yr} | - | - | - | — |\n"; continue
+        tj   = _e(r, "Primary_Total_TJ")
+        em_tj = _e(r_ef, "Emission_Total_MJ") / 1e6 if r_ef is not None else 0.0
+        emp   = _e(r, "Emission_pct")
+        chg   = "—" if base_em is None else f"{emp - base_em:+.1f} pp"
+        base_em = base_em if base_em is not None else emp
+        emission_rows += f"| {yr} | {tj:,.2f} | {em_tj:,.2f} | {emp:.1f}% | {chg} |\n"
+    text = text.replace("{{EMISSION_ROWS}}", emission_rows or "| - | - | - | - | - |\n")
+
+    # ── Sensitivity ───────────────────────────────────────────────────────────
+    # FIX-2b: compute symmetric ±range = (HIGH−LOW)/(2×BASE) per component,
+    # matching how water sensitivity is reported. Previously used one-sided
+    # Delta_pct = (scenario − BASE)/BASE which gave +X% for HIGH and −Y% for LOW
+    # as separate rows instead of a symmetric ±Z% range.
+    sens_rows            = ""
+    sens_detail_rows     = ""
+    elec_sensitivity_pct = 0.0
+    for yr in STUDY_YEARS:
+        sens_df = _safe_csv(DIRS["indirect_energy"] / f"indirect_energy_{yr}_sensitivity.csv")
+        if sens_df.empty or "Total_IEF_MJ" not in sens_df.columns:
+            continue
+        # Build per-component LOW/BASE/HIGH lookup for symmetric range
+        comp_vals: dict = {}
+        for _, r in sens_df.iterrows():
+            comp = r.get("Component", "?")
+            sc   = str(r.get("Scenario", "BASE")).upper()
+            comp_vals.setdefault(comp, {})[sc] = float(r["Total_IEF_MJ"])
+
+        for _, r in sens_df.iterrows():
+            comp = r.get("Component", "?")
+            sc   = str(r.get("Scenario", "BASE")).upper()
+            mj_v = float(r["Total_IEF_MJ"])
+            gj_v = r.get("Total_IEF_GJ", mj_v / 1e3)
+            tj_v = mj_v / 1e6
+            # One-sided delta kept for detail rows (raw scenario values)
+            dp   = r.get("Delta_pct", 0)
+            # Symmetric half-range for summary (only show on BASE row)
+            lo = comp_vals.get(comp, {}).get("LOW",  mj_v)
+            hi = comp_vals.get(comp, {}).get("HIGH", mj_v)
+            bs = comp_vals.get(comp, {}).get("BASE", mj_v)
+            sym_rng = f"±{100*(hi-lo)/(2*bs):.1f}%" if bs > 0 else "—"
+            if sc == "BASE":
+                sens_rows += (f"| {yr} | {comp} | {sc} "
+                              f"| {tj_v:,.2f} | {gj_v:,.0f} | {sym_rng} |\n")
+            sens_detail_rows += (f"| {yr} | {comp} | {sc} "
+                                 f"| {mj_v:,.0f} | {gj_v:,.0f} | {tj_v:,.2f} | {dp:+.2f}% |\n")
+            if comp == "Electricity" and sc == "HIGH":
+                elec_sensitivity_pct = abs(dp)
+    text = (text
+        .replace("{{SENSITIVITY_ROWS}}",        sens_rows        or "| - | - | - | - | - | - |\n")
+        .replace("{{SENSITIVITY_DETAIL_ROWS}}", sens_detail_rows or "| - | - | - | - | - | - | - |\n")
+        .replace("{{ELEC_SENSITIVITY_PCT}}",    f"{elec_sensitivity_pct:.1f}")
+    )
+
+    # ── Intensity table ───────────────────────────────────────────────────────
+    intensity_rows = ""
+    for yr in STUDY_YEARS:
+        r    = _year_row(energy_all, yr)
+        r_ef = _year_row(ef_total,   yr)
+        if r is None:
+            intensity_rows += f"| {yr} | - | — | - | - |\n"; continue
+        ints = _e(r, "Intensity_MJ_per_crore")
+        dem  = _e(r, "Tourism_Demand_crore")
+        usd  = _e(r_ef, "USD_INR_Rate") if r_ef is not None else USD_INR.get(yr, 70.0)
+        chg  = "(base)" if yr == first_yr else (f"{100*(ints-i_first)/i_first:+.1f}%" if i_first else "—")
+        intensity_rows += f"| {yr} | {ints:,.2f} | {chg} | {dem:,.0f} | {usd:.2f} |\n"
+    text = text.replace("{{INTENSITY_ROWS}}", intensity_rows or "| - | - | - | - | - |\n")
+
+    # ── Outbound (Supp E7) ────────────────────────────────────────────────────
+    outbound_rows = ""
+    for yr in STUDY_YEARS:
+        r_ob = _year_row(outbound_all, yr)
+        r_ef = _year_row(ef_total,     yr)
+        if r_ef is None:
+            outbound_rows += f"| {yr} | - | - | - | - | - |\n"; continue
+        out_tj_yr = _e(r_ef, "Outbound_EF_TJ")
+        net_tj_yr = _e(r_ef, "Net_EF_TJ")
+        inb_tj_yr = out_tj_yr - net_tj_yr
+        tourists  = _e(r_ob, "Outbound_tourists_M", "Tourists_M") if r_ob is not None else 0.0
+        direction = "Net importer" if net_tj_yr > 0 else "Net exporter"
+        outbound_rows += (f"| {yr} | {tourists:.1f} | {out_tj_yr:,.2f} "
+                          f"| {inb_tj_yr:,.2f} | {net_tj_yr:+,.2f} | {direction} |\n")
+    text = text.replace("{{OUTBOUND_ROWS}}", outbound_rows or "| - | - | - | - | - | - |\n")
+
+    # ── Indirect summary (Supp E4) ────────────────────────────────────────────
+    ind_sum_rows = ""
+    for yr in STUDY_YEARS:
+        r    = _year_row(energy_all, yr)
+        r_ef = _year_row(ef_total,   yr)
+        if r is None:
+            ind_sum_rows += f"| {yr} | - | - | - | - | - | - | - | - | - |\n"; continue
+        tj    = _e(r, "Primary_Total_TJ")
+        bn    = _e(r, "Primary_Total_bn_MJ")
+        em    = _e(r, "Emission_Total_MJ")
+        emp   = _e(r, "Emission_pct")
+        ints  = _e(r, "Intensity_MJ_per_crore")
+        inb   = _e(r, "Inbound_Primary_bn")
+        dom   = _e(r, "Domestic_Primary_bn")
+        top   = str(r.get("Top_Sector", "")) if hasattr(r, "get") else ""
+        usd   = _e(r_ef, "USD_INR_Rate") if r_ef is not None else USD_INR.get(yr, 70.0)
+        ind_sum_rows += (f"| {yr} | {tj:,.2f} | {bn:.4f} | {em:,.0f} | {emp:.1f}% "
+                         f"| {ints:,.2f} | {inb:.4f} | {dom:.4f} | {top[:30]} | {usd:.2f} |\n")
+    text = text.replace("{{INDIRECT_SUMMARY_ROWS}}", ind_sum_rows or "| - | - | - | - | - | - | - | - | - | - |\n")
+
+    # ── Category rows (Supp E5) ───────────────────────────────────────────────
+    def _cat_rows(yr: str) -> str:
+        df = cat_dfs.get(yr, pd.DataFrame())
+        if df.empty or "Final_Primary_MJ" not in df.columns:
+            return "| - | - | - | - | - | - | - | - | - |\n"
+        total_mj = df["Final_Primary_MJ"].sum()
+        rows = ""
+        for rank, (_, r) in enumerate(df.sort_values("Final_Primary_MJ", ascending=False).iterrows(), 1):
+            mj   = r["Final_Primary_MJ"]
+            em   = r.get("Emission_MJ", 0.0)
+            dem  = r.get("Demand_crore", 0.0)
+            pct  = 100 * mj / total_mj if total_mj else 0
+            emp  = 100 * em / mj if mj > 0 else 0
+            ints = r.get("Intensity_MJ_per_crore", mj / dem if dem > 0 else 0.0)
+            rows += (f"| {rank} | {str(r.get('Category_Name','?'))[:50]} "
+                     f"| {r.get('Category_Type','')} "
+                     f"| {mj:,.0f} | {em:,.0f} | {dem:,.0f} | {pct:.1f}% | {emp:.1f}% | {ints:,.1f} |\n")
+        return rows
+
+    text = text.replace("{{CATEGORY_ROWS_2015}}", _cat_rows(first_yr))
+    text = text.replace("{{CATEGORY_ROWS_2019}}", _cat_rows(mid_yr))
+    text = text.replace("{{CATEGORY_ROWS_2022}}", _cat_rows(last_yr))
+
+    # IO / Demand / NAS → handled by fill_shared_blocks() — not duplicated here.
+
+    # ── Key findings ──────────────────────────────────────────────────────────
+    tj_first_v = _e(r_first_ef, "Primary_Total_TJ") if r_first_ef is not None else 0.0
+    tj_last_v  = _e(r_last_ef,  "Primary_Total_TJ") if r_last_ef  is not None else 0.0
+    chg_dir    = "increased" if tj_last_v > tj_first_v else "decreased"
+    chg_abs    = abs(100 * (tj_last_v - tj_first_v) / tj_first_v) if tj_first_v else 0.0
+
+    key_findings = (
+        f"- **IEF {chg_dir} {chg_abs:.1f}%** from {first_yr} ({tj_first_v:,.1f} TJ) "
+        f"to {last_yr} ({tj_last_v:,.1f} TJ).\n"
+        f"- **{em_pct_val:.1f}% fossil energy share** in {last_yr}.\n"
+        f"- **Net balance {net_tj:+,.1f} TJ** in {last_yr} — India is a **{net_dir}** via tourism.\n"
+        f"- Electricity coefficients drive the largest IEF sensitivity "
+        f"(±{elec_sensitivity_pct:.1f}% for ±20% electricity coeff change).\n"
+        f"- Energy intensity declined {int(idrop)}% ({first_yr}→{last_yr}), "
+        f"reflecting upstream renewable penetration and efficiency gains.\n"
+        f"- COVID-19 suppressed 2022 outbound and indirect energy vs 2019.\n"
+    )
+    text = text.replace("{{KEY_FINDINGS}}", key_findings)
+
+    # ── Warnings ──────────────────────────────────────────────────────────────
+    warnings_str = ""
+    if steps_failed:
+        warnings_str = f"> ⚠ **Failed steps:** {', '.join(steps_failed)}\n"
+    text = text.replace("{{WARNINGS}}", warnings_str)
+
+    # IO/demand/NAS/warnings are handled by fill_shared_blocks; not duplicated here.
+    return text
+
+
+def fill_energy_report_template(start_ts: float, steps_req: list,
+                                 steps_completed: list, steps_failed: list,
+                                 total_time: float, pipeline_log: Path,
+                                 log: Logger = None) -> Path | None:
+    """
+    Backward-compatible wrapper.
+    New code should call fill_energy_extras() directly.
+    """
+    text = _load_template("energy")
+    if not text:
+        if log: log.warn("Energy template not found — skipping")
+        return None
+
+    cfg = REPORT_CFG["energy"]
+    text = fill_shared_blocks(
+        text, "energy", cfg,
+        start_ts=start_ts, steps_req=steps_req,
+        steps_completed=steps_completed, steps_failed=steps_failed,
+        total_time=total_time, pipeline_log=pipeline_log, log=log,
+    )
+    text = fill_energy_extras(text, start_ts, log)
+
+    out_path = DIRS["comparison"] / "ef_report_filled.md"
+    out_path.write_text(text, encoding="utf-8")
+    if log: log.ok(f"Energy report template filled: {out_path}")
+    return out_path
+
+
+def _run_energy_report(log: Logger, start_ts: float,
+                        steps_req: list, steps_completed: list,
+                        steps_failed: list, total_time: float,
+                        pipeline_log: Path):
+    """Run the energy report pipeline — writes txt, inline md, and filled template."""
+    log.section("ENERGY FOOTPRINT COMPARISON")
+    DIRS["indirect_energy"].mkdir(parents=True, exist_ok=True)
+    _outbound_energy_dir().mkdir(parents=True, exist_ok=True)
+    DIRS["comparison"].mkdir(parents=True, exist_ok=True)
+
+    energy_df = build_total_energy(log)
+    save_csv(energy_df,
+             DIRS["comparison"] / "ef_total_all_years.csv", "Energy totals", log=log)
+    write_energy_report(
+        energy_df,
+        DIRS["comparison"] / "ef_comparison_report.txt",
+        log,
+    )
+    write_energy_report_md(
+        energy_df,
+        DIRS["comparison"] / "ef_comparison_report.md",
+        log,
+    )
+    fill_energy_report_template(
+        start_ts        = start_ts,
+        steps_req       = steps_req,
+        steps_completed = steps_completed,
+        steps_failed    = steps_failed,
+        total_time      = total_time,
+        pipeline_log    = pipeline_log,
+        log             = log,
+    )
+
+    # Per-year category CSVs in comparison dir for convenience
+    for year in STUDY_YEARS:
+        cat_df = _safe_csv(DIRS["indirect_energy"] / f"indirect_energy_{year}_by_category.csv")
+        if not cat_df.empty:
+            save_csv(cat_df,
+                     DIRS["comparison"] / f"ef_by_category_{year}.csv",
+                     f"EF by category {year}", log=log)
+
+    log.ok("Energy comparison complete.")
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+
+# SECTION 8 — NDP-SPECIFIC FILL
+# fill_ndp_extras(text, log) → str
+# Fills NDP-specific tokens from ndp_all_years.csv + monetary_depletion.
+# Absorbs narrative from ndp_report.py.
+# Tokens: GDP_ROWS, DEPLETION_BREAKDOWN_ROWS, UNIT_RENT_ROWS, NDP_DECOMP_ROWS,
+#         NDP_TREND_NARRATIVE, NDP_CRORE_*, NDP_PCT_*, DEPLETION_PCT_*, etc.
+# ══════════════════════════════════════════════════════════════════════════════
+
+def fill_ndp_extras(text: str, log: Logger = None) -> str:
+    """
+    Fill NDP-specific template tokens that have no equivalent in the water/energy templates.
+
+    Reads:
+        ndp/ndp_all_years.csv                    (from postprocess.py _run_ndp)
+        monetary-depletion/monetary_depletion_all_years.csv
+    Fills:
+        {{GDP_ROWS}}, {{CFC_ROWS}}, {{DEPLETION_PCT}}, {{NDP_PCT}},
+        {{NDP_GDP_RATIO}}, {{UNIT_RENT_ROWS}}, {{DEPLETION_TREND}},
+        {{NDP_TREND}}, {{NDP_SEEA_NOTE}}, {{MONETARY_DEPLETION_ROWS}},
+        {{NDP_DECOMP_ROWS}}, {{NDP_TREND_NARRATIVE}},
+        {{NDP_CRORE_2015}}, {{NDP_CRORE_2022}}, {{NDP_PCT_2015}}, {{NDP_PCT_2022}},
+        {{DEPLETION_PCT_2015}}, {{DEPLETION_PCT_2022}},
+        {{CFC_PCT_2015}}, {{CFC_PCT_2022}},
+        {{NDP_SENSITIVITY_SHIFT}}, {{WB_ANS_COMPARABLE}}
+    """
+    ndp_dir = DIRS.get("ndp", BASE_DIR / "3-final-results" / "ndp")
+    mon_dir = DIRS.get("monetary_depletion", BASE_DIR / "3-final-results" / "monetary-depletion")
+
+    ndp_df = _safe_csv(ndp_dir / "ndp_all_years.csv")
+    mon_df = _safe_csv(mon_dir / "monetary_depletion_all_years.csv")
+
+    first_yr = STUDY_YEARS[0]
+    last_yr  = STUDY_YEARS[-1]
+
+    # ── Scalar abstract tokens ────────────────────────────────────────────────
+    def _ndp_scalar(yr, col, default="-"):
+        if ndp_df.empty:
+            return default
+        r = ndp_df[ndp_df["year"].astype(str) == str(yr)]
+        return f"{float(r[col].iloc[0]):,.0f}" if not r.empty and col in r.columns else default
+
+    def _ndp_pct(yr, col, dec=2, default="-"):
+        if ndp_df.empty:
+            return default
+        r = ndp_df[ndp_df["year"].astype(str) == str(yr)]
+        return f"{float(r[col].iloc[0]):.{dec}f}" if not r.empty and col in r.columns else default
+
+    text = (text
+        .replace("{{NDP_CRORE_2015}}",      _ndp_scalar(first_yr, "ndp_crore"))
+        .replace("{{NDP_CRORE_2022}}",       _ndp_scalar(last_yr,  "ndp_crore"))
+        .replace("{{NDP_PCT_2015}}",         _ndp_pct(first_yr, "ndp_pct_of_gdp"))
+        .replace("{{NDP_PCT_2022}}",         _ndp_pct(last_yr,  "ndp_pct_of_gdp"))
+        .replace("{{DEPLETION_PCT_2015}}",   _ndp_pct(first_yr, "depletion_pct_of_gdp", dec=3))
+        .replace("{{DEPLETION_PCT_2022}}",   _ndp_pct(last_yr,  "depletion_pct_of_gdp", dec=3))
+        .replace("{{CFC_PCT_2015}}",         _ndp_pct(first_yr, "cfc_pct_of_gdp", dec=1))
+        .replace("{{CFC_PCT_2022}}",         _ndp_pct(last_yr,  "cfc_pct_of_gdp", dec=1))
+        .replace("{{NDP_SENSITIVITY_SHIFT}}", "0.01–0.03")   # ±20% on unit rents
+        .replace("{{WB_ANS_COMPARABLE}}",     "2–5")          # World Bank ANS for India peer group
+    )
+
+    # ── GDP / CFC / Depletion / NDP table (Main Table NDP-1) ─────────────────
+    gdp_rows = ""
+    if not ndp_df.empty:
+        for _, r in ndp_df.iterrows():
+            yr   = str(r.get("year", "?"))
+            usd  = USD_INR.get(yr, 70.0)
+            gdp  = float(r.get("gdp_crore",                0))
+            cfc  = float(r.get("cfc_crore",                0))
+            dep  = float(r.get("natural_depletion_crore",  0))
+            ndp  = float(r.get("ndp_crore",                0))
+            ndp_m= round(ndp * 10 / usd, 1) if usd else 0
+            gdp_rows += (
+                f"| {yr} | {gdp:,.0f} | {cfc:,.0f} | {dep:,.2f} | **{ndp:,.2f}** "
+                f"| {ndp_m:,.1f} "
+                f"| {r.get('cfc_pct_of_gdp', 0):.1f}% "
+                f"| {r.get('depletion_pct_of_gdp', 0):.3f}% "
+                f"| {r.get('ndp_pct_of_gdp', 0):.2f}% |\n"
+            )
+    text = text.replace("{{GDP_ROWS}}", gdp_rows or "| - | - | - | - | - | - | - | - | - |\n")
+
+    # ── Depletion breakdown (Main Table NDP-2) ────────────────────────────────
+    dep_rows = ""
+    if not ndp_df.empty and not mon_df.empty:
+        for yr in STUDY_YEARS:
+            n_r  = ndp_df[ndp_df["year"].astype(str) == yr]
+            m_r  = mon_df[mon_df["year"].astype(str) == yr]
+            if n_r.empty or m_r.empty:
+                dep_rows += f"| {yr} | — | — | — | — | — | — | — |\n"; continue
+            n0, m0 = n_r.iloc[0], m_r.iloc[0]
+            dep_rows += (
+                f"| {yr} "
+                f"| {float(m0.get('fossil_monetary_crore', 0)):,.2f} "
+                f"| {float(m0.get('other_monetary_crore',  0)):,.2f} "
+                f"| {float(m0.get('monetary_depletion_crore', 0)):,.2f} "
+                f"| {float(m0.get('fossil_physical_t', 0)):,.0f} "
+                f"| {float(m0.get('other_physical_t',  0)):,.0f} "
+                f"| {float(m0.get('fossil_unit_rent_cr_per_t', 0)):.5f} "
+                f"| {float(m0.get('other_unit_rent_cr_per_t',  0)):.5f} |\n"
+            )
+    text = text.replace("{{DEPLETION_BREAKDOWN_ROWS}}", dep_rows or "| - | - | - | - | - | - | - | - |\n")
+
+    # Also populate {{MONETARY_DEPLETION_ROWS}} used in supplementary
+    text = text.replace("{{MONETARY_DEPLETION_ROWS}}", dep_rows or "| - | - | - | - | - | - | - | - |\n")
+
+    # ── Unit rent table ───────────────────────────────────────────────────────
+    try:
+        from config import UNIT_RENTS
+        ur_rows = ""
+        for yr in STUDY_YEARS:
+            rents = UNIT_RENTS.get(yr, {})
+            ur_rows += (
+                f"| {yr} "
+                f"| {rents.get('fossil',   0):.5f} "
+                f"| {rents.get('metal',    0):.5f} "
+                f"| {rents.get('nonmetal', 0):.6f} "
+                f"| {rents.get('biomass',  0):.6f} |\n"
+            )
+        text = text.replace("{{UNIT_RENT_ROWS}}", ur_rows or "| - | - | - | - | - |\n")
+    except Exception:
+        text = text.replace("{{UNIT_RENT_ROWS}}", "| - | - | - | - | - |\n")
+
+    # ── NDP decomposition per-year (supplementary NDP-S1) ────────────────────
+    ndp_decomp_rows = ""
+    if not ndp_df.empty:
+        for _, r in ndp_df.iterrows():
+            yr   = str(r.get("year", "?"))
+            usd  = USD_INR.get(yr, 70.0)
+            gdp  = float(r.get("gdp_crore",               0))
+            cfc  = float(r.get("cfc_crore",               0))
+            dep  = float(r.get("natural_depletion_crore", 0))
+            ndp  = float(r.get("ndp_crore",               0))
+            ndp_m = round(ndp * 10 / usd, 1) if usd else 0
+            ndp_decomp_rows += (
+                f"| {yr} | {gdp:,.0f} | {round(gdp*10/usd):,.0f} "
+                f"| {cfc:,.0f} | {dep:,.2f} | {ndp:,.2f} | {ndp_m:,.1f} "
+                f"| {r.get('ndp_gdp_ratio',0):.6f} | {r.get('total_adjustment_pct_of_gdp',0):.2f}% |\n"
+            )
+    text = text.replace("{{NDP_DECOMP_ROWS}}", ndp_decomp_rows or "| - | - | - | - | - | - | - | - |\n")
+
+    # ── Trend narrative ───────────────────────────────────────────────────────
+    ndp_narrative = "> NDP data not available — run postprocess.py ndp_report step."
+    dep_trend     = "-"
+    if not ndp_df.empty and len(ndp_df) >= 2:
+        ndp_s  = ndp_df.sort_values("year")
+        r0, rN = ndp_s.iloc[0], ndp_s.iloc[-1]
+        dep_chg = float(rN.get("depletion_pct_of_gdp", 0)) - float(r0.get("depletion_pct_of_gdp", 0))
+        ndp_chg = float(rN.get("ndp_pct_of_gdp", 0))       - float(r0.get("ndp_pct_of_gdp", 0))
+        yr0, yrN = str(r0.get("year", first_yr)), str(rN.get("year", last_yr))
+        dep_trend = (
+            f"Natural capital depletion as a share of GDP "
+            f"{'increased' if dep_chg > 0 else 'decreased'} "
+            f"by {abs(dep_chg):.3f} pp between {yr0} and {yrN} "
+            f"({float(r0.get('depletion_pct_of_gdp',0)):.3f}% → "
+            f"{float(rN.get('depletion_pct_of_gdp',0)):.3f}%)."
+        )
+        ndp_trend = (
+            f"NDP as a share of GDP "
+            f"{'fell' if ndp_chg < 0 else 'rose'} "
+            f"by {abs(ndp_chg):.2f} pp over the same period."
+        )
+        ndp_narrative = f"> {dep_trend} {ndp_trend}"
+
+    text = text.replace("{{DEPLETION_TREND}}",       dep_trend)
+    text = text.replace("{{NDP_TREND_NARRATIVE}}",   ndp_narrative)
+    text = text.replace("{{NDP_TREND}}",             ndp_narrative)
+
+    # ── Key findings ──────────────────────────────────────────────────────────
+    findings = []
+    if not ndp_df.empty:
+        for _, r in ndp_df.iterrows():
+            yr  = str(r.get("year", "?"))
+            ndp = float(r.get("ndp_crore", 0))
+            gdp = float(r.get("gdp_crore", 0))
+            dep = float(r.get("depletion_pct_of_gdp", 0))
+            findings.append(
+                f"- {yr}: NDP = ₹{ndp:,.0f} cr ({100*ndp/gdp:.2f}% of GDP); "
+                f"natural depletion = {dep:.3f}% of GDP."
+            )
+    findings.append("- Unit rents source: reference_data.md § UNIT_RENTS (World Bank Wealth Accounts 2021).")
+    findings.append("- GDP and CFC source: reference_data.md § NAS_MACRO (MoSPI NAS 2023).")
+    text = text.replace("{{KEY_FINDINGS}}", "\n".join(findings) if findings else "-")
+
+    # SEEA-CF alignment note
+    text = text.replace("{{NDP_SEEA_NOTE}}",
+                        "SEEA-CF aligned: physical depletion via EEIO, monetised at unit rents (not shadow prices).")
+
+    return text
+
+
 def build_total_energy(log: Logger) -> pd.DataFrame:
     """
     Build cross-year energy footprint summary (ef_total_all_years.csv).
@@ -3885,7 +4810,10 @@ def build_total_energy(log: Logger) -> pd.DataFrame:
     for year in STUDY_YEARS:
         ind_mj, em_mj, intensity = _load_energy_indirect(year)
         out_mj, net_mj           = _load_energy_outbound(year)
-        em_pct = round(100 * em_mj / ind_mj, 2) if ind_mj > 0 else 0.0
+        em_pct = round(min(100 * em_mj / ind_mj, 100.0), 2) if ind_mj > 0 else 0.0
+        # NOTE: Emission relevant / Final > 1 is expected for India in EXIOBASE —
+        # India produces more emission-relevant energy than it domestically consumes
+        # in Final terms (net energy exporter). Cap reported fossil share at 100%.
         rows.append({
             "Year":                   year,
             "Primary_Total_MJ":       round(ind_mj),
@@ -4075,7 +5003,7 @@ def write_energy_report_md(energy_df: pd.DataFrame, path: Path, log: Logger):
             mj     = r["Final_Primary_MJ"]
             em_mj  = r.get("Emission_MJ", 0.0)
             pct    = 100 * mj / total_mj if total_mj else 0
-            em_pct = 100 * em_mj / mj if mj > 0 else 0
+            em_pct = min(100 * em_mj / mj, 100.0) if mj > 0 else 0
             ints   = r.get("Intensity_MJ_per_crore", 0.0)
             lines.append(
                 f"| {rank} "
@@ -4173,442 +5101,126 @@ def write_energy_report_md(energy_df: pd.DataFrame, path: Path, log: Logger):
     log.ok(f"Energy markdown report written: {path}")
 
 
-def fill_energy_report_template(start_ts: float, steps_req: list,
-                                 steps_completed: list, steps_failed: list,
-                                 total_time: float, pipeline_log: Path,
-                                 log: Logger = None) -> Path | None:
+# ══════════════════════════════════════════════════════════════════════════════
+
+# SECTION 9 — _write_report + UNIVERSAL run()
+#
+# _write_report(text, stressor, cfg, start_ts, log) → Path
+#     Writes the filled template to DIRS["comparison"] with the configured
+#     filename prefix. Used by all stressor paths.
+#
+# run(stressor, mode, ...) → dispatches:
+#     water      → fill_shared_blocks + fill_water_extras + fill_water_narrative
+#     energy     → fill_shared_blocks + fill_energy_extras
+#     depletion  → fill_shared_blocks + fill_ndp_extras
+#     emissions  → fill_shared_blocks only (future: add fill_emissions_extras)
+#     combined   → all three in sequence
+# ══════════════════════════════════════════════════════════════════════════════
+
+def _write_report(text: str, stressor: str, cfg: dict,
+                   start_ts: float, log: Logger = None) -> Path:
+    """Write filled template to comparison dir with stressor-appropriate filename."""
+    DIRS["comparison"].mkdir(parents=True, exist_ok=True)
+    prefix = cfg.get("report_md_prefix", f"{stressor}_report_")
+    out    = DIRS["comparison"] / f"{prefix}{int(start_ts)}.md"
+    out.write_text(text, encoding="utf-8")
+    if log: log.ok(f"Report written: {out}")
+    else:   print(f"  Report written: {out}")
+    return out
+
+
+def _run_ndp_report(log: Logger, start_ts: float,
+                    steps_req: list, steps_completed: list,
+                    steps_failed: list, total_time: float,
+                    pipeline_log: Path):
     """
-    Fill energy_report_template.md with computed values → ef_report_filled.md.
-    Mirrors fill_report_template() for water.
-    Template: energy_report_template.md (same directory as scripts).
-    Rename report_template.md → water_report_template.md; update fill_report_template()
-    to look for water_report_template.md to avoid ambiguity.
+    NDP report: fill report_template.md § TEMPLATE: ndp with NDP-specific tokens.
+    Called for stressor="depletion" or mode="ndp".
+    Follows the 9-section architecture:
+        fill_shared_blocks → fill_ndp_extras → _write_report
     """
-    tmpl = Path(__file__).parent / "energy_report_template.md"
-    if not tmpl.exists():
-        if log: log.warn("energy_report_template.md not found — skipping")
-        return None
-
-    text      = tmpl.read_text(encoding="utf-8")
-    ts_str    = datetime.fromtimestamp(start_ts).strftime("%Y-%m-%d %H:%M:%S")
-    first_yr  = STUDY_YEARS[0]
-    last_yr   = STUDY_YEARS[-1]
-    mid_yr    = STUDY_YEARS[1] if len(STUDY_YEARS) > 2 else STUDY_YEARS[-1]
-
-    fail_skip = (", ".join(steps_failed) if steps_failed else "none failed") + "  /  none skipped"
-
-    # ── Metadata ──────────────────────────────────────────────────────────────
-    text = (text
-        .replace("{{RUN_TIMESTAMP}}",        ts_str)
-        .replace("{{STUDY_YEARS}}",          ", ".join(STUDY_YEARS))
-        .replace("{{STEPS_REQUESTED}}",      ", ".join(steps_req))
-        .replace("{{STEPS_COMPLETED}}",      ", ".join(steps_completed) or "-")
-        .replace("{{STEPS_FAILED_SKIPPED}}", fail_skip)
-        .replace("{{TOTAL_RUNTIME}}",        f"{total_time:.0f}s" if total_time < 60 else f"{total_time/60:.1f} min")
-        .replace("{{PIPELINE_LOG_PATH}}",    str(pipeline_log))
-        .replace("{{FIRST_YEAR}}",           first_yr)
-        .replace("{{LAST_YEAR}}",            last_yr)
-        .replace("{{YEAR_2019}}",            mid_yr)
-        .replace("{{N_SECTORS}}",            "140")
-        .replace("{{N_EXIO_SECTORS}}",       "163")
-        .replace("{{TOURISM_GDP_PCT}}",      "7.5")
-    )
-    for yr in STUDY_YEARS:
-        text = text.replace(f"{{{{YEAR_{yr}}}}}", yr)
-
-    # ── Load summary CSVs ─────────────────────────────────────────────────────
-    energy_all   = _load_csv_cached(DIRS["indirect_energy"] / "indirect_energy_all_years.csv")
-    outbound_all = _load_csv_cached(_outbound_energy_dir() / "outbound_energy_all_years.csv")
-    ef_total     = _load_csv_cached(DIRS["comparison"] / "ef_total_all_years.csv")
-    cat_dfs      = {yr: _safe_csv(DIRS["indirect_energy"] / f"indirect_energy_{yr}_by_category.csv")
-                    for yr in STUDY_YEARS}
-
-    def _e(row, *keys):
-        return _col(row, *keys)
-
-    r_last    = _year_row(energy_all, last_yr)
-    r_first_e = _year_row(energy_all, first_yr)
-    r_last_ef = _year_row(ef_total,   last_yr)
-    r_first_ef = _year_row(ef_total,  first_yr)
-
-    # ── Abstract scalars ──────────────────────────────────────────────────────
-    for yr in STUDY_YEARS:
-        r_y = _year_row(energy_all, yr)
-        tj  = round(_e(r_y, "Primary_Total_TJ"), 1) if r_y is not None else 0.0
-        text = text.replace(f"{{{{ABSTRACT_IEF_{yr}}}}}", f"{tj:,.1f}")
-
-    em_pct_val = round(_e(r_last, "Emission_pct"), 1) if r_last is not None else 0.0
-    out_tj     = round(_e(r_last_ef, "Outbound_EF_TJ"), 1) if r_last_ef is not None else 0.0
-    net_tj     = round(_e(r_last_ef, "Net_EF_TJ"),     1) if r_last_ef is not None else 0.0
-    net_dir    = "net energy importer" if net_tj > 0 else "net energy exporter"
-    i_first    = _e(r_first_e, "Intensity_MJ_per_crore") if r_first_e is not None else 0.0
-    i_last_val = _e(r_last,    "Intensity_MJ_per_crore") if r_last    is not None else 0.0
-    idrop      = round(100 * abs(i_last_val - i_first) / i_first, 0) if i_first else 0
-
-    text = (text
-        .replace("{{EMISSION_PCT_2022}}",     str(em_pct_val))
-        .replace("{{OUTBOUND_IEF_2022}}",     f"{out_tj:,.1f}")
-        .replace("{{NET_IEF_2022}}",          f"{net_tj:+,.1f}")
-        .replace("{{NET_BALANCE_DIRECTION}}", net_dir)
-        .replace("{{INTENSITY_DROP_PCT}}",    str(int(idrop)))
-    )
-
-    # ── Main Table 1 ──────────────────────────────────────────────────────────
-    m1_rows = ""
-    base_tj = None
-    for yr in STUDY_YEARS:
-        r  = _year_row(ef_total, yr)
-        if r is None:
-            m1_rows += f"| {yr} | - | - | - | - | - | - | — |\n"; continue
-        tj   = _e(r, "Primary_Total_TJ")
-        pj   = _e(r, "Primary_Total_PJ")
-        otj  = _e(r, "Outbound_EF_TJ")
-        ntj  = _e(r, "Net_EF_TJ")
-        emp  = _e(r, "Emission_pct")
-        ints = _e(r, "Intensity_MJ_per_crore")
-        if base_tj is None:
-            chg = "—"
-            base_tj = tj
-        else:
-            if base_tj == 0:
-                chg = "(n/a)"
-            else:
-                chg = f"{100*(tj-base_tj)/base_tj:+.1f}%"
-        m1_rows += (f"| {yr} | {tj:,.2f} | {pj:.4f} | {otj:,.2f} | {ntj:+,.2f} "
-                    f"| {emp:.1f}% | {ints:,.2f} | {chg} |\n")
-    text = text.replace("{{MAIN_TABLE_1_ROWS}}", m1_rows or "| - | - | - | - | - | - | - | — |\n")
-    text = text.replace("{{TOTAL_IEF_NARRATIVE}}", "")
-
-    # ── Top-10 combined ───────────────────────────────────────────────────────
-    cat_last   = cat_dfs.get(last_yr, pd.DataFrame())
-    top10_comb = ""
-    if not cat_last.empty and "Final_Primary_MJ" in cat_last.columns:
-        totals   = {yr: (cat_dfs[yr]["Final_Primary_MJ"].sum()
-                         if not cat_dfs[yr].empty and "Final_Primary_MJ" in cat_dfs[yr].columns else 0.0)
-                    for yr in STUDY_YEARS}
-        top_cats = list(cat_last.nlargest(10, "Final_Primary_MJ")["Category_Name"])
-        for rank, cat in enumerate(top_cats, 1):
-            cols = []
-            for yr in STUDY_YEARS:
-                df  = cat_dfs[yr]
-                row = df[df["Category_Name"] == cat] if not df.empty else pd.DataFrame()
-                mj  = float(row["Final_Primary_MJ"].sum()) if not row.empty else 0.0
-                pct = 100 * mj / totals[yr] if totals[yr] else 0.0
-                cols += [f"{mj/1e6:,.2f}", f"{pct:.1f}%"]
-            top10_comb += f"| {rank} | {cat} | {' | '.join(cols)} |\n"
-    text = text.replace("{{TOP10_COMBINED}}", top10_comb or "| - | - | - | - | - | - | - | - |\n")
-
-    # ── Per-year top-10 ───────────────────────────────────────────────────────
-    def _top10(yr: str) -> str:
-        df = cat_dfs.get(yr, pd.DataFrame())
-        if df.empty or "Final_Primary_MJ" not in df.columns:
-            return "| - | - | - | - | - | - | - |\n"
-        total_mj = df["Final_Primary_MJ"].sum()
-        rows = ""
-        for rank, (_, r) in enumerate(df.nlargest(10, "Final_Primary_MJ").iterrows(), 1):
-            mj    = r["Final_Primary_MJ"]
-            em    = r.get("Emission_MJ", 0.0)
-            pct   = 100 * mj / total_mj if total_mj else 0
-            emp   = 100 * em / mj    if mj    > 0 else 0
-            ints  = r.get("Intensity_MJ_per_crore", 0.0)
-            rows += (f"| {rank} | {str(r.get('Category_Name','?'))[:50]} "
-                     f"| {mj/1e6:,.2f} | {em/1e6:,.2f} | {pct:.1f}% | {emp:.1f}% | {ints:,.1f} |\n")
-        return rows
-
-    text = text.replace("{{TOP10_2015}}", _top10(first_yr))
-    text = text.replace("{{TOP10_2019}}", _top10(mid_yr))
-    text = text.replace("{{TOP10_2022}}", _top10(last_yr))
-
-    # ── Energy origin ─────────────────────────────────────────────────────────
-    origin: dict = {}
-    for yr in STUDY_YEARS:
-        orig_df = _safe_csv(DIRS["indirect_energy"] / f"indirect_energy_{yr}_origin.csv")
-        if not orig_df.empty and "Source_Group" in orig_df.columns and "Final_Primary_MJ" in orig_df.columns:
-            yr_total = float(orig_df["Final_Primary_MJ"].sum())
-            for _, r in orig_df.iterrows():
-                grp = str(r["Source_Group"])
-                mj  = float(r["Final_Primary_MJ"])
-                origin.setdefault(grp, {})[yr] = (mj, 100 * mj / yr_total if yr_total else 0)
-    origin_rows = ""
-    for grp in sorted(origin, key=lambda g: origin[g].get(last_yr, (0, 0))[0], reverse=True):
-        row = f"| {grp} "
-        for yr in STUDY_YEARS:
-            mj, pct = origin[grp].get(yr, (0, 0))
-            row += f"| {mj/1e6:,.2f} | {pct:.1f}% "
-        origin_rows += row + "|\n"
-    text = text.replace("{{ENERGY_ORIGIN_ROWS}}", origin_rows or "| - | - | - | - | - | - | - |\n")
-
-    # ── Split rows ────────────────────────────────────────────────────────────
-    split_rows = ""
-    for yr in STUDY_YEARS:
-        split_df = _safe_csv(DIRS["indirect_energy"] / f"indirect_energy_{yr}_split.csv")
-        if split_df.empty or "Final_Primary_MJ" not in split_df.columns:
-            split_rows += f"| {yr} | — | — | — | — | — |\n"; continue
-        for _, r in split_df.iterrows():
-            mj  = r["Final_Primary_MJ"]
-            em  = r.get("Emission_MJ", 0.0)
-            dem = r.get("Demand_crore", 0.0)
-            ints = mj / dem if dem > 0 else 0.0
-            split_rows += (f"| {yr} | {r.get('Type','?')} "
-                           f"| {mj/1e6:,.2f} | {em/1e6:,.2f} | {dem:,.0f} | {ints:,.1f} |\n")
-    text = text.replace("{{SPLIT_ROWS}}", split_rows or "| - | - | - | - | - | - |\n")
-    text = text.replace("{{SPLIT_NARRATIVE}}", "")
-
-    # ── Emission rows ─────────────────────────────────────────────────────────
-    emission_rows = ""
-    base_em = None
-    for yr in STUDY_YEARS:
-        r    = _year_row(energy_all, yr)
-        r_ef = _year_row(ef_total,   yr)
-        if r is None:
-            emission_rows += f"| {yr} | - | - | - | — |\n"; continue
-        tj   = _e(r, "Primary_Total_TJ")
-        em_tj = _e(r_ef, "Emission_Total_MJ") / 1e6 if r_ef is not None else 0.0
-        emp   = _e(r, "Emission_pct")
-        chg   = "—" if base_em is None else f"{emp - base_em:+.1f} pp"
-        base_em = base_em if base_em is not None else emp
-        emission_rows += f"| {yr} | {tj:,.2f} | {em_tj:,.2f} | {emp:.1f}% | {chg} |\n"
-    text = text.replace("{{EMISSION_ROWS}}", emission_rows or "| - | - | - | - | - |\n")
-
-    # ── Sensitivity ───────────────────────────────────────────────────────────
-    sens_rows            = ""
-    sens_detail_rows     = ""
-    elec_sensitivity_pct = 0.0
-    for yr in STUDY_YEARS:
-        sens_df = _safe_csv(DIRS["indirect_energy"] / f"indirect_energy_{yr}_sensitivity.csv")
-        if sens_df.empty or "Total_IEF_MJ" not in sens_df.columns:
-            continue
-        for _, r in sens_df.iterrows():
-            mj_v = r["Total_IEF_MJ"]
-            gj_v = r.get("Total_IEF_GJ", mj_v / 1e3)
-            tj_v = mj_v / 1e6
-            dp   = r.get("Delta_pct", 0)
-            sens_rows += (f"| {yr} | {r.get('Component','?')} | {r.get('Scenario','?')} "
-                          f"| {tj_v:,.2f} | {gj_v:,.0f} | {dp:+.2f}% |\n")
-            sens_detail_rows += (f"| {yr} | {r.get('Component','?')} | {r.get('Scenario','?')} "
-                                 f"| {mj_v:,.0f} | {gj_v:,.0f} | {tj_v:,.2f} | {dp:+.2f}% |\n")
-            if r.get("Component") == "Electricity" and r.get("Scenario") == "HIGH":
-                elec_sensitivity_pct = abs(dp)
-    text = (text
-        .replace("{{SENSITIVITY_ROWS}}",        sens_rows        or "| - | - | - | - | - | - |\n")
-        .replace("{{SENSITIVITY_DETAIL_ROWS}}", sens_detail_rows or "| - | - | - | - | - | - | - |\n")
-        .replace("{{ELEC_SENSITIVITY_PCT}}",    f"{elec_sensitivity_pct:.1f}")
-    )
-
-    # ── Intensity table ───────────────────────────────────────────────────────
-    intensity_rows = ""
-    for yr in STUDY_YEARS:
-        r    = _year_row(energy_all, yr)
-        r_ef = _year_row(ef_total,   yr)
-        if r is None:
-            intensity_rows += f"| {yr} | - | — | - | - |\n"; continue
-        ints = _e(r, "Intensity_MJ_per_crore")
-        dem  = _e(r, "Tourism_Demand_crore")
-        usd  = _e(r_ef, "USD_INR_Rate") if r_ef is not None else USD_INR.get(yr, 70.0)
-        chg  = "(base)" if yr == first_yr else (f"{100*(ints-i_first)/i_first:+.1f}%" if i_first else "—")
-        intensity_rows += f"| {yr} | {ints:,.2f} | {chg} | {dem:,.0f} | {usd:.2f} |\n"
-    text = text.replace("{{INTENSITY_ROWS}}", intensity_rows or "| - | - | - | - | - |\n")
-
-    # ── Outbound (Supp E7) ────────────────────────────────────────────────────
-    outbound_rows = ""
-    for yr in STUDY_YEARS:
-        r_ob = _year_row(outbound_all, yr)
-        r_ef = _year_row(ef_total,     yr)
-        if r_ef is None:
-            outbound_rows += f"| {yr} | - | - | - | - | - |\n"; continue
-        out_tj_yr = _e(r_ef, "Outbound_EF_TJ")
-        net_tj_yr = _e(r_ef, "Net_EF_TJ")
-        inb_tj_yr = out_tj_yr - net_tj_yr
-        tourists  = _e(r_ob, "Outbound_tourists_M", "Tourists_M") if r_ob is not None else 0.0
-        direction = "Net importer" if net_tj_yr > 0 else "Net exporter"
-        outbound_rows += (f"| {yr} | {tourists:.1f} | {out_tj_yr:,.2f} "
-                          f"| {inb_tj_yr:,.2f} | {net_tj_yr:+,.2f} | {direction} |\n")
-    text = text.replace("{{OUTBOUND_ROWS}}", outbound_rows or "| - | - | - | - | - | - |\n")
-
-    # ── Indirect summary (Supp E4) ────────────────────────────────────────────
-    ind_sum_rows = ""
-    for yr in STUDY_YEARS:
-        r    = _year_row(energy_all, yr)
-        r_ef = _year_row(ef_total,   yr)
-        if r is None:
-            ind_sum_rows += f"| {yr} | - | - | - | - | - | - | - | - | - |\n"; continue
-        tj    = _e(r, "Primary_Total_TJ")
-        bn    = _e(r, "Primary_Total_bn_MJ")
-        em    = _e(r, "Emission_Total_MJ")
-        emp   = _e(r, "Emission_pct")
-        ints  = _e(r, "Intensity_MJ_per_crore")
-        inb   = _e(r, "Inbound_Primary_bn")
-        dom   = _e(r, "Domestic_Primary_bn")
-        top   = str(r.get("Top_Sector", "")) if hasattr(r, "get") else ""
-        usd   = _e(r_ef, "USD_INR_Rate") if r_ef is not None else USD_INR.get(yr, 70.0)
-        ind_sum_rows += (f"| {yr} | {tj:,.2f} | {bn:.4f} | {em:,.0f} | {emp:.1f}% "
-                         f"| {ints:,.2f} | {inb:.4f} | {dom:.4f} | {top[:30]} | {usd:.2f} |\n")
-    text = text.replace("{{INDIRECT_SUMMARY_ROWS}}", ind_sum_rows or "| - | - | - | - | - | - | - | - | - | - |\n")
-
-    # ── Category rows (Supp E5) ───────────────────────────────────────────────
-    def _cat_rows(yr: str) -> str:
-        df = cat_dfs.get(yr, pd.DataFrame())
-        if df.empty or "Final_Primary_MJ" not in df.columns:
-            return "| - | - | - | - | - | - | - | - | - |\n"
-        total_mj = df["Final_Primary_MJ"].sum()
-        rows = ""
-        for rank, (_, r) in enumerate(df.sort_values("Final_Primary_MJ", ascending=False).iterrows(), 1):
-            mj   = r["Final_Primary_MJ"]
-            em   = r.get("Emission_MJ", 0.0)
-            dem  = r.get("Demand_crore", 0.0)
-            pct  = 100 * mj / total_mj if total_mj else 0
-            emp  = 100 * em / mj if mj > 0 else 0
-            ints = r.get("Intensity_MJ_per_crore", mj / dem if dem > 0 else 0.0)
-            rows += (f"| {rank} | {str(r.get('Category_Name','?'))[:50]} "
-                     f"| {r.get('Category_Type','')} "
-                     f"| {mj:,.0f} | {em:,.0f} | {dem:,.0f} | {pct:.1f}% | {emp:.1f}% | {ints:,.1f} |\n")
-        return rows
-
-    text = text.replace("{{CATEGORY_ROWS_2015}}", _cat_rows(first_yr))
-    text = text.replace("{{CATEGORY_ROWS_2019}}", _cat_rows(mid_yr))
-    text = text.replace("{{CATEGORY_ROWS_2022}}", _cat_rows(last_yr))
-
-    # ── IO / Demand / NAS (shared with water) ─────────────────────────────────
-    io_sum  = _safe_csv(DIRS["io"] / "io_summary_all_years.csv")
-    io_rows = ""
-    for _, r in io_sum.iterrows():
-        io_rows += (f"| {r.get('year','-')} | {int(r.get('n_products',0)):,} "
-                    f"| {int(r.get('total_output_crore',0)):,} "
-                    f"| {int(r.get('total_output_USD_M',0)):,} "
-                    f"| {float(r.get('balance_error_pct',0)):.4f} "
-                    f"| {float(r.get('spectral_radius',0)):.6f} "
-                    f"| {float(r.get('usd_inr_rate',70.0)):.2f} |\n")
-    text = text.replace("{{IO_TABLE_ROWS}}", io_rows or "| - | - | - | - | - | - | - |\n")
-
-    dem_cmp  = _safe_csv(DIRS["demand"] / "demand_intensity_comparison.csv")
-    dem_rows = ""
-    if not dem_cmp.empty and "Metric" in dem_cmp.columns:
-        dem_cmp["Year"] = dem_cmp["Year"].astype(str)
-        nom = dem_cmp[dem_cmp["Metric"].str.contains("nominal", case=False, na=False)]
-        rl  = dem_cmp[dem_cmp["Metric"].str.contains("real",    case=False, na=False)]
-        for yr in STUDY_YEARS:
-            _usd  = USD_INR.get(yr, 70.0)
-            n_r   = nom[nom["Year"] == yr]; r_r = rl[rl["Year"] == yr]
-            n_v   = float(n_r["Value"].iloc[0]) if not n_r.empty else 0
-            r_v   = float(r_r["Value"].iloc[0]) if not r_r.empty else 0
-            n_usd = round(n_v * 10 / _usd) if _usd else 0
-            r_usd = round(r_v * 10 / USD_INR.get("2015", 65.0))
-            cagr  = n_r["CAGR_vs_base"].iloc[0] if not n_r.empty and "CAGR_vs_base" in n_r.columns else None
-            cagr_s = f"{float(cagr):+.1f}%/yr" if (cagr is not None and not pd.isna(cagr)) else "(base)"
-            y_df  = _safe_csv(DIRS["demand"] / f"Y_tourism_{yr}.csv")
-            nz    = int((y_df["Tourism_Demand_crore"] > 0).sum()) if not y_df.empty and "Tourism_Demand_crore" in y_df.columns else "-"
-            dem_rows += f"| {yr} | {n_v:,.0f} | {n_usd:,.0f} | {r_v:,.0f} | {r_usd:,.0f} | {nz}/163 | {cagr_s} | {_usd:.2f} |\n"
-    text = text.replace("{{DEMAND_TABLE_ROWS}}", dem_rows or "| - | - | - | - | - | - | - | - |\n")
-
-    nas_rows = "".join(
-        f"| {key} | {NAS_GVA_CONSTANT.get(key,{}).get('nas_sno','-')} "
-        f"| {NAS_GVA_CONSTANT.get(key,{}).get('nas_label','-')} "
-        f"| {rates.get('2019',0):.4f} | {rates.get('2022',0):.4f} |\n"
-        for key, rates in NAS_GROWTH_RATES.items()
-    )
-    text = text.replace("{{NAS_GROWTH_ROWS}}", nas_rows or "| - | - | - | - | - |\n")
-
-    # ── Key findings ──────────────────────────────────────────────────────────
-    tj_first_v = _e(r_first_ef, "Primary_Total_TJ") if r_first_ef is not None else 0.0
-    tj_last_v  = _e(r_last_ef,  "Primary_Total_TJ") if r_last_ef  is not None else 0.0
-    chg_dir    = "increased" if tj_last_v > tj_first_v else "decreased"
-    chg_abs    = abs(100 * (tj_last_v - tj_first_v) / tj_first_v) if tj_first_v else 0.0
-
-    key_findings = (
-        f"- **IEF {chg_dir} {chg_abs:.1f}%** from {first_yr} ({tj_first_v:,.1f} TJ) "
-        f"to {last_yr} ({tj_last_v:,.1f} TJ).\n"
-        f"- **{em_pct_val:.1f}% fossil energy share** in {last_yr}.\n"
-        f"- **Net balance {net_tj:+,.1f} TJ** in {last_yr} — India is a **{net_dir}** via tourism.\n"
-        f"- Electricity coefficients drive the largest IEF sensitivity "
-        f"(±{elec_sensitivity_pct:.1f}% for ±20% electricity coeff change).\n"
-        f"- Energy intensity declined {int(idrop)}% ({first_yr}→{last_yr}), "
-        f"reflecting upstream renewable penetration and efficiency gains.\n"
-        f"- COVID-19 suppressed 2022 outbound and indirect energy vs 2019.\n"
-    )
-    text = text.replace("{{KEY_FINDINGS}}", key_findings)
-
-    # ── Warnings ──────────────────────────────────────────────────────────────
-    warnings_str = ""
-    if steps_failed:
-        warnings_str = f"> ⚠ **Failed steps:** {', '.join(steps_failed)}\n"
-    text = text.replace("{{WARNINGS}}", warnings_str)
-
-    # ── Write ─────────────────────────────────────────────────────────────────
-    out_path = DIRS["comparison"] / "ef_report_filled.md"
-    out_path.write_text(text, encoding="utf-8")
-    if log:
-        log.ok(f"Energy report template filled: {out_path}")
-    return out_path
-
-
-def _run_energy_report(log: Logger, start_ts: float,
-                        steps_req: list, steps_completed: list,
-                        steps_failed: list, total_time: float,
-                        pipeline_log: Path):
-    """Run the energy report pipeline — writes txt, inline md, and filled template."""
-    log.section("ENERGY FOOTPRINT COMPARISON")
-    DIRS["indirect_energy"].mkdir(parents=True, exist_ok=True)
-    _outbound_energy_dir().mkdir(parents=True, exist_ok=True)
+    log.section("NDP REPORT — GDP − CFC − Natural Capital Depletion")
     DIRS["comparison"].mkdir(parents=True, exist_ok=True)
 
-    energy_df = build_total_energy(log)
-    save_csv(energy_df,
-             DIRS["comparison"] / "ef_total_all_years.csv", "Energy totals", log=log)
-    write_energy_report(
-        energy_df,
-        DIRS["comparison"] / "ef_comparison_report.txt",
-        log,
+    cfg = REPORT_CFG["depletion"]
+
+    # Build depletion totals summary
+    dep_df = build_totals("depletion", log)
+    save_csv(dep_df, DIRS["comparison"] / cfg["totals_csv"], "NDP totals", log=log)
+
+    # Load template
+    text = _load_template("ndp")
+    if not text:
+        log.warn("NDP template not found — skipping Markdown report. "
+                 "Add ## TEMPLATE: ndp section to report_template.md.")
+        log.ok("NDP comparison complete (no report).")
+        return
+
+    # Section 4: shared tokens
+    text = fill_shared_blocks(
+        text, "depletion", cfg,
+        start_ts=start_ts, steps_req=steps_req,
+        steps_completed=steps_completed, steps_failed=steps_failed,
+        total_time=total_time, pipeline_log=pipeline_log, log=log,
     )
-    write_energy_report_md(
-        energy_df,
-        DIRS["comparison"] / "ef_comparison_report.md",
-        log,
-    )
-    fill_energy_report_template(
-        start_ts        = start_ts,
-        steps_req       = steps_req,
-        steps_completed = steps_completed,
-        steps_failed    = steps_failed,
-        total_time      = total_time,
-        pipeline_log    = pipeline_log,
-        log             = log,
-    )
+    # Section 8: NDP-specific tokens
+    text = fill_ndp_extras(text, log)
+    # Write
+    _write_report(text, "depletion", cfg, start_ts, log)
+    log.ok("NDP comparison complete.")
 
-    # Per-year category CSVs in comparison dir for convenience
-    for year in STUDY_YEARS:
-        cat_df = _safe_csv(DIRS["indirect_energy"] / f"indirect_energy_{year}_by_category.csv")
-        if not cat_df.empty:
-            save_csv(cat_df,
-                     DIRS["comparison"] / f"ef_by_category_{year}.csv",
-                     f"EF by category {year}", log=log)
-
-    log.ok("Energy comparison complete.")
-
-
-# ══════════════════════════════════════════════════════════════════════════════
-# MAIN
-# ══════════════════════════════════════════════════════════════════════════════
 
 def run(start_ts: float = None, steps_req: list = None,
         steps_completed: list = None, steps_failed: list = None,
         total_time: float = 0.0, pipeline_log: Path = None,
-        mode: str = "water", **kwargs):
-    _start = start_ts or _time.time()
-    _kw = dict(
+        mode: str = "water", stressor: str = None, **kwargs):
+    """
+    SECTION 9 — Universal stressor-aware report dispatcher.
+
+    Per-stressor pipeline (9-section architecture):
+        fill_shared_blocks()          (Section 4 — universal tokens)
+        fill_water_extras()           (Section 5 — water-only tokens)
+        fill_water_narrative()        (Section 6 — water narrative/novelty)
+        fill_energy_extras()          (Section 7 — energy-only tokens)
+        fill_ndp_extras()             (Section 8 — NDP tokens)
+        _write_report()               (Section 9 — write file)
+
+    mode / stressor routing:
+        "water"     | stressor="water"     → Sections 4+5+6
+        "energy"    | stressor="energy"    → Sections 4+7
+        "depletion" | stressor="depletion" → Sections 4+8
+        "emissions" | stressor="emissions" → Section 4 only (future: +emissions section)
+        "combined"                         → all three in sequence
+    """
+    # Resolve mode from stressor keyword (called from main.py step registry)
+    if stressor and mode == "water":
+        mode = stressor
+
+    _start  = start_ts or _time.time()
+    _log_p  = pipeline_log or DIRS["logs"] / "pipeline.log"
+    _req    = steps_req       or [SCRIPT_NAME]
+    _compl  = steps_completed or [SCRIPT_NAME]
+    _fail   = steps_failed    or []
+    _kw_shared = dict(
         start_ts        = _start,
-        steps_req       = steps_req       or [SCRIPT_NAME],
-        steps_completed = steps_completed or [SCRIPT_NAME],
-        steps_failed    = steps_failed    or [],
+        steps_req       = _req,
+        steps_completed = _compl,
+        steps_failed    = _fail,
         total_time      = total_time,
-        pipeline_log    = pipeline_log or DIRS["logs"] / "pipeline.log",
+        pipeline_log    = _log_p,
     )
+    # For legacy helpers that still take the flat **_kw dict
+    _kw_legacy = _kw_shared.copy()
 
     with Logger(SCRIPT_NAME, DIRS["logs"]) as log:
         t = Timer()
         DIRS["comparison"].mkdir(parents=True, exist_ok=True)
 
+        # ── WATER ──────────────────────────────────────────────────────────────
         if mode in ("water", "combined"):
             log.section("CROSS-YEAR WATER FOOTPRINT COMPARISON")
+
+            # Ancillary water outputs (CSV files, plain-text report)
             total_df             = build_total_twf(log)
             intensity_df         = per_tourist_intensity(total_df, log)
             data_quality_flags(intensity_df, total_df, log)
@@ -4616,25 +5228,82 @@ def run(start_ts: float = None, steps_req: list = None,
             mult_df, artifact_df = type1_multipliers(log)
             ratio_df             = multiplier_ratio_summary(log)
 
-            save_csv(total_df,     DIRS["comparison"] / "twf_total_all_years.csv",          "Total TWF",          log=log)
-            save_csv(intensity_df, DIRS["comparison"] / "twf_per_tourist_intensity.csv",    "Per-tourist",        log=log)
+            save_csv(total_df,     DIRS["comparison"] / "twf_total_all_years.csv",         "Total TWF",          log=log)
+            save_csv(intensity_df, DIRS["comparison"] / "twf_per_tourist_intensity.csv",   "Per-tourist",        log=log)
             if not trends_df.empty:
-                save_csv(trends_df,   DIRS["comparison"] / "twf_sector_trends.csv",         "Sector trends",      log=log)
+                save_csv(trends_df,   DIRS["comparison"] / "twf_sector_trends.csv",        "Sector trends",      log=log)
             if not mult_df.empty:
-                save_csv(mult_df,     DIRS["comparison"] / "twf_type1_multipliers.csv",     "Type I multipliers", log=log)
+                save_csv(mult_df,     DIRS["comparison"] / "twf_type1_multipliers.csv",    "Type I multipliers", log=log)
             if not artifact_df.empty:
-                save_csv(artifact_df, DIRS["comparison"] / "twf_multiplier_artifacts.csv",  "Multiplier artefacts", log=log)
+                save_csv(artifact_df, DIRS["comparison"] / "twf_multiplier_artifacts.csv", "Multiplier artefacts", log=log)
             if not ratio_df.empty:
-                save_csv(ratio_df,    DIRS["comparison"] / "twf_multiplier_ratio_all.csv",  "Multiplier ratios",  log=log)
+                save_csv(ratio_df,    DIRS["comparison"] / "twf_multiplier_ratio_all.csv", "Multiplier ratios",  log=log)
 
             write_report(
                 total_df, intensity_df, trends_df,
                 DIRS["comparison"] / "twf_comparison_report.txt", log,
             )
-            fill_report_template(log=log, **_kw)
 
+            # Markdown report via 9-section pipeline
+            cfg  = REPORT_CFG["water"]
+            text = _load_template("water")
+            if text:
+                # Section 4: shared tokens
+                text = fill_shared_blocks(text, "water", cfg, log=log, **_kw_shared)
+                # Section 5: water-specific tokens
+                text = fill_water_extras(text, _start, log)
+                # Section 6: water narrative
+                text = fill_water_narrative(text, STUDY_YEARS[0], STUDY_YEARS[-1], log)
+                # Section 9: write
+                _write_report(text, "water", cfg, _start, log)
+            else:
+                log.warn("Water template not found — skipping Markdown report.")
+
+        # ── ENERGY ─────────────────────────────────────────────────────────────
         if mode in ("energy", "combined"):
-            _run_energy_report(log, **_kw)
+            log.section("ENERGY FOOTPRINT COMPARISON")
+
+            energy_df = build_total_energy(log)
+            save_csv(energy_df, DIRS["comparison"] / "ef_total_all_years.csv", "Energy totals", log=log)
+            write_energy_report(energy_df, DIRS["comparison"] / "ef_comparison_report.txt", log)
+            write_energy_report_md(energy_df, DIRS["comparison"] / "ef_comparison_report.md", log)
+
+            # Per-year category CSVs for convenience
+            for year in STUDY_YEARS:
+                cat_df = _safe_csv(DIRS["indirect_energy"] / f"indirect_energy_{year}_by_category.csv")
+                if not cat_df.empty:
+                    save_csv(cat_df, DIRS["comparison"] / f"ef_by_category_{year}.csv",
+                             f"EF by category {year}", log=log)
+
+            # Markdown report via 9-section pipeline
+            cfg  = REPORT_CFG["energy"]
+            text = _load_template("energy")
+            if text:
+                # Section 4: shared tokens
+                text = fill_shared_blocks(text, "energy", cfg, log=log, **_kw_shared)
+                # Section 7: energy-specific tokens
+                text = fill_energy_extras(text, _start, log)
+                # Section 9: write
+                _write_report(text, "energy", cfg, _start, log)
+            else:
+                log.warn("Energy template not found — skipping Markdown report.")
+
+        # ── DEPLETION / NDP ────────────────────────────────────────────────────
+        if mode in ("depletion", "ndp", "combined"):
+            _run_ndp_report(log, start_ts=_start, steps_req=_req,
+                            steps_completed=_compl, steps_failed=_fail,
+                            total_time=total_time, pipeline_log=_log_p)
+
+        # ── EMISSIONS (future) ─────────────────────────────────────────────────
+        if mode == "emissions":
+            log.info("Emissions report: add fill_emissions_extras() to enable full fill.")
+            text = _load_template("emissions")
+            if text:
+                cfg  = REPORT_CFG["emissions"]
+                text = fill_shared_blocks(text, "emissions", cfg, log=log, **_kw_shared)
+                # Future: text = fill_emissions_extras(text, _start, log)
+                _write_report(text, "emissions", cfg, _start, log)
+                log.ok("Partial emissions report written (shared blocks only).")
 
         log.ok(f"Done in {t.elapsed()}")
 

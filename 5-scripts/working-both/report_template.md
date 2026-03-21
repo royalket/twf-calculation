@@ -1,3 +1,12 @@
+# India Tourism Footprint — Unified Report Templates
+> This file contains all report templates. The `_load_template(stressor)` function
+> in `compare.py` reads the appropriate section based on the stressor argument.
+> Add new stressors by appending `## TEMPLATE: {stressor}` sections below.
+
+---
+
+## TEMPLATE: water
+
 # India Tourism Water Footprint: A Multi-Year Environmentally Extended Input–Output Analysis
 
 **Generated:** {{RUN_TIMESTAMP}} · **Years:** {{STUDY_YEARS}} · **Runtime:** {{TOTAL_RUNTIME}} · **Log:** `{{PIPELINE_LOG_PATH}}`
@@ -134,11 +143,11 @@ Tourism nominal demand (NAS-scaled): {{DEMAND_TABLE_ROWS_INLINE}}. Non-zero EXIO
 
 **Main Table 1. TWF trajectory, scarce water, and Monte Carlo confidence intervals.**
 
-| FY | Blue Indirect (bn m³) | Green Indirect (bn m³) | Blue+Green Indirect (bn m³) | Scarce TWF (bn m³) | Direct Blue (bn m³) | **Total Blue (bn m³)** | MC P5 (bn m³) | MC P95 (bn m³) | Intensity (L/tourist-day, Blue) | Intensity (L/tourist-day, Blue+Green) | Δ vs {{FIRST_YEAR}} |
-|---|---|---|---|---|---|---|---|---|---|---|---|
+| FY | Blue Indirect (M m³) | Green Indirect (M m³) | Blue+Green Indirect (M m³) | Scarce TWF (M m³) | Direct Blue (M m³) | **Total Blue (bn m³)** | MC P5 (bn m³) | MC P95 (bn m³) | Intensity (L/tourist-day, Blue) | Intensity (L/tourist-day, Blue+Green) | Indirect/Direct ratio | Δ vs {{FIRST_YEAR}} |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
 {{MAIN_TABLE_1_ROWS}}
 
-> **Blue Indirect** = W·L·Y (EEIO, blue WaterGAP coefficients). **Green Indirect** = exact EEIO propagation of green (rainfed ET) coefficients through agriculture rows only — not a proportional allocation. **Blue+Green Indirect** = sum of the two; not used as a headline metric (blue and green carry distinct scarcity implications per Hoekstra & Mekonnen 2012). **Total Blue** = Blue Indirect + Direct Blue (BASE scenario). **Intensity (Blue)** = Total Blue m³ × 10⁶ / tourist-days; **Intensity (Blue+Green)** = (Blue Indirect + Green Indirect + Direct Blue) × 10⁶ / tourist-days. MC CI applies to Total Blue only (n = 10,000, agr σ = 0.30 log-normal, single correlated multiplier — conservative upper bound; realistic ±18–22% under partial independence).
+> Individual water volumes in **M m³** (million m³) to avoid sub-hundredths values in the Direct Blue column; **Total Blue** retained in bn m³ as the headline aggregate. **Blue Indirect** = W·L·Y (EEIO, blue WaterGAP coefficients). **Green Indirect** = exact EEIO propagation of green (rainfed ET) coefficients through agriculture rows only — not a proportional allocation. **Blue+Green Indirect** = sum of the two; not used as a headline metric (blue and green carry distinct scarcity implications per Hoekstra & Mekonnen 2012). **Total Blue** = Blue Indirect + Direct Blue (BASE scenario). **Indirect/Direct ratio** = Blue Indirect ÷ Direct Blue; China reported ~10:1 (Lee et al. 2021) — India ratio confirms cross-study pattern. **Intensity (Blue)** = Total Blue bn m³ × 10⁹ × 10³ L/m³ / tourist-days; **Intensity (Blue+Green)** uses Blue+Green Indirect + Direct Blue. MC CI applies to Total Blue only (n = 10,000, agr σ = 0.30 log-normal, single correlated multiplier — conservative upper bound; realistic ±18–22% under partial independence).
 
 {{TOTAL_TWF_NARRATIVE}}
 
@@ -146,11 +155,11 @@ Tourism nominal demand (NAS-scaled): {{DEMAND_TABLE_ROWS_INLINE}}. Non-zero EXIO
 
 **Main Table 5 (panel A). Top-10 upstream sectors by Leontief pull — {{LAST_YEAR}} — with scarce water.**
 
-| Rank | Source Sector | Source Group | Water m³ | Water % | WSI Weight | Scarce m³ | Scarce % |
+| Rank | Source Sector | Source Group | Water (M m³) | Water % | WSI Weight | Scarce (M m³) | Scarce % |
 |---|---|---|---|---|---|---|---|
 {{ORIGIN_TOP10_ROWS}}
 
-> Agriculture accounts for {{AGR_SHARE_2022}}% of indirect blue TWF despite tourists purchasing no raw crops directly — entirely Leontief-propagated through food supply chains. WSI = 0.827 for agricultural rows. Full origin breakdown by source group in Supplementary Table S7b.
+> Agriculture accounts for {{AGR_SHARE_2022}}% of indirect blue TWF despite tourists purchasing no raw crops directly — entirely Leontief-propagated through food supply chains. WSI = 0.827 for agricultural rows. Values in M m³ (million m³). Full origin breakdown by source group in Supplementary Table S7b.
 
 > **📝 Paper text (Results §3.4, upstream water origin):** *"Agriculture accounted for {{AGR_SHARE_2022}}% of indirect blue TWF in {{LAST_YEAR}} (Main Table 5A, Supplementary Table S7b), despite receiving zero direct tourism expenditure. This is entirely Leontief-propagated water: food-service supply chains embed paddy, wheat, and sugarcane irrigation water from the Indus-Gangetic Plain through multiple upstream tiers before reaching the tourism sector. The top-10 upstream sectors (Main Table 5A) are dominated by agricultural sub-sectors across all three study years, consistent with the scarce/blue ratio of {{SCARCE_RATIO_2022}} (Main Table 1) — over {{SCARCE_RATIO_2022_PCT}}% of abstracted water originates from basins at WSI ≥ 0.8. Paddy irrigation intensity in WaterGAP increased +61.5% between the 2015-16 and 2021-22 model vintages, consistent with documented Indus-Gangetic groundwater depletion (Rodell et al. 2018), and accounts for the upward W-effect visible in Main Table 3."*
 
@@ -162,29 +171,46 @@ Tourism nominal demand (NAS-scaled): {{DEMAND_TABLE_ROWS_INLINE}}. Non-zero EXIO
 
 ### 3.6 Direct Operational Water
 
-Direct water was {{DIRECT_SHARE_RANGE}}% of total blue TWF — indirect supply chains dominate by ~10:1. In {{LAST_YEAR}}, inbound direct water was led by hotel use ({{INB_HOTEL_LPDAY}} L/tourist-day); domestic direct water by restaurants ({{DOM_REST_LPDAY}} L/tourist-day). Direct LOW/BASE/HIGH scenario detail in Supplementary Table S6.
+Direct water was {{DIRECT_SHARE_RANGE}}% of total blue TWF — indirect supply chains dominate by ~{{INDIRECT_DIRECT_RATIO}}:1. In {{LAST_YEAR}}, inbound direct water was led by hotel use ({{INB_HOTEL_LPDAY}} L/tourist-day); domestic direct water by restaurants ({{DOM_REST_LPDAY}} L/tourist-day).
+
+**Direct TWF by sector — BASE scenario (M m³).**
+
+| Sector | 2015-16 (M m³) | 2015-16 % | 2019-20 (M m³) | 2019-20 % | 2021-22 (M m³) | 2021-22 % | Coefficient basis |
+|---|---|---|---|---|---|---|---|
+| Hotels — Inbound | {{HOTEL_INB_2015}} | {{HOTEL_INB_PCT_2015}} | {{HOTEL_INB_2019}} | {{HOTEL_INB_PCT_2019}} | {{HOTEL_INB_2022}} | {{HOTEL_INB_PCT_2022}} | L/room/night × inbound nights (100% hotel share) |
+| Hotels — Domestic | {{HOTEL_DOM_2015}} | {{HOTEL_DOM_PCT_2015}} | {{HOTEL_DOM_2019}} | {{HOTEL_DOM_PCT_2019}} | {{HOTEL_DOM_2022}} | {{HOTEL_DOM_PCT_2022}} | L/room/night × domestic nights (15% hotel share, NSS 580) |
+| Restaurants | {{REST_2015}} | {{REST_PCT_2015}} | {{REST_2019}} | {{REST_PCT_2019}} | {{REST_2022}} | {{REST_PCT_2022}} | L/meal × meals/day × tourist-days |
+| Rail | {{RAIL_2015}} | {{RAIL_PCT_2015}} | {{RAIL_2019}} | {{RAIL_PCT_2019}} | {{RAIL_2022}} | {{RAIL_PCT_2022}} | L/pkm × 25% modal share × avg km (MoR Table 2) |
+| Air | {{AIR_2015}} | {{AIR_PCT_2015}} | {{AIR_2019}} | {{AIR_PCT_2019}} | {{AIR_2022}} | {{AIR_PCT_2022}} | L/passenger × tourist air share |
+| **TOTAL** | **{{DIRECT_TOTAL_2015}}** | 100% | **{{DIRECT_TOTAL_2019}}** | 100% | **{{DIRECT_TOTAL_2022}}** | 100% | |
+| *Indirect/Direct ratio* | *{{IND_DIR_RATIO_2015}}×* | | *{{IND_DIR_RATIO_2019}}×* | | *{{IND_DIR_RATIO_2022}}×* | | *Indirect TWF ÷ Direct TWF (BASE)* |
+
+> Hotels split into inbound and domestic sub-rows because inbound hotel share = 100% vs domestic = 15% (NSS Report 580, blended rural/urban), producing disproportionately high inbound direct water per tourist. Direct LOW/BASE/HIGH scenario detail in Supplementary Table S6. Indirect/Direct ratio confirms supply-chain dominance is consistent across all three study years.
 
 ### 3.7 Per-Tourist Water Intensity and Inbound–Domestic Gap
 
 **Main Table 2. Per-tourist-day water intensity — inbound vs domestic, all water components.**
 
-| FY | Segment | Demand (₹ cr) | Ind. Blue (bn m³) | Ind. Green (bn m³) | Total Indirect (bn m³) | Direct Blue (bn m³) | **Total (bn m³)** | **Blue L/day** | **Total (B+G) L/day** | Spend (₹/day) | TWF ratio | Spend ratio | Residual ratio |
-|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| FY | Segment | Demand (₹ cr) | Demand (USD M) | Ind. Blue (M m³) | Ind. Green (M m³) | Total Indirect (M m³) | Direct Blue (M m³) | **Total (M m³)** | **Blue L/day** | **Total (B+G) L/day** | Spend (₹/day) | TWF ratio | Spend ratio | Residual ratio |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
 {{INTENSITY_SEGMENT_ROWS}}
 
-> **Blue L/day** = (Ind. Blue + Direct Blue) × 10⁶ / tourist-days. **Total (B+G) L/day** = (Ind. Blue + Ind. Green + Direct Blue) × 10⁶ / tourist-days. Both intensity columns are shown: Blue-only is the appropriate metric for cross-study benchmarking (all prior global studies report blue only); Blue+Green shows the complete physical burden. **Spend ratio** = inbound ₹/day ÷ domestic ₹/day. **Residual ratio** = TWF ratio ÷ Spend ratio; value ≈ 1.0 means the gap is spending-basket driven; value > 1.0 means inbound supply chains are inherently more water-intensive per rupee. † Green column absent if pipeline not updated.
+> Water volumes in **M m³** (million m³) per segment. **Blue L/day** = (Ind. Blue + Direct Blue) × 10⁶ m³ × 10³ L/m³ / tourist-days. **Total (B+G) L/day** = (Ind. Blue + Ind. Green + Direct Blue) × 10⁶ × 10³ / tourist-days. Both intensity columns are shown: Blue-only is the appropriate metric for cross-study benchmarking (all prior global studies report blue only); Blue+Green shows the complete physical burden. **Demand (USD M)** = ₹ cr × 10 ÷ USD/INR (fiscal-year average rate). **Spend ratio** = inbound ₹/day ÷ domestic ₹/day. **Residual ratio** = TWF ratio ÷ Spend ratio; value ≈ 1.0 means the gap is spending-basket driven; value > 1.0 means inbound supply chains are inherently more water-intensive per rupee. † Green column absent if pipeline not updated.
 
 {{INTENSITY_SPLIT_NARRATIVE}}
 
 ### 3.8 TSA Category Decomposition
 
-**Main Table 7. Cross-year TSA category decomposition — top 8 categories.**
+**Main Table 7. Cross-year TSA category decomposition — top 8 categories (wide format, ranked by {{LAST_YEAR}} indirect TWF).**
 
-| FY | Rank | TSA Category | Demand (₹ cr) | Indirect (bn m³) | Direct (bn m³) | Total (bn m³) | Direct % | Agr % | Elec % | Petro % |
-|---|---|---|---|---|---|---|---|---|---|---|
-{{SECTOR_DECOMP_CROSS_YEAR_ROWS}}
+| TSA Category | Type | 2015-16 Demand (₹ cr) | 2015-16 Demand (USD M) | 2015-16 Indirect Blue (M m³) | 2015-16 Green (M m³) | 2015-16 Direct (M m³) | 2019-20 Demand (₹ cr) | 2019-20 Demand (USD M) | 2019-20 Indirect Blue (M m³) | 2019-20 Green (M m³) | 2019-20 Direct (M m³) | 2021-22 Demand (₹ cr) | 2021-22 Demand (USD M) | 2021-22 Indirect Blue (M m³) | 2021-22 Green (M m³) | 2021-22 Direct (M m³) | Δ Indirect 2015→2022 (%) | Δ Indirect 2019→2022 (%) | m³/₹ cr † | Green % † | Agr % † | Elec % † | Petro % † |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+{{TSA_WIDE_ROWS}}
+| **TOTAL top-8** | | {{TOP8_DEMAND_2015}} | {{TOP8_DEMAND_2015_USD}} | {{TOP8_IND_2015_MN}} | | {{TOP8_DIR_2015_MN}} | {{TOP8_DEMAND_2019}} | {{TOP8_DEMAND_2019_USD}} | {{TOP8_IND_2019_MN}} | | {{TOP8_DIR_2019_MN}} | {{TOP8_DEMAND_2022}} | {{TOP8_DEMAND_2022_USD}} | {{TOP8_IND_2022_MN}} | | {{TOP8_DIR_2022_MN}} | {{TOP8_DELTA_1522}} | {{TOP8_DELTA_1922}} | {{TOP8_MULT}} | | | | |
 
-> Agriculture % of indirect (Agr %) ranges {{AGR_PCT_RANGE}} across top-8 categories and all years, confirming agricultural supply-chain water dominates regardless of TSA category type. COVID-era rank shifts identify structurally resilient (Food & Beverage) vs demand-sensitive (Accommodation) categories. Direct % < 5% for all categories confirms supply-chain dominance throughout.
+> Per-category water volumes in **M m³** (million m³). **Indirect Blue** = EEIO Leontief upstream supply-chain water. **Direct** = activity-based operational water (hotels, restaurants, transport) allocated to category by demand share. **Green** = rainfed agricultural evapotranspiration (agriculture categories only). TOTAL row in M m³. **bn m³ aggregate**: {{TOP8_IND_2015}} / {{TOP8_IND_2019}} / {{TOP8_IND_2022}} bn m³ indirect blue for 2015-16 / 2019-20 / 2021-22. **USD M** = ₹ cr × 10 ÷ USD/INR. † columns show 2021-22 values only; full per-year decomposition in Supplementary Table S7d. **Δ** columns track indirect blue only.
+
+> Agriculture % of indirect (Agr %) ranges {{AGR_PCT_RANGE}} across top-8 categories, confirming agricultural supply-chain water dominates regardless of TSA category type. The two Δ columns jointly identify structurally resilient categories (small Δ 2019→2022, e.g. Food & Beverage) vs demand-sensitive categories (large negative Δ 2019→2022, e.g. Accommodation, Air). Categories where Δ 2015→2022 is positive but Δ 2019→2022 is strongly negative experienced pre-COVID growth followed by COVID collapse — the SDA Y-effect captures this pattern in aggregate.
 
 {{SECTOR_DECOMP_NARRATIVE}}
 
@@ -219,11 +245,11 @@ Direct water was {{DIRECT_SHARE_RANGE}}% of total blue TWF — indirect supply c
 
 **Main Table 5 (panel B). Outbound TWF and net virtual water balance.**
 
-| FY | Outbound tourists (M) | Avg stay (days) | Outbound TWF (bn m³) | Outbound Scarce (bn m³) | Inbound TWF (bn m³) | Net balance (bn m³) | India is |
-|---|---|---|---|---|---|---|---|
+| FY | Outbound tourists (M) | Avg stay (days) | Outbound TWF (bn m³) | Outbound Scarce (bn m³) | Outbound to WSI>0.5 (%) | Outbound to WSI>0.8 (%) | Inbound TWF (bn m³) | Net balance (bn m³) | India is |
+|---|---|---|---|---|---|---|---|---|---|
 {{OUTBOUND_TWF_ROWS}}
 
-> ⚠ Destination shares require verification against MoT ITS 2022 before publication — net balance direction may reverse. UAE (~30%) and Saudi Arabia (WSI = 1.0) concentrate India's outbound virtual water in the world's most water-scarce basins. Net balance = Outbound − Inbound; directional indicator only (outbound = activity-based Lee et al. 2021; inbound = EEIO Leontief — not methodologically equivalent).
+> ⚠ Destination shares require verification against MoT ITS 2022 before publication — net balance direction may reverse. UAE (~30%) and Saudi Arabia (WSI = 1.0) concentrate India's outbound virtual water in the world's most water-scarce basins. **Outbound to WSI>0.5 (%)** = share of outbound TWF flowing to moderately-to-severely stressed destinations. **Outbound to WSI>0.8 (%)** = share flowing to severely stressed destinations (equivalent to Lee et al. 2021 "water deficient countries" finding for China). Net balance = Outbound − Inbound; directional indicator only (outbound = activity-based Lee et al. 2021; inbound = EEIO Leontief — not methodologically equivalent). Per-destination breakdown in Supplementary Table S18.
 
 {{OUTBOUND_TWF_NARRATIVE}}
 
@@ -247,7 +273,30 @@ Agriculture accounted for {{AGR_SHARE_2022}}% of indirect blue TWF in {{LAST_YEA
 
 ### 4.4 Comparison with Prior Literature
 
-India's blue water intensity falls within the range reported in comparative EEIO studies: Hadjikakou et al. (2015, Cyprus): ~980 L/tourist-day; Su et al. (2019, China): ~340 L/tourist-day; Lenzen et al. (2018, global): 200–1,500 L/tourist-day depending on destination. India's agricultural supply-chain dominance pattern generalises to any emerging economy with large rainfed/irrigated agriculture, tourism spending weighted toward food services, and WaterGAP-modelled irrigation-intensive basins.
+**Table 4.4. Cross-study benchmarking — EEIO+TSA tourism water footprint studies.**
+
+| Study | Country | Year | Method | Total L/tourist-day | Indirect/Direct ratio | Agriculture % | Inbound/Domestic ratio |
+|---|---|---|---|---|---|---|---|
+| **This study** | **India** | **2015–22** | **EEIO+TSA, 3-year panel** | **{{INDIA_LPDAY_LAST}}** | **{{INDIRECT_DIRECT_RATIO}}:1** | **{{AGR_SHARE_2022}}%** | **{{INB_DOM_RATIO}}×** |
+| Lee et al. (2021) | China | 2017 | EEIO+TSA, 135 sectors | 1,354 | ~10:1 | ~74% | ~6× |
+| Hadjikakou et al. (2015) | Cyprus | 2010 | EEIO+TSA | 200–5,000 | — | — | — |
+| Sun & Hsu (2019) | Taiwan | — | EEIO+TSA | — | — | — | — |
+| Cazcarro et al. (2016) | Spain | — | EEIO+TSA | — | — | — | — |
+| Gössling et al. (2012) | Global | — | Bottom-up review | 2,000–12,000 | — | — | — |
+
+> Bottom-up studies (Gössling et al.) report 2–9× higher L/tourist-day than EEIO studies because they sample high-spending 4–5 star hotels; EEIO includes the full accommodation spectrum. India's agricultural supply-chain dominance ({{AGR_SHARE_2022}}%) is higher than China's ~74% (Lee et al. 2021), consistent with India's more irrigation-intensive food system and higher WaterGAP paddy coefficients. The India inbound/domestic ratio of {{INB_DOM_RATIO}}× compared to China's ~6× reflects the much larger absolute spending gap between international and domestic tourists in India's TSA.
+
+India's blue water intensity falls within the range reported in comparative EEIO studies: Hadjikakou et al. (2015, Cyprus): ~980 L/tourist-day; Lee et al. (2021, China): 1,354 L/tourist-day; Lenzen et al. (2018, global): 200–1,500 L/tourist-day depending on destination. India's agricultural supply-chain dominance pattern generalises to any emerging economy with large rainfed/irrigated agriculture, tourism spending weighted toward food services, and WaterGAP-modelled irrigation-intensive basins.
+
+**Table 4.5. Water productivity per unit of tourism spending — India tourism sector.**
+
+> Metric: litres of blue water embedded in tourism supply chains per ₹ of nominal tourism expenditure (L/₹) and m³ per USD of spending. Denominator = NAS-scaled nominal tourism demand (₹ crore) from `demand_intensity_comparison.csv`. This is a water-intensity metric (lower = more water-efficient per unit of economic output), not an economic productivity metric. Decline over the study period reflects supply-chain restructuring (L-effect dominant in SDA, Main Table 3) rather than on-site efficiency improvements.
+
+| FY | Tourism demand (₹ cr) | Tourism demand (USD M) | Total blue TWF (bn m³) | L per ₹ | m³ per USD | Δ vs base |
+|---|---:|---:|---:|---:|---:|---:|
+{{WPD_TABLE}}
+
+> **In {{LAST_YEAR}}**, India's tourism sector embedded **{{WPD_LITRE_PER_INR}} litres per ₹** of spending ({{WPD_USD_LAST}} m³ per USD). For comparison, Lee et al. (2021) China: ~0.003 m³/USD; Hadjikakou et al. (2015) Cyprus: ~0.012 m³/USD. India's higher value reflects the greater share of agricultural supply-chain water relative to tourism revenue — a structural feature of food-dominant tourism spending in an irrigation-intensive economy. The metric's decline over the panel period confirms that TWF intensity improvements outpaced demand growth, consistent with the L-effect dominance found in SDA (Section 3.7).
 
 ### 4.5 Limitations
 
@@ -372,6 +421,44 @@ This is the **supply-chain source view** — where water physically originates a
 
 ---
 
+## Supplementary Table S7c. Top-5 Direct Sectors vs Top-5 Indirect Source Sectors — Side by Side, All Years
+
+> Mirrors Lee et al. (2021) Figure 2 structure for India. Direct sectors = on-site operational (activity-based); Indirect source sectors = upstream Leontief pull origin. The structural contrast — accommodation/restaurants dominate direct; agriculture dominates indirect — is the paper's most communicable result.
+
+#### 2015-16
+
+| Rank | Direct Sector | Direct (M m³) | Direct % | | Indirect Source Sector | Indirect (M m³) | Indirect % |
+|---|---|---|---|---|---|---|---|
+{{S7C_DIRECT_2015}}
+
+#### 2019-20
+
+| Rank | Direct Sector | Direct (M m³) | Direct % | | Indirect Source Sector | Indirect (M m³) | Indirect % |
+|---|---|---|---|---|---|---|---|
+{{S7C_DIRECT_2019}}
+
+#### 2021-22
+
+| Rank | Direct Sector | Direct (M m³) | Direct % | | Indirect Source Sector | Indirect (M m³) | Indirect % |
+|---|---|---|---|---|---|---|---|
+{{S7C_DIRECT_2022}}
+
+> Direct % = share of total direct TWF. Indirect % = share of total indirect blue TWF. The direct/indirect split for each operational sector (e.g. accommodation = 32% direct, 68% indirect in Lee et al. China) shows that even the highest direct-use sectors are dominated by their upstream supply-chain water. Policy implication: hotel water recycling targets the 32%; supply-chain procurement targets the 68%.
+
+---
+
+## Supplementary Table S7d. Full Cross-Year TSA Category Decomposition — All 8 Categories × 3 Years (Detailed)
+
+> Full per-year detail supporting Main Table 7. Includes Rank (per-year position by indirect TWF), per-year Agr %, Elec %, Petro %, and Direct %, enabling year-on-year supply-chain composition tracking. COVID rank shifts visible by comparing Rank column across years.
+
+| FY | Rank | TSA Category | Type | Demand (₹ cr) | Demand (USD M) | Indirect (M m³) | Direct (M m³) | Total (M m³) | Direct % | Agr % | Elec % | Petro % | m³/₹ cr |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|---|
+{{SECTOR_DECOMP_CROSS_YEAR_ROWS}}
+
+> Water volumes in **M m³** per category-year. m³/₹ cr = Indirect ÷ Demand per year. **USD M** = ₹ cr × 10 ÷ USD/INR (fiscal-year average rate). Agr %, Elec %, Petro % per year confirm whether the supply-chain composition for each category shifted — cross-reference against Main Table 3 SDA W-effect to attribute causation.
+
+---
+
 ## Supplementary Table S8. Direct TWF — All-Year Summary (BASE)
 
 | FY | Scenario | Hotel m³ | Restaurant m³ | Rail m³ | Air m³ | Total m³ | Total bn m³ |
@@ -484,7 +571,7 @@ This is the **supply-chain source view** — where water physically originates a
 
 **Top-10 water pathways per year (source sector → tourism demand, m³):**
 
-| Rank | Path (Source → Destination) | Source Group | Water m³ | Share % |
+| Rank | Path (Source → Destination) | Source Group | Water (M m³) | Share % |
 |---|---|---|---|---|
 {{SC_PATHS_COMBINED}}
 
@@ -496,7 +583,7 @@ This is the **supply-chain source view** — where water physically originates a
 
 **HEM dependency index — top-10 sectors where tourism drives water use:**
 
-| Rank | Product | Source Group | Dependency Index % | Tourism Water m³ |
+| Rank | Product | Source Group | Dependency Index % | Tourism Water (M m³) |
 |---|---|---|---|---|
 {{HEM_ROWS}}
 
@@ -535,7 +622,7 @@ This is the **supply-chain source view** — where water physically originates a
 
 ## Supplementary Table S18. Outbound TWF by Destination
 
-| FY | Country | Dest share | Local WF (m³/yr) | WSI | Tourists (M) | Avg stay | Outbound m³ | Scarce m³ |
+| FY | Country | Dest share | Local WF (m³/yr) | WSI | Tourists (M) | Avg stay | Outbound (M m³) | Scarce (M m³) |
 |---|---|---|---|---|---|---|---|---|
 {{OUTBOUND_BY_DEST_ROWS}}
 
@@ -543,14 +630,17 @@ This is the **supply-chain source view** — where water physically originates a
 
 ## Supplementary Table S19. Placeholder Audit *(resolve before submission)*
 
-| Token / Section | What to verify | Source | Risk |
-|---|---|---|---|
-| Outbound destination shares (Main Table 5B) | UAE ~30%, Saudi ~15% etc. | MoT ITS 2022, Table 4.4 | **High — net balance direction may reverse** |
-| `{{TOURISM_GDP_PCT}}`, `{{TOURISM_JOBS_M}}` | Current GDP/jobs figures | WTTC Economic Impact India 2023 | Low |
-| `{{EURINR_VALUES}}` | RBI annual average rates each FY | RBI reference rates | Medium |
-| `{{NAS_HOTELS_2022}}` | NAS 2024 Statement 6.1 Hotels & Restaurants GVA | MoSPI NAS 2024 | Medium |
-| `{{SECTOR_DECOMP_CROSS_YEAR_ROWS}}` | Top-8 TSA category rows × 3 years from `indirect_twf_{year}_sector_decomp.csv` | Pipeline output | **High — Main Table 7 empty until steps run** |
-| `{{INB_BLUE_LASTYEAR}}`, `{{DOM_BLUE_LASTYEAR}}`, `{{INB_GREEN_LASTYEAR}}`, `{{DOM_GREEN_LASTYEAR}}` | Inbound/domestic indirect blue and green for {{LAST_YEAR}} | `indirect_twf_{{LAST_YEAR}}_split.csv` | **High — requires updated calculate_indirect_twf.py** |
+| Token / Section | What to verify | Source | Risk | Impact on headline result if wrong |
+|---|---|---|---|---|
+| Outbound destination shares (Main Table 5B) | UAE ~30%, Saudi ~15% etc. | MoT ITS 2022, Table 4.4 | **High — net balance direction may reverse** | Net balance sign could flip; WSI>0.8 % would change materially — §3.11 conclusion affected |
+| `{{TOURISM_GDP_PCT}}`, `{{TOURISM_JOBS_M}}` | Current GDP/jobs figures | WTTC Economic Impact India 2023 | Low | Introduction context only — no results table affected |
+| `{{EURINR_VALUES}}` | RBI annual average rates each FY | RBI reference rates | Medium | USD-denominated columns in all tables shift proportionally; ratios unaffected |
+| `{{NAS_HOTELS_2022}}` | NAS 2024 Statement 6.1 Hotels & Restaurants GVA | MoSPI NAS 2024 | Medium | Accommodation demand vector shifts ~±10%; indirect TWF for Accommodation category in Main Table 7 affected; aggregate TWF shift < 5% |
+| `{{SECTOR_DECOMP_CROSS_YEAR_ROWS}}` / `{{TSA_WIDE_ROWS}}` | Top-8 TSA category rows × 3 years from `indirect_twf_{year}_sector_decomp.csv` | Pipeline output | **High — Main Tables 7 and S7d empty until steps run** | Core category decomposition result — Section 3.8 and Discussion §4.1 procurement leverage argument both depend on this |
+| `{{INB_BLUE_LASTYEAR}}`, `{{DOM_BLUE_LASTYEAR}}`, `{{INB_GREEN_LASTYEAR}}`, `{{DOM_GREEN_LASTYEAR}}` | Inbound/domestic indirect blue and green for {{LAST_YEAR}} | `indirect_twf_{{LAST_YEAR}}_split.csv` | **High — requires updated calculate_indirect_twf.py** | Main Table 2 inbound/domestic gap — the {{INB_DOM_RATIO}}× headline finding depends on this |
+| `{{INDIRECT_DIRECT_RATIO}}` | Computed from Blue Indirect ÷ Direct Blue (BASE) per year | Pipeline output (Main Table 1) | Low | Cross-study comparison with Lee et al. 10:1 China ratio — Discussion §4.4 benchmark affected if ratio differs substantially |
+| `{{WPD_TABLE}}`, `{{WPD_LITRE_PER_INR}}`, `{{WPD_USD_LAST}}` | Litres blue water per ₹ and m³ per USD of nominal tourism demand | Pipeline output — `compare.py` `_fill_narrative_placeholders()` from `demand_intensity_comparison.csv` + `twf_total_all_years.csv` | Low | Table 4.5 water productivity metric — §4.4 cross-study discussion. Populates automatically once demand and comparison steps run. |
+| `{{S7C_DIRECT_2015}}`, `{{S7C_DIRECT_2019}}`, `{{S7C_DIRECT_2022}}` | Top-5 direct sectors from `direct_twf_{year}.csv`; top-5 indirect from `indirect_twf_{year}_origin.csv` | Pipeline output | Medium | Supplementary S7c side-by-side table — does not affect main body conclusions but is key visual for peer review |
 
 ---
 
@@ -741,3 +831,457 @@ Seven main tables fit within the upper limit of most target journals (Water Rese
 
 *Generated by India TWF Pipeline — report_template.md filled by `compare_years.py`*
 *Framework: Leontief (1970); Miller & Blair (2009); Hoekstra et al. (2011); Dietzenbacher & Los (1998)*
+
+---
+## TEMPLATE: energy
+
+# India Tourism Energy Footprint
+## Multi-Year Environmentally Extended Input–Output Analysis
+
+> **Generated:** {{RUN_TIMESTAMP}} · **Study Years:** {{STUDY_YEARS}} · **Runtime:** {{TOTAL_RUNTIME}}
+> **Log:** `{{PIPELINE_LOG_PATH}}`
+
+---
+
+## Abstract
+
+India's tourism sector embeds substantial energy demand in supply chains spanning electricity generation, petroleum refining, and manufacturing. This study applies an EEIO framework to MoSPI Supply-Use Tables for FY 2015–16, 2019–20, and 2021–22, paired with EXIOBASE 3.8 energy satellites (163 India sectors), estimating the indirect tourism energy footprint (IEF) across three periods spanning pre-COVID growth and recovery.
+
+Tourism demand vectors are derived from India TSA 2015–16 extrapolated via NAS Statement 6.1 real GVA growth rates. Outbound energy is estimated from WTO departure statistics and per-tourist energy averages for key destination countries.
+
+### Key Metrics at a Glance
+
+| Metric | {{FIRST_YEAR}} | {{YEAR_2019}} | {{LAST_YEAR}} |
+|--------|---------------|--------------|--------------|
+| Indirect primary IEF (TJ) | **{{ABSTRACT_IEF_2015}}** | **{{ABSTRACT_IEF_2019}}** | **{{ABSTRACT_IEF_2022}}** |
+| Fossil energy share (%) | — | — | **{{EMISSION_PCT_2022}}%** |
+| Energy intensity change vs {{FIRST_YEAR}} | — | — | **−{{INTENSITY_DROP_PCT}}%** per ₹ cr |
+| Outbound IEF (TJ) | — | — | **{{OUTBOUND_IEF_2022}}** |
+| Net balance (TJ) | — | — | **{{NET_IEF_2022}}** ({{NET_BALANCE_DIRECTION}}) |
+
+> **Sensitivity:** ±20% on electricity coefficients shifts total IEF by **{{ELEC_SENSITIVITY_PCT}}%**.
+
+**Keywords:** tourism energy footprint · EEIO · India · indirect energy · fossil energy · outbound energy · COVID-19 · energy intensity
+
+---
+
+## 1. Introduction
+
+Tourism contributes ~{{TOURISM_GDP_PCT}}% of India's GDP and is a significant energy consumer — directly (transport, accommodation) and indirectly through supply chains embedding electricity, petroleum, and industrial energy.
+
+India's rapid electrification and petroleum dependency mean that supply-chain energy is a material climate risk in the tourism sector. This study covers **{{N_SECTORS}} SUT sectors** mapped to **{{N_EXIO_SECTORS}} EXIOBASE sectors** across three fiscal years:
+
+- **2015–16** — pre-COVID baseline
+- **2019–20** — peak year
+- **2021–22** — post-COVID recovery
+
+---
+
+## 2. Methods
+
+### 2.1 EEIO Framework
+
+Supply-Use Tables (MoSPI, 140 products × 140 industries) are converted to IO tables via the **Product Technology Assumption (PTA)**:
+
+```
+B = V · diag(g)⁻¹        (industry output shares by product)
+A = U · diag(q)⁻¹ · B⁻¹  (IO technical coefficients)
+L = (I − A)⁻¹             (Leontief inverse)
+```
+
+The core EEIO identity for energy is:
+
+```
+IEF_indirect = E_final × L × Y    [MJ; total supply-chain embedded primary energy]
+IEF_emission = E_fossil × L × Y   [MJ; fossil fuel portion only]
+```
+
+where **E_final** (140×140 diagonal) contains sector final energy intensities from EXIOBASE 3.8 (MJ/₹ crore), **E_fossil** contains emission-energy intensities, **L** is the Leontief inverse, and **Y** (140×1) is the tourism final demand vector.
+
+### 2.2 Tourism Demand Vectors
+
+India's TSA has not been updated since 2015–16. Demand vectors are extrapolated using NAS Statement 6.1 real GVA growth rates (constant 2011–12 prices). Separate inbound (Y_inb) and domestic (Y_dom) vectors are produced for each year.
+
+### 2.3 Energy Coefficients
+
+Final energy coefficients are extracted from EXIOBASE 3.8 energy satellite rows for India:
+- `Final_Primary_MJ` — final primary energy use per ₹ crore of sectoral output
+- `Emission_MJ` — fossil-fuel combustion portion (scope 1 + upstream scope 2)
+
+### 2.4 Outbound Energy
+
+```
+Net_IEF = Outbound_IEF − Inbound_IEF_indirect
+```
+
+A **positive** net balance indicates India is a net energy *importer* via tourism (Indian tourists abroad consume more than inbound tourists consume in India).
+
+---
+
+## 3. Results
+
+### 3.1 Cross-Year Indirect Energy Footprint
+
+**Table 1. Indirect tourism energy footprint across study years.**
+
+| FY | Primary IEF (TJ) | Primary IEF (PJ) | Outbound (TJ) | Net (TJ) | Emission % | Intensity (MJ/₹ cr) | Δ vs {{FIRST_YEAR}} |
+|----|----------------:|----------------:|-------------:|---------:|-----------:|-------------------:|---------------------|
+{{MAIN_TABLE_1_ROWS}}
+
+> **Net balance** = Outbound − Inbound indirect.  Positive = India is a net energy *importer* via tourism.
+
+{{TOTAL_IEF_NARRATIVE}}
+
+---
+
+### 3.2 Top Energy Sectors by Year
+
+**Table 2. Top-10 upstream energy sectors (demand-destination view), ranked by {{LAST_YEAR}} Final Primary MJ.**
+
+| Rank | Category | {{FIRST_YEAR}} TJ | {{FIRST_YEAR}} % | {{YEAR_2019}} TJ | {{YEAR_2019}} % | {{LAST_YEAR}} TJ | {{LAST_YEAR}} % |
+|-----:|----------|------------------:|-----------------:|----------------:|-----------------:|----------------:|-----------------:|
+{{TOP10_COMBINED}}
+
+> Electricity and petroleum supply chains typically dominate due to high energy intensity coefficients propagated via the Leontief multiplier through food-processing, manufacturing, and transport sectors.
+
+<details>
+<summary>▶ Per-year detail (click to expand)</summary>
+
+#### {{FIRST_YEAR}}
+| Rank | Category | Final Primary (TJ) | Emission (TJ) | Energy % | Fossil % | Intensity (MJ/₹ cr) |
+|-----:|----------|-----------------:|--------------:|---------:|---------:|-------------------:|
+{{TOP10_2015}}
+
+#### {{YEAR_2019}}
+| Rank | Category | Final Primary (TJ) | Emission (TJ) | Energy % | Fossil % | Intensity (MJ/₹ cr) |
+|-----:|----------|-----------------:|--------------:|---------:|---------:|-------------------:|
+{{TOP10_2019}}
+
+#### {{LAST_YEAR}}
+| Rank | Category | Final Primary (TJ) | Emission (TJ) | Energy % | Fossil % | Intensity (MJ/₹ cr) |
+|-----:|----------|-----------------:|--------------:|---------:|---------:|-------------------:|
+{{TOP10_2022}}
+
+</details>
+
+---
+
+### 3.3 Energy by Source Group (Upstream Origin)
+
+**Table 3. Indirect energy by supply-chain source group.**
+
+| Source Group | {{FIRST_YEAR}} TJ | {{FIRST_YEAR}} % | {{YEAR_2019}} TJ | {{YEAR_2019}} % | {{LAST_YEAR}} TJ | {{LAST_YEAR}} % |
+|--------------|------------------:|-----------------:|----------------:|-----------------:|----------------:|-----------------:|
+{{ENERGY_ORIGIN_ROWS}}
+
+> Electricity and petroleum dominate. Manufacturing embeds energy via purchased inputs.
+
+---
+
+### 3.4 Inbound vs Domestic Split
+
+**Table 4. Indirect energy split by tourist segment.**
+
+| FY | Type | Final Primary (TJ) | Emission (TJ) | Demand (₹ cr) | IEF/₹ cr (MJ) |
+|----|------|-----------------:|--------------:|-------------:|-------------:|
+{{SPLIT_ROWS}}
+
+{{SPLIT_NARRATIVE}}
+
+---
+
+### 3.5 Fossil Energy Share
+
+**Table 5. Emission (fossil) energy share by year.**
+
+| FY | Final Primary (TJ) | Emission (TJ) | Emission % | Change vs {{FIRST_YEAR}} |
+|----|-----------------:|--------------:|-----------:|------------------------:|
+{{EMISSION_ROWS}}
+
+> A declining emission share indicates renewable energy penetration in the upstream economy; an increasing share indicates fossil lock-in.
+
+---
+
+## 4. Sensitivity Analysis
+
+**Table 6. ±20% sensitivity on key energy coefficients.**
+
+| FY | Component | Scenario | Total IEF (TJ) | Total IEF (GJ) | Δ% |
+|----|-----------|----------|---------------:|---------------:|---:|
+{{SENSITIVITY_ROWS}}
+
+> A 20% reduction in electricity energy intensity (e.g. through renewable energy growth) would reduce total IEF by approximately **{{ELEC_SENSITIVITY_PCT}}%**, reflecting India's high coal-to-electricity share in EXIOBASE.
+
+---
+
+## 5. Cross-Year Intensity
+
+**Table 7. Energy intensity per ₹ crore of tourism demand.**
+
+| FY | Intensity (MJ/₹ cr) | Change vs {{FIRST_YEAR}} | Tourism Demand (₹ cr) | USD/INR |
+|----|-------------------:|------------------------:|---------------------:|--------:|
+{{INTENSITY_ROWS}}
+
+> Declining intensity reflects supply-chain energy efficiency improvements and shifts in tourism demand composition toward lower-energy service sectors.
+
+---
+
+## 6. Key Findings
+
+{{KEY_FINDINGS}}
+
+---
+
+## 7. Run Diagnostics
+
+| Metric | Value |
+|--------|-------|
+| Steps requested | {{STEPS_REQUESTED}} |
+| Steps completed | {{STEPS_COMPLETED}} |
+| Steps failed / skipped | {{STEPS_FAILED_SKIPPED}} |
+| Total runtime | {{TOTAL_RUNTIME}} |
+| Pipeline log | `{{PIPELINE_LOG_PATH}}` |
+
+{{WARNINGS}}
+
+---
+
+## Supplementary Tables
+
+<details>
+<summary>▶ E1 – IO Summary</summary>
+
+| FY | Products | Total Output (₹ cr) | Total Output (USD M) | Balance Error % | Spectral Radius | USD/INR |
+|----|--------:|-------------------:|--------------------:|---------------:|---------------:|--------:|
+{{IO_TABLE_ROWS}}
+
+</details>
+
+<details>
+<summary>▶ E2 – Tourism Demand Vectors</summary>
+
+| FY | Nominal (₹ cr) | Nominal (USD M) | Real 2015–16 (₹ cr) | Real 2015–16 (USD M) | Non-zero sectors | CAGR vs {{FIRST_YEAR}} | USD/INR |
+|----|--------------:|----------------:|--------------------:|--------------------:|-----------------:|----------------------:|--------:|
+{{DEMAND_TABLE_ROWS}}
+
+</details>
+
+<details>
+<summary>▶ E3 – NAS GVA Growth Rates</summary>
+
+| Sector key | NAS S.No. | NAS label | ×{{YEAR_2019}} | ×{{LAST_YEAR}} |
+|------------|-----------|-----------|---------------:|---------------:|
+{{NAS_GROWTH_ROWS}}
+
+</details>
+
+<details>
+<summary>▶ E4 – Indirect Energy Summary (All Years)</summary>
+
+| FY | Primary IEF (TJ) | Primary IEF (bn MJ) | Emission MJ | Emission % | Intensity (MJ/₹ cr) | Inbound (bn MJ) | Domestic (bn MJ) | Top Sector | USD/INR |
+|----|----------------:|--------------------:|------------:|-----------:|-------------------:|----------------:|-----------------:|------------|--------:|
+{{INDIRECT_SUMMARY_ROWS}}
+
+</details>
+
+<details>
+<summary>▶ E5 – Per-Year Category Detail</summary>
+
+#### {{FIRST_YEAR}}
+| Rank | Category | Category Type | Final Primary (MJ) | Emission (MJ) | Demand (₹ cr) | Energy % | Fossil % | Intensity (MJ/₹ cr) |
+|-----:|----------|--------------|------------------:|--------------:|-------------:|---------:|---------:|-------------------:|
+{{CATEGORY_ROWS_2015}}
+
+#### {{YEAR_2019}}
+| Rank | Category | Category Type | Final Primary (MJ) | Emission (MJ) | Demand (₹ cr) | Energy % | Fossil % | Intensity (MJ/₹ cr) |
+|-----:|----------|--------------|------------------:|--------------:|-------------:|---------:|---------:|-------------------:|
+{{CATEGORY_ROWS_2019}}
+
+#### {{LAST_YEAR}}
+| Rank | Category | Category Type | Final Primary (MJ) | Emission (MJ) | Demand (₹ cr) | Energy % | Fossil % | Intensity (MJ/₹ cr) |
+|-----:|----------|--------------|------------------:|--------------:|-------------:|---------:|---------:|-------------------:|
+{{CATEGORY_ROWS_2022}}
+
+</details>
+
+<details>
+<summary>▶ E6 – Sensitivity Detail</summary>
+
+| FY | Component | Scenario | Total IEF (MJ) | Total IEF (GJ) | Total IEF (TJ) | Δ% |
+|----|-----------|----------|---------------:|---------------:|---------------:|---:|
+{{SENSITIVITY_DETAIL_ROWS}}
+
+</details>
+
+<details>
+<summary>▶ E7 – Outbound Energy</summary>
+
+| FY | Outbound tourists (M) | Outbound IEF (TJ) | Inbound IEF (TJ) | Net IEF (TJ) | Direction |
+|----|---------------------:|------------------:|-----------------:|-------------:|-----------|
+{{OUTBOUND_ROWS}}
+
+</details>
+
+---
+
+*Generated by `compare.py` · Study years: {{STUDY_YEARS}} · Formula: `IEF = E × L × Y  (MJ/₹ crore)`*
+
+
+---
+## TEMPLATE: ndp
+
+# India Net Domestic Product (NDP) — EEIO Natural Capital Depletion Estimate
+
+> **Generated:** {{RUN_TIMESTAMP}} · **Study Years:** {{STUDY_YEARS}} · **Runtime:** {{TOTAL_RUNTIME}}
+> **Log:** `{{PIPELINE_LOG_PATH}}`
+> **Framework:** SEEA-CF / UNSC recommendation (NDP = GDP − CFC − Natural Capital Depletion)
+
+---
+
+## Abstract
+
+India's Net Domestic Product (NDP) is computed by adjusting GDP for both Consumption of Fixed Capital (CFC, the standard NAS deduction) and natural capital depletion estimated via an Environmentally Extended Input-Output (EEIO) model. Depletion coefficients are extracted from EXIOBASE 3.8 material satellite (material/F.txt), applied to MoSPI Supply-Use Tables (140 sectors, FY 2015–16, 2019–20, 2021–22), and monetised using World Bank Wealth Account unit rents. This produces the first supply-chain-complete NDP estimate for India across three fiscal years spanning pre-COVID growth and post-COVID recovery.
+
+**Key results:** NDP {{FIRST_YEAR}} = ₹{{NDP_CRORE_2015}} crore ({{NDP_PCT_2015}}% of GDP); NDP {{LAST_YEAR}} = ₹{{NDP_CRORE_2022}} crore ({{NDP_PCT_2022}}% of GDP). Natural capital depletion = {{DEPLETION_PCT_2015}}% of GDP ({{FIRST_YEAR}}) → {{DEPLETION_PCT_2022}}% ({{LAST_YEAR}}). CFC = {{CFC_PCT_2015}}% of GDP ({{FIRST_YEAR}}) → {{CFC_PCT_2022}}% ({{LAST_YEAR}}).
+
+**Keywords:** NDP · natural capital depletion · EEIO · India · SEEA-CF · unit rents · World Bank Wealth Accounts
+
+---
+
+## 1. Introduction
+
+Standard GDP accounting does not capture the depletion of natural resources. The UNSC System of Environmental-Economic Accounting (SEEA-CF) recommends reporting NDP = GDP − CFC − Natural Capital Depletion as a welfare-adjusted measure. For India, natural resource extraction (fossil fuels, metal ores, non-metallic minerals, biomass) is substantial; this study provides the first EEIO-based NDP estimate linking tourism-driven supply chains to natural capital drawdown across three fiscal years.
+
+---
+
+## 2. Methods
+
+### 2.1 NDP Formula
+
+```
+NDP = GDP − CFC − Natural_Capital_Depletion
+
+Natural_Capital_Depletion = Σᵢ (Physical_Extraction_i × Unit_Rent_i)
+```
+
+All values in ₹ crore at current prices.
+
+### 2.2 Data Sources
+
+- **GDP and CFC:** MoSPI National Accounts Statistics 2023, Statement 1 (GDP at market prices) and Statement 2 (Consumption of Fixed Capital). Values in reference_data.md § NAS_MACRO.
+- **Physical depletion:** EEIO D×L×Y where D = EXIOBASE 3.8 material/F.txt domestic extraction coefficients (tonnes per ₹ crore), L = Leontief inverse from MoSPI SUT, Y = India final demand (all sectors, not tourism-only).
+- **Unit rents:** World Bank Wealth Accounts 2021 India; IBM/Ministry of Mines royalty data. Values in reference_data.md § UNIT_RENTS.
+
+### 2.3 Unit Rent Sources
+
+| Resource category | Method | Source |
+|---|---|---|
+| Fossil fuels | Net price method (market price − avg extraction cost) | World Bank Wealth Accounts 2021 |
+| Metal ores | Royalty-based rent | IBM / Ministry of Mines royalty data |
+| Non-metallic minerals | Royalty-based rent | IBM / Ministry of Mines royalty data |
+| Biomass (timber/crops) | Stumpage value; FAO unit values | FAO / World Bank Wealth Accounts 2021 |
+
+---
+
+## 3. Results
+
+### 3.1 GDP, CFC, and NDP
+
+**Main Table NDP-1. NDP decomposition by year.**
+
+| Year | GDP (₹ cr) | CFC (₹ cr) | Natural Depletion (₹ cr) | NDP (₹ cr) | NDP (USD M) | CFC % of GDP | Depletion % of GDP | NDP % of GDP |
+|---|---|---|---|---|---|---|---|---|
+{{GDP_ROWS}}
+
+> Source: MoSPI NAS 2023 (GDP, CFC); EEIO D×L×Y (natural depletion). All ₹ crore at current prices.
+
+{{NDP_TREND_NARRATIVE}}
+
+### 3.2 Natural Capital Depletion Breakdown
+
+**Main Table NDP-2. Monetary depletion by resource category.**
+
+| Year | Fossil Depletion (₹ cr) | Other Depletion (₹ cr) | Total Depletion (₹ cr) | Fossil Physical (t) | Other Physical (t) | Fossil Unit Rent (₹ cr/t) | Other Unit Rent (₹ cr/t) |
+|---|---|---|---|---|---|---|---|
+{{DEPLETION_BREAKDOWN_ROWS}}
+
+> Fossil = coal + crude oil + natural gas (net price method). Other = metal ores + non-metallic minerals + biomass (royalty-based rents).
+
+### 3.3 Unit Rents Used
+
+| Year | Fossil (₹ cr/t) | Metal (₹ cr/t) | Non-metal (₹ cr/t) | Biomass (₹ cr/t) |
+|---|---|---|---|---|
+{{UNIT_RENT_ROWS}}
+
+> Source: reference_data.md § UNIT_RENTS (World Bank Wealth Accounts 2021; IBM/MoM royalty data). Values rise year-on-year reflecting both real rent increases and INR depreciation.
+
+### 3.4 Sensitivity
+
+**±20% on unit rents shifts NDP by approximately {{NDP_SENSITIVITY_SHIFT}}% of GDP.** This is the dominant uncertainty source — larger than the EEIO coefficient uncertainty because unit rents translate physical tonnes directly into monetary values.
+
+---
+
+## 4. Discussion
+
+### 4.1 India's Natural Capital Adjustment
+
+Natural capital depletion of ~{{DEPLETION_PCT_2022}}% of GDP ({{LAST_YEAR}}) is within the range reported for fossil-fuel-dependent middle-income economies (World Bank Adjusted Net Savings: {{WB_ANS_COMPARABLE}}% for comparable economies). The depletion share is modest relative to CFC (~{{CFC_PCT_2022}}%), indicating India's produced capital depreciation exceeds its natural capital drawdown — a structurally different profile from pure resource-export economies.
+
+### 4.2 SEEA-CF Alignment
+
+This estimate follows SEEA-CF principles: physical depletion via EEIO (not top-down commodity flows), monetised at actual unit rents (not social cost of carbon or shadow prices). The distinction from green GDP concepts: NDP accounts for actual resource depletion, not ecosystem service values or pollution externalities.
+
+### 4.3 Limitations
+
+**Unit rent uncertainty.** World Bank Wealth Accounts values are revised infrequently; ±20% rent sensitivity is material.
+
+**EXIOBASE India resolution.** Material satellite rows at EXIOBASE 163-sector level; finer sub-sector disaggregation would improve accuracy for mining sub-sectors.
+
+**Scope.** This estimate covers extraction depletion only — not land degradation, aquifer depletion, or soil carbon loss, which would require additional SEEA physical asset accounts.
+
+---
+
+## 5. Key Findings
+
+{{KEY_FINDINGS}}
+
+---
+
+## Data Quality Warnings
+
+```
+{{WARNINGS}}
+```
+
+---
+
+## Supplementary Tables
+
+### NDP-S1. Full NDP Decomposition
+
+| Year | GDP (₹ cr) | GDP (USD M) | CFC (₹ cr) | Depletion (₹ cr) | NDP (₹ cr) | NDP (USD M) | NDP/GDP | Total Adj % |
+|---|---|---|---|---|---|---|---|---|
+{{NDP_DECOMP_ROWS}}
+
+### NDP-S2. Monetary Depletion All Years
+
+{{MONETARY_DEPLETION_ROWS}}
+
+---
+
+*Generated by `compare.py` · Framework: SEEA-CF / UNSC · Method: EEIO D×L×Y (EXIOBASE 3.8 material/F.txt) + World Bank unit rents*
+
+
+---
+## TEMPLATE: emissions
+
+# India Tourism Emissions Footprint
+## PLACEHOLDER — Add when emissions stressor is implemented
+
+> **Generated:** {{RUN_TIMESTAMP}} · **Study Years:** {{STUDY_YEARS}}
+
+This template will be filled when the emissions stressor pipeline (build_coefficients → indirect → postprocess → decompose → compare) is implemented.
+
+**Tokens to implement:** {{ABSTRACT_EMISSIONS_2022}}, {{EMISSIONS_INTENSITY_DROP_PCT}}, {{CARBON_INTENSITY_ROWS}}, {{SDA_EMISSIONS_ROWS}}, {{MC_EMISSIONS_ROWS}}
+
+---

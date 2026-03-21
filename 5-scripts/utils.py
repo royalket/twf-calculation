@@ -524,6 +524,10 @@ def classify_source_group(product_id: int) -> str:
       41 – 113  Manufacturing  (71–80 = Petroleum, separate sub-group)
       114 – 116 Electricity + Water supply
       117 – 140 Services
+
+    THIS IS THE SINGLE SOURCE OF TRUTH for group boundaries.
+    All other files must import and call this function — never define
+    their own boundary ranges or group-name strings.
     """
     pid = int(product_id)
     if 1   <= pid <= 29:  return "Agriculture"
@@ -532,6 +536,87 @@ def classify_source_group(product_id: int) -> str:
     if 41  <= pid <= 113: return "Manufacturing"
     if 114 <= pid <= 116: return "Electricity"
     return "Services"
+
+
+# ── Canonical group taxonomy ──────────────────────────────────────────────────
+# Ordered list matching classify_source_group() output exactly.
+# Import SOURCE_GROUPS from here wherever a list of group names is needed —
+# never define the list locally in individual scripts.
+SOURCE_GROUPS: list[str] = [
+    "Agriculture",
+    "Mining",
+    "Petroleum",
+    "Manufacturing",
+    "Electricity",
+    "Services",
+]
+
+# Product-ID ranges for each group (inclusive, 1-indexed, matching above).
+# Use these for sensitivity lambdas and MC masks instead of hardcoding ranges.
+SOURCE_GROUP_RANGES: dict[str, tuple[int, int] | list[tuple[int, int]]] = {
+    "Agriculture":  [(1,  29)],
+    "Mining":       [(30, 40)],
+    "Petroleum":    [(71, 80)],
+    "Manufacturing":[(41, 70), (81, 113)],   # excl. Petroleum 71-80
+    "Electricity":  [(114, 116)],
+    "Services":     [(117, 140)],
+}
+
+# Alias sets for tolerant matching of legacy strings produced by
+# build_coefficients.py ("Energy Processing", "Utilities/Energy") or
+# any other code that writes non-canonical group names into CSVs.
+# Usage:  canonical = SOURCE_GROUP_ALIASES.get(raw.lower(), raw)
+SOURCE_GROUP_ALIASES: dict[str, str] = {
+    # Electricity aliases
+    "electricity":       "Electricity",
+    "utilities/energy":  "Electricity",
+    "energy processing": "Electricity",
+    "utilities":         "Electricity",
+    "util":              "Electricity",
+    "power":             "Electricity",
+    # Agriculture aliases
+    "agriculture":       "Agriculture",
+    "agr":               "Agriculture",
+    "crops":             "Agriculture",
+    # Mining aliases
+    "mining":            "Mining",
+    "min":               "Mining",
+    # Petroleum aliases
+    "petroleum":         "Petroleum",
+    "petrol":            "Petroleum",
+    "oil":               "Petroleum",
+    # Manufacturing aliases
+    "manufacturing":     "Manufacturing",
+    "manuf":             "Manufacturing",
+    # Services aliases
+    "services":          "Services",
+    "service":           "Services",
+}
+
+
+def canonical_source_group(raw: str) -> str:
+    """
+    Map any raw/legacy group label to the canonical SOURCE_GROUPS name.
+    Falls back to the original string if no alias is found.
+    Use this whenever reading Source_Group from a CSV that may have been
+    written by build_coefficients.py or older pipeline versions.
+    """
+    return SOURCE_GROUP_ALIASES.get(str(raw).strip().lower(), str(raw).strip())
+
+
+# Sector-decomp label sets used by indirect.py build_sector_decomp().
+# Defined here so indirect.py, compare.py and visualise.py all share them.
+# Keys are lowercase canonical names for .str.lower().isin() matching.
+SRC_DECOMP_AGR_LABELS:   frozenset[str] = frozenset({"agriculture"})
+SRC_DECOMP_ELEC_LABELS:  frozenset[str] = frozenset({
+    "electricity", "utilities/energy", "energy processing", "utilities"
+})
+SRC_DECOMP_PETRO_LABELS: frozenset[str] = frozenset({
+    "petroleum", "mining"
+    # NOTE: "energy processing" deliberately removed — it was in both ELEC
+    # and PETRO causing double-counting. "Energy Processing" maps to Electricity
+    # via SOURCE_GROUP_ALIASES; Mining is canonical and stands alone here.
+})
 
 
 # ══════════════════════════════════════════════════════════════════════════════
@@ -605,7 +690,14 @@ def six_polar_sda(
     from itertools import permutations
 
     def _twf(w, l, y):
-        return float(np.dot(w @ l, y))
+        # Accept either a diagonal matrix `w` (n×n) or a 1-D intensity vector.
+        # Compute w^T (L y) → scalar. This avoids calling float() on an array.
+        wy = l @ y
+        if isinstance(w, np.ndarray) and w.ndim == 2 and w.shape[0] == w.shape[1]:
+            w_vec = np.diag(w)
+        else:
+            w_vec = np.asarray(w).ravel()
+        return float(np.dot(w_vec, wy))
 
     base, year1 = [W0, L0, Y0], [W1, L1, Y1]
     names = ["W", "L", "Y"]

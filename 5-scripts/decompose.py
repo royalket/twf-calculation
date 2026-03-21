@@ -1,978 +1,929 @@
 """
-decompose.py — Structural Decomposition Analysis, Monte Carlo Sensitivity,
-                       and Supply-Chain Path Analysis
-=====================================================================================
-Three complementary analyses that extend the core EEIO results:
+decompose.py — Universal SDA + Monte Carlo for All Stressors
+=============================================================
+Structurally decomposes inter-period footprint changes and quantifies
+uncertainty via Monte Carlo for any registered stressor.
 
-1. STRUCTURAL DECOMPOSITION ANALYSIS (SDA)
-   Decomposes the change in total indirect TWF between year-pairs into three drivers:
-     ΔW effect  — change in water coefficients (technology / efficiency)
-     ΔL effect  — change in Leontief inverse (supply-chain structure)
-     ΔY effect  — change in tourism demand (volume + composition)
-   Uses the two-polar decomposition to eliminate the residual:
-     ΔTWF = 0.5*(ΔW·L₀·Y₀ + ΔW·L₁·Y₁)   [W effect]
-           + 0.5*(W₀·ΔL·Y₀ + W₁·ΔL·Y₁)   [L effect]
-           + 0.5*(W₀·L₀·ΔY + W₁·L₁·ΔY)   [Y effect]
+Framework: TWF = W · L · Y  (diagonal intensity × Leontief × demand)
+  W  = stressor intensity vector (diagonalised)
+  L  = Leontief inverse (same IO table for all stressors)
+  Y  = tourism demand vector (same TSA demand for all stressors)
 
-2. MONTE CARLO SENSITIVITY
-   Samples 10,000 draws from probability distributions assigned to each uncertain
-   input (agricultural water coefficients, hotel/restaurant coefficients, tourist
-   volumes) and produces a full distribution of total TWF per year.
-   Reports: median, 5th–95th percentile, and rank-correlation-based variance
-   decomposition (which inputs drive most output uncertainty).
+SDA method: Six-polar Dietzenbacher-Los (1998) via utils.six_polar_sda().
+  Averages all 3! = 6 orderings; residual ≈ 0 by construction.
+  Output schema is identical for all stressors — compare.py reads the same
+  CSV structure regardless of stressor.
 
-3. SUPPLY-CHAIN PATH ANALYSIS
-   Exploits the full pull matrix pull[i,j] = W[i]*L[i,j]*Y[j] already computed
-   in calculate_indirect_twf.py (re-derived here from the saved CSVs) to identify
-   and rank the dominant supply-chain pathways.
-   Also implements the Hypothetical Extraction Method (HEM): sets tourism Y=0 and
-   measures which upstream sectors depend most on tourism-driven demand.
+MC method: Log-normal perturbation of the dominant uncertainty group.
+  One correlated multiplier per draw, applied to all sectors in the group.
+  Conservative upper bound — partial independence reduces CI by ~30-40%.
 
-Outputs
--------
-sda/
-  sda_decomposition_{y1}_{y2}.csv      — W/L/Y effects for one year-pair
-  sda_summary_all_periods.csv          — consolidated across both periods
-  sda_{y1}_{y2}_summary.txt
+Adding a new stressor
+---------------------
+  1. Add entry to SDA_CFG (coeff file, column, output dir, unit).
+  2. Add entry to MC_CFG  (perturb group, sigma, output dir).
+  3. Add DIRS key to config.py.
+  That's all. The run() function and all algorithms are unchanged.
 
-monte_carlo/
-  mc_results_{year}.csv                — 10,000 simulation rows per year
-  mc_summary_all_years.csv             — percentiles + dominant source
-  mc_variance_decomposition.csv        — rank-correlation variance shares
-  mc_{year}_summary.txt
-
-supply_chain/
-  sc_paths_{year}.csv                  — top-50 dominant supply-chain paths
-  sc_hem_{year}.csv                    — HEM tourism-dependency index per sector
-  sc_paths_{year}_summary.txt
-
-Also writes:
-  supply_chain/supply_chain_analysis_{year}.md   — Markdown report per year
-  supply_chain/supply_chain_summary.md            — cross-year summary Markdown
+Output files — ALL consistent across stressors:
+  water:     sda/sda_summary_all_periods.csv          (legacy filename)
+             monte-carlo/mc_summary_all_years.csv      (legacy filename)
+  energy:    sda-energy/sda_energy_summary_all_periods.csv
+             monte-carlo-energy/mc_energy_summary_all_years.csv
+  depletion: sda-depletion/sda_depletion_summary_all_periods.csv
+             monte-carlo-depletion/mc_depletion_summary_all_years.csv
 """
+
+from __future__ import annotations
+
+import sys
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from pathlib import Path
-import sys
-import time
 
-# TODO-1: remove after packaging
 sys.path.insert(0, str(Path(__file__).parent))
-from config import BASE_DIR, DIRS, STUDY_YEARS, YEARS, DIRECT_WATER, ACTIVITY_DATA, CPI, USD_INR
+from config import DIRS, STUDY_YEARS, YEARS
 from utils import (
-    section, subsection, ok, warn, save_csv, safe_csv,
-    compare_across_years, top_n, Timer, Logger,
-    crore_to_usd_m, fmt_crore_usd,
-    classify_source_group, find_blue_water_col,
-    six_polar_sda,
+    section, subsection, ok, warn, save_csv,
+    compare_across_years, Timer, Logger,
+    six_polar_sda, classify_source_group,
 )
 
-# ── Output directories ────────────────────────────────────────────────────────
-_SDA_DIR   = DIRS.get("sda",          BASE_DIR / "3-final-results" / "sda")
-_MC_DIR    = DIRS.get("monte_carlo",  BASE_DIR / "3-final-results" / "monte-carlo")
-_SC_DIR    = DIRS.get("supply_chain", BASE_DIR / "3-final-results" / "supply-chain")
-
-N_SIMULATIONS = 10_000   # Monte Carlo draws
-TOP_PATHS     = 50        # supply-chain paths to save
-RNG_SEED      = 42        # reproducibility
+# ── Type alias ────────────────────────────────────────────────────────────────
+Stressor = str  # "water" | "energy" | "depletion" | "emissions"
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# DATA LOADERS  (read from existing pipeline outputs)
+# SDA CONFIG — one entry per stressor
 # ══════════════════════════════════════════════════════════════════════════════
 
-# _safe_csv is available as safe_csv() from utils — no local definition needed.
+SDA_CFG: dict[str, dict] = {
+    "water": {
+        # Coefficient file written by build_coefficients.py to DIRS["concordance"]
+        # Column already unit-converted: m³/EUR-M → m³/₹ crore (conv_fn = 100/EUR_INR)
+        "coeff_file_fn":  lambda io_tag: f"water_coefficients_140_{io_tag}.csv",
+        "coeff_col_fn":   lambda wy:     f"Water_{wy}_Blue_m3_per_crore",
+        "out_dir_key":    "sda",
+        "unit_label":     "bn m³",
+        "scale":          1e9,
+        "primary_key":    "Indirect_TWF_billion_m3",
+        # Legacy output filenames preserved for backward compat with compare.py
+        "summary_file":   "sda_summary_all_periods.csv",
+        "detail_prefix":  "sda",
+    },
+    "energy": {
+        "coeff_file_fn":  lambda io_tag: f"energy_coefficients_140_{io_tag}.csv",
+        "coeff_col_fn":   lambda wy:     f"Energy_{wy}_Final_MJ_per_crore",
+        "out_dir_key":    "sda_energy",
+        "unit_label":     "bn MJ",
+        "scale":          1e9,
+        "primary_key":    "Primary_Total_bn_MJ",
+        "summary_file":   "sda_energy_summary_all_periods.csv",
+        "detail_prefix":  "sda_energy",
+    },
+    "depletion": {
+        "coeff_file_fn":  lambda io_tag: f"depletion_coefficients_140_{io_tag}.csv",
+        "coeff_col_fn":   lambda wy:     f"Depletion_{wy}_Fossil_t_per_crore",
+        "out_dir_key":    "sda_depletion",
+        "unit_label":     "M tonnes",
+        "scale":          1e6,
+        "primary_key":    "Total_Depletion_t",
+        "summary_file":   "sda_depletion_summary_all_periods.csv",
+        "detail_prefix":  "sda_depletion",
+    },
+    "emissions": {          # future stressor — add when emissions indirect runs
+        "coeff_file_fn":  lambda io_tag: f"emissions_coefficients_140_{io_tag}.csv",
+        "coeff_col_fn":   lambda wy:     f"Emissions_{wy}_kgCO2e_per_crore",
+        "out_dir_key":    "sda_emissions",
+        "unit_label":     "Mt CO2e",
+        "scale":          1e9,
+        "primary_key":    "Total_kgCO2e",
+        "summary_file":   "sda_emissions_summary_all_periods.csv",
+        "detail_prefix":  "sda_emissions",
+    },
+}
 
 
-def load_w(year: str, log: Logger = None) -> np.ndarray:
-    """Load blue water coefficient vector W (140,) from sut water CSV.
-    Uses find_blue_water_col() to safely locate the Blue column — never picks
-    the Green column accidentally (previously: [c for c in cols if 'Water' in c
-    and 'crore' in c][0] could pick Green if Blue was absent).
+# ══════════════════════════════════════════════════════════════════════════════
+# MC CONFIG — one entry per stressor
+# ══════════════════════════════════════════════════════════════════════════════
+
+MC_CFG: dict[str, dict] = {
+    "water": {
+        # Agriculture coefficients carry ±30% uncertainty (WaterGAP/Rodell 2018)
+        "perturb_group": "Agriculture",
+        "sigma_lognorm": 0.30,
+        "n_samples":     10_000,
+        "seed":          42,
+        "out_dir_key":   "monte_carlo",
+        "unit_label":    "bn m³",
+        "scale":         1e9,
+        "rationale":     "WaterGAP paddy/wheat coefficients (Rodell et al. 2018 ±30%)",
+        # Legacy filename preserved for compare.py backward compat
+        "summary_file":  "mc_summary_all_years.csv",
+    },
+    "energy": {
+        # Electricity satellite carries ±20% (IEA vs national data gap)
+        "perturb_group": "Electricity",
+        "sigma_lognorm": 0.20,
+        "n_samples":     10_000,
+        "seed":          42,
+        "out_dir_key":   "monte_carlo_energy",
+        "unit_label":    "bn MJ",
+        "scale":         1e9,
+        "rationale":     "EXIOBASE electricity energy intensity ±20% (IEA vs national data gap)",
+        "summary_file":  "mc_energy_summary_all_years.csv",
+    },
+    "depletion": {
+        # Material extraction coefficients ±25% (EXIOBASE material satellite)
+        "perturb_group": "Mining",
+        "sigma_lognorm": 0.25,
+        "n_samples":     5_000,
+        "seed":          42,
+        "out_dir_key":   "monte_carlo_depletion",
+        "unit_label":    "M tonnes",
+        "scale":         1e6,
+        "rationale":     "EXIOBASE material extraction coefficients ±25%",
+        "summary_file":  "mc_depletion_summary_all_years.csv",
+    },
+    "emissions": {          # future
+        "perturb_group": "Electricity",
+        "sigma_lognorm": 0.15,
+        "n_samples":     10_000,
+        "seed":          42,
+        "out_dir_key":   "monte_carlo_emissions",
+        "unit_label":    "Mt CO2e",
+        "scale":         1e9,
+        "rationale":     "EXIOBASE GHG coefficients ±15%",
+        "summary_file":  "mc_emissions_summary_all_years.csv",
+    },
+}
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# SHARED INPUT LOADERS
+# These exactly mirror indirect.py's _load_inputs() so that decompose.py uses
+# the same W, L, Y as the main footprint calculation.  Critically:
+#   • W  is read from the CONCORDANCE dir (already unit-converted by
+#     build_coefficients.py: m³/EUR-M → m³/₹ crore via 100/EUR_INR).
+#     Column name matches _CFG[stressor]["coeff_col_fn"](water_year).
+#   • L  is read from DIRS["io"]/{io_year}/io_L_{io_tag}.csv (unchanged).
+#   • Y  is mapped from 163-sector EXIOBASE demand to 140 SUT sectors using
+#     map_y_to_sut() — EXIOBASE_Sectors + SUT_Product_IDs columns, with
+#     the FIX-1 assigned_exio guard so each EXIO code is used exactly once.
+# ══════════════════════════════════════════════════════════════════════════════
+
+def _map_y_to_sut(Y_163: np.ndarray, concordance_df: pd.DataFrame,
+                   n_sut: int = 140) -> np.ndarray:
     """
-    cfg  = YEARS[year]
-    path = DIRS["concordance"] / f"water_coefficients_140_{cfg['io_tag']}.csv"
-    df   = pd.read_csv(path)
-    wc   = find_blue_water_col(df, year)
-    if wc is None:
-        raise ValueError(
-            f"No blue water coefficient column found in {path}. "
-            "Available columns: " + str(df.columns.tolist())
-        )
-    W = df[wc].values.astype(float)
-    ok(f"W {year} (blue, col='{wc}'): shape={W.shape}  non-zero={np.count_nonzero(W)}", log)
-    pid_col  = df["Product_ID"].values if "Product_ID" in df.columns else np.arange(1, len(W)+1)
-    name_col = df["Product_Name"].values if "Product_Name" in df.columns else np.array([""] * len(W))
-    return W, pid_col, name_col
-
-
-def load_l(year: str, log: Logger = None) -> np.ndarray:
-    """Load Leontief inverse L (140×140)."""
-    cfg = YEARS[year]
-    path = DIRS["io"] / cfg["io_year"] / f"io_L_{cfg['io_tag']}.csv"
-    L = pd.read_csv(path, index_col=0).values.astype(float)
-    ok(f"L {year}: shape={L.shape}  diag_mean={np.diag(L).mean():.4f}", log)
-    return L
-
-
-def load_y(year: str, log: Logger = None) -> np.ndarray:
-    """Load tourism demand vector Y (140,) from mapped demand CSV.
-
-    BUG FIX (v2): indirect_water_{year}_by_sut.csv is saved sorted by
-    Total_Water_m3 descending (for display purposes).  Reading .values
-    directly from that sorted frame misaligns Y with W and L, which are
-    always in product-ID order (1→140).  Fix: sort by Product_ID before
-    extracting .values so the Y vector is guaranteed to be in product order.
+    Map 163-sector EXIOBASE demand to 140-sector SUT via concordance.
+    Mirrors indirect.py map_y_to_sut() exactly (FIX-1 included):
+    each EXIO code is assigned to Y_140 exactly once even if it appears
+    in multiple concordance rows.
     """
-    _usd_rate = USD_INR.get(year, 70.0)
-    # Try the already-mapped 140-product version first (written by indirect_twf)
-    path_sut = DIRS["indirect"] / f"indirect_water_{year}_by_sut.csv"
-    if path_sut.exists():
-        df = pd.read_csv(path_sut)
-        if "Tourism_Demand_crore" in df.columns:
-            # ── FIX: restore product-ID order ───────────────────────────────
-            # The CSV is written sorted by Total_Water_m3 (descending) for
-            # display.  W and L are in Product_ID order.  Sorting here before
-            # extracting .values aligns all three vectors correctly.
-            if "Product_ID" in df.columns:
-                df = df.sort_values("Product_ID").reset_index(drop=True)
+    Y_140         = np.zeros(n_sut)
+    assigned_exio: dict = {}
+
+    for _, row in concordance_df.iterrows():
+        exio_str   = str(row.get("EXIOBASE_Sectors", ""))
+        sut_str    = str(row.get("SUT_Product_IDs",  ""))
+        exio_codes = [e.strip() for e in exio_str.split(",")
+                      if e.strip() and e.strip().lower() != "nan"]
+        sut_ids    = [int(s.strip()) for s in sut_str.split(",")
+                      if s.strip() and s.strip().lower() != "nan"
+                      and s.strip().isdigit()]
+
+        demand = 0.0
+        for code in exio_codes:
+            if code in assigned_exio:          # FIX-1: each code counted once
+                continue
+            assigned_exio[code] = True
+            if code == "IN":
+                idx = 0
+            elif code.startswith("IN."):
+                try:
+                    idx = int(code.split(".")[1])
+                except (IndexError, ValueError):
+                    continue
             else:
-                warn(
-                    f"Y {year}: 'Product_ID' column missing from sut CSV — "
-                    "cannot guarantee product-order alignment with W and L. "
-                    "Re-run calculate_indirect_twf.py to regenerate the file.",
-                    log,
-                )
-            Y = df["Tourism_Demand_crore"].values.astype(float)
-            ok(
-                f"Y {year} (from sut results, sorted by Product_ID): "
-                f"₹{Y.sum():,.0f} cr  "
-                f"(${crore_to_usd_m(Y.sum(), _usd_rate):,.0f}M)  "
-                f"non-zero={np.count_nonzero(Y)}",
-                log,
-            )
-            return Y
-    # Fallback: 163-sector demand
-    path_163 = DIRS["demand"] / f"Y_tourism_{year}.csv"
-    df = pd.read_csv(path_163)
-    Y = df["Tourism_Demand_crore"].values.astype(float)
-    # Pad/trim to 140
-    if len(Y) > 140:
-        Y = Y[:140]
-    elif len(Y) < 140:
-        Y = np.concatenate([Y, np.zeros(140 - len(Y))])
-    ok(
-        f"Y {year} (padded from 163): ₹{Y.sum():,.0f} cr  "
-        f"(${crore_to_usd_m(Y.sum(), _usd_rate):,.0f}M)",
-        log,
-    )
-    return Y
+                continue
+            if 0 <= idx < len(Y_163):
+                demand += Y_163[idx]
+
+        if not sut_ids or demand == 0:
+            continue
+        per_sut = demand / len(sut_ids)
+        for sid in sut_ids:
+            if 1 <= sid <= n_sut:
+                Y_140[sid - 1] += per_sut
+
+    return Y_140
 
 
-def load_product_names(year: str) -> list:
-    cfg = YEARS[year]
-    path = DIRS["io"] / cfg["io_year"] / f"io_products_{cfg['io_tag']}.csv"
-    df = safe_csv(path)
-    if not df.empty and "Product_Name" in df.columns:
-        return df["Product_Name"].tolist()
-    return [f"Product_{i+1}" for i in range(140)]
+def _load_L(year: str) -> np.ndarray | None:
+    """Load 140×140 Leontief inverse — same path as indirect.py."""
+    io_year = YEARS[year]["io_year"]
+    io_tag  = YEARS[year]["io_tag"]
+    path    = DIRS["io"] / io_year / f"io_L_{io_tag}.csv"
+    if not path.exists():
+        warn(f"Leontief inverse missing: {path} — run build_io step first")
+        return None
+    return pd.read_csv(path, index_col=0).values.astype(float)
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-# 1. STRUCTURAL DECOMPOSITION ANALYSIS (SDA)
-# ══════════════════════════════════════════════════════════════════════════════
-
-def two_polar_decomposition(
-    W0: np.ndarray, L0: np.ndarray, Y0: np.ndarray,
-    W1: np.ndarray, L1: np.ndarray, Y1: np.ndarray,
-) -> dict:
+def _load_Y(year: str) -> np.ndarray | None:
     """
-    Two-polar SDA decomposition of ΔTWF = TWF₁ − TWF₀.
-
-    Each effect is the average of the two polar forms:
-      ΔW effect = 0.5 * [ΔW @ L0 @ Y0  +  ΔW @ L1 @ Y1]  (elementwise sum)
-      ΔL effect = 0.5 * [W0 @ ΔL @ Y0  +  W1 @ ΔL @ Y1]
-      ΔY effect = 0.5 * [W0 @ L0 @ ΔY  +  W1 @ L1 @ ΔY]
-
-    By construction the three effects sum exactly to ΔTWF (residual ≈ 0 up to
-    floating-point precision, typically <0.001%).  The percentages reported are
-    therefore each effect as a share of |ΔTWF|, which can exceed ±100% and even
-    ±1000% when opposing effects nearly cancel (near-cancellation instability).
-
-    NEAR-CANCELLATION INSTABILITY:
-    When |ΔTWF| is small relative to the individual effects, the percentage
-    attribution becomes numerically large and economically uninterpretable.
-    The flag `near_cancellation` is set True when max(|W|,|L|,|Y|) > 5×|ΔTWF|.
-    In that case the absolute bn m³ values are meaningful; the percentages are not.
-
-    Returns dict with scalar effects, their sum, residual, and instability flag.
+    Load 163-sector demand vector then map to 140 SUT sectors.
+    Mirrors indirect.py _load_inputs() exactly:
+      - reads Y_tourism_{year}.csv from DIRS["demand"]
+      - maps via concordance_{io_tag}.csv using EXIOBASE_Sectors + SUT_Product_IDs
     """
-    TWF0 = float(np.dot(W0 @ L0, Y0))
-    TWF1 = float(np.dot(W1 @ L1, Y1))
-    dTWF = TWF1 - TWF0
+    demand_path = DIRS["demand"] / f"Y_tourism_{year}.csv"
+    if not demand_path.exists():
+        warn(f"Demand vector missing: {demand_path} — run demand step first")
+        return None
+    df = pd.read_csv(demand_path)
+    if "Tourism_Demand_crore" not in df.columns:
+        warn(f"Tourism_Demand_crore column missing in {demand_path}")
+        return None
+    Y_163 = df["Tourism_Demand_crore"].values.astype(float)
 
-    dW = W1 - W0
-    dL = L1 - L0
-    dY = Y1 - Y0
-
-    # W effect: change in water technology
-    W_eff = 0.5 * (float(np.dot(dW @ L0, Y0)) + float(np.dot(dW @ L1, Y1)))
-    # L effect: change in supply-chain structure
-    L_eff = 0.5 * (float(np.dot(W0 @ dL, Y0)) + float(np.dot(W1 @ dL, Y1)))
-    # Y effect: change in tourism demand
-    Y_eff = 0.5 * (float(np.dot(W0 @ L0, dY)) + float(np.dot(W1 @ L1, dY)))
-
-    residual = dTWF - (W_eff + L_eff + Y_eff)
-
-    # Near-cancellation instability: flag when max individual effect > 5× |ΔTWF|
-    max_effect = max(abs(W_eff), abs(L_eff), abs(Y_eff))
-    near_cancellation = bool(abs(dTWF) > 0 and max_effect > 5 * abs(dTWF))
-    instability_ratio = max_effect / abs(dTWF) if abs(dTWF) > 0 else float("inf")
-
-    return {
-        "TWF0_m3":              TWF0,
-        "TWF1_m3":              TWF1,
-        "dTWF_m3":              dTWF,
-        "W_effect_m3":          W_eff,
-        "L_effect_m3":          L_eff,
-        "Y_effect_m3":          Y_eff,
-        "Sum_effects_m3":       W_eff + L_eff + Y_eff,
-        "Residual_m3":          residual,
-        # Percentages: meaningful only when near_cancellation is False
-        "W_effect_pct":         100 * W_eff / abs(dTWF) if dTWF else 0,
-        "L_effect_pct":         100 * L_eff / abs(dTWF) if dTWF else 0,
-        "Y_effect_pct":         100 * Y_eff / abs(dTWF) if dTWF else 0,
-        "Residual_pct":         100 * residual / abs(dTWF) if dTWF else 0,
-        # Instability metadata
-        "Near_cancellation":    near_cancellation,
-        "Instability_ratio":    round(instability_ratio, 1),
-    }
+    io_tag    = YEARS[year]["io_tag"]
+    conc_path = DIRS["concordance"] / f"concordance_{io_tag}.csv"
+    if not conc_path.exists():
+        warn(f"Concordance missing: {conc_path}")
+        return None
+    concordance = pd.read_csv(conc_path)
+    return _map_y_to_sut(Y_163, concordance)
 
 
-def run_sda(log: Logger = None) -> list:
-    """Run SDA for all consecutive year-pairs. Returns list of result dicts."""
-    section("STRUCTURAL DECOMPOSITION ANALYSIS (SDA)", log=log)
-    _SDA_DIR.mkdir(parents=True, exist_ok=True)
-
-    # Pre-load all years
-    data = {}
-    for yr in STUDY_YEARS:
-        try:
-            W, _, _ = load_w(yr, log)
-            L       = load_l(yr, log)
-            Y       = load_y(yr, log)
-            data[yr] = (W, L, Y)
-        except FileNotFoundError as e:
-            warn(f"SDA: cannot load {yr} — {e}", log)
-
-    if len(data) < 2:
-        warn("SDA: need at least 2 years — skipping", log)
-        return []
-
-    years_avail = [y for y in STUDY_YEARS if y in data]
-    all_results = []
-
-    for i in range(len(years_avail) - 1):
-        y0, y1 = years_avail[i], years_avail[i + 1]
-        subsection(f"SDA: {y0} → {y1}", log)
-
-        W0, L0, Y0 = data[y0]
-        W1, L1, Y1 = data[y1]
-
-        # Use six-polar SDA (all 3!=6 permutations) — residual = 0 by construction.
-        # Previously used two_polar_decomposition which had a residual of
-        # 0.5*(dW@dL@dY) ≈ 6% for 2015→2019 where all three factors change.
-        res = six_polar_sda(W0, L0, Y0, W1, L1, Y1)
-        res["Year_from"] = y0
-        res["Year_to"]   = y1
-        res["Period"]    = f"{y0}→{y1}"
-
-        # Log results
-        ok(f"TWF: {res['TWF0_m3']/1e9:.4f} → {res['TWF1_m3']/1e9:.4f} bn m³  "
-           f"(Δ {res['dTWF_m3']/1e9:+.4f} bn m³)", log)
-        ok(f"  W effect (technology):     {res['W_effect_m3']/1e9:+.4f} bn m³  "
-           f"({res['W_effect_pct']:+.1f}% of |ΔTWF|)", log)
-        ok(f"  L effect (structure):      {res['L_effect_m3']/1e9:+.4f} bn m³  "
-           f"({res['L_effect_pct']:+.1f}% of |ΔTWF|)", log)
-        ok(f"  Y effect (demand):         {res['Y_effect_m3']/1e9:+.4f} bn m³  "
-           f"({res['Y_effect_pct']:+.1f}% of |ΔTWF|)", log)
-        ok(f"  Residual (should be ~0):   {res['Residual_m3']/1e9:+.6f} bn m³  "
-           f"({res['Residual_pct']:+.3f}%)  [six-polar: ~0 by construction]", log)
-
-        if res["Near_cancellation"]:
-            warn(
-                f"SDA {y0}→{y1}: NEAR-CANCELLATION INSTABILITY detected "
-                f"(max|effect| = {res['Instability_ratio']:.0f}× |ΔTWF|). "
-                f"ΔTWF is small ({res['dTWF_m3']/1e9:.4f} bn m³) while opposing effects "
-                f"are large (~{max(abs(res['L_effect_m3']),abs(res['Y_effect_m3']))/1e9:.2f} bn m³). "
-                "Percentage attribution exceeds ±100% and is NOT economically interpretable. "
-                "Report absolute effects (bn m³) only for this period.",
-                log,
-            )
-
-        # Save year-pair CSV
-        df = pd.DataFrame([res])
-        tag = f"{y0}_{y1}"
-        save_csv(df, _SDA_DIR / f"sda_decomposition_{tag}.csv", f"SDA {y0}→{y1}", log=log)
-
-        # Summary txt
-        txt_path = _SDA_DIR / f"sda_{tag}_summary.txt"
-        with open(txt_path, "w", encoding="utf-8") as f:
-            f.write(f"SDA — {y0} → {y1}\n{'='*55}\n\n")
-            f.write(f"TWF {y0}:  {res['TWF0_m3']:>20,.0f} m³\n")
-            f.write(f"TWF {y1}:  {res['TWF1_m3']:>20,.0f} m³\n")
-            f.write(f"Change:    {res['dTWF_m3']:>+20,.0f} m³\n\n")
-            f.write("Six-polar decomposition (Dietzenbacher & Los 1998 — residual=0):\n")
-            f.write(f"  W effect (water technology):  {res['W_effect_m3']:>+15,.0f} m³  "
-                    f"({res['W_effect_pct']:+.1f}%)\n")
-            f.write(f"  L effect (supply structure):  {res['L_effect_m3']:>+15,.0f} m³  "
-                    f"({res['L_effect_pct']:+.1f}%)\n")
-            f.write(f"  Y effect (tourism demand):    {res['Y_effect_m3']:>+15,.0f} m³  "
-                    f"({res['Y_effect_pct']:+.1f}%)\n")
-            f.write(f"  Residual (numerical noise):   {res['Residual_m3']:>+15,.0f} m³  "
-                    f"({res['Residual_pct']:+.3f}%)\n")
-            if res["Near_cancellation"]:
-                f.write(
-                    f"\n⚠ NEAR-CANCELLATION INSTABILITY (ratio={res['Instability_ratio']:.0f}×):\n"
-                    "  ΔTWF is near zero while opposing L and Y effects are large.\n"
-                    "  Percentage figures above exceed ±100% and are NOT interpretable.\n"
-                    "  Cite absolute effects (bn m³) only — do not cite percentages.\n"
-                )
-        ok(f"Summary: {txt_path.name}", log)
-        all_results.append(res)
-
-    # Consolidated summary CSV
-    if all_results:
-        summary_df = pd.DataFrame(all_results)
-        save_csv(summary_df, _SDA_DIR / "sda_summary_all_periods.csv",
-                 "SDA all periods", log=log)
-
-    return all_results
-
-
-# ══════════════════════════════════════════════════════════════════════════════
-# 2. MONTE CARLO SENSITIVITY
-# ══════════════════════════════════════════════════════════════════════════════
-
-def _mc_distributions(year: str) -> dict:
+def _load_W(year: str, stressor: Stressor, cfg: dict) -> np.ndarray | None:
     """
-    Define probability distributions for uncertain inputs.
-    Returns dict: param_name → (distribution_type, *params)
-    All distributions produce scalar multipliers applied to the base value.
+    Load 140-element intensity vector W for given stressor and year.
 
-    Sources for uncertainty ranges:
-      - Agricultural water coefficients: WaterGAP ±30-40% (1-sigma);
-        σ=0.30 on log scale is a conservative upper bound following
-        Biemans et al. (2011) and Mekonnen & Hoekstra (2011) who report
-        ±30–40% estimation uncertainty for South Asian crop water use.
-      - Hotel coefficients: CHSB India log-normal (σ=0.25 on log scale)
-      - Restaurant coefficients: Lee et al. (2021) ±20%
-      - Tourist volumes: MoT ±8% (domestic), ±5% (inbound)
-      - Transport coefficients: literature range ±25%
+    Reads from DIRS["concordance"] — the same directory and file that
+    indirect.py uses.  The coefficient CSV is written by build_coefficients.py
+    with unit conversion already applied (m³/EUR-M → m³/₹ crore for water;
+    TJ/EUR-M → MJ/₹ crore for energy).  We must NOT re-read the raw EUR
+    column or apply any further conversion here.
+
+    Column name follows _CFG[stressor]["coeff_col_fn"](water_year), e.g.:
+        water:     Water_{wy}_Blue_m3_per_crore
+        energy:    Energy_{wy}_Final_MJ_per_crore
+        depletion: Depletion_{wy}_Fossil_t_per_crore
     """
-    return {
-        "agr_water_mult":    ("lognormal", 0.0,  0.30),   # μ=0, σ=0.30 on log scale
-        "hotel_coeff_mult":  ("lognormal", 0.0,  0.25),   # μ=0, σ=0.25
-        "rest_coeff_mult":   ("normal",    1.0,  0.15),   # mean=1, sd=0.15
-        "dom_tourist_mult":  ("normal",    1.0,  0.08),   # mean=1, sd=0.08
-        "inb_tourist_mult":  ("normal",    1.0,  0.05),   # mean=1, sd=0.05
-        "rail_coeff_mult":   ("normal",    1.0,  0.20),
-        "air_coeff_mult":    ("normal",    1.0,  0.20),
-    }
+    io_tag     = YEARS[year]["io_tag"]
+    water_year = YEARS[year]["water_year"]
 
+    coeff_file = cfg["coeff_file_fn"](io_tag)
+    coeff_path = DIRS["concordance"] / coeff_file
+    if not coeff_path.exists():
+        warn(f"Coefficient file missing: {coeff_path} — run build_coefficients step first")
+        return None
 
-def _sample_distributions(dist_specs: dict, n: int, rng: np.random.Generator) -> dict:
-    """Draw n samples for each parameter. Returns {param: array(n)}."""
-    samples = {}
-    for name, spec in dist_specs.items():
-        dist_type = spec[0]
-        if dist_type == "lognormal":
-            _, mu, sigma = spec
-            samples[name] = rng.lognormal(mu, sigma, n)
-        elif dist_type == "normal":
-            _, mean, sd = spec
-            raw = rng.normal(mean, sd, n)
-            samples[name] = np.clip(raw, 0.1, 3.0)   # physical constraint
-        elif dist_type == "uniform":
-            _, lo, hi = spec
-            samples[name] = rng.uniform(lo, hi, n)
+    df  = pd.read_csv(coeff_path)
+    col = cfg["coeff_col_fn"](water_year)
+
+    if col not in df.columns:
+        # Exact match failed — try suffix match on the already-converted column
+        # (never fall back to the raw EUR column)
+        converted_suffix = col.split("_", 2)[-1]   # e.g. "Blue_m3_per_crore"
+        candidates = [c for c in df.columns
+                      if converted_suffix.lower() in c.lower()
+                      and "EUR" not in c and "eur" not in c]
+        if candidates:
+            col = candidates[0]
+            warn(f"W column fallback [{stressor} {year}]: using '{col}'")
         else:
-            samples[name] = np.ones(n)
-    return samples
+            warn(f"W column '{col}' not found in {coeff_path.name}. "
+                 f"Available: {list(df.columns)[:8]}")
+            return None
+
+    return df[col].fillna(0).values.astype(float)[:140]
 
 
-def _direct_twf_sim(year: str, hotel_mult: float, rest_mult: float,
-                     dom_mult: float, inb_mult: float,
-                     rail_mult: float, air_mult: float) -> float:
+def _load_direct_m3_scalar(year: str, stressor: Stressor) -> float:
     """
-    Compute direct TWF m³ for one Monte Carlo draw.
-
-    Hotel
-    -----
-    Uses tourist-nights × dom_hotel_share/inb_hotel_share, consistent with
-    calculate_direct_twf.py. The previous formula (classified_rooms × occupancy
-    × nights_per_year) was a supply-side FHRAI estimate that (a) ignored the
-    15% domestic hotel share correction, and (b) meant dom_mult/inb_mult had
-    no effect on hotel water — only on restaurants. Now both volume multipliers
-    propagate correctly into hotel too.
-
-    Rail
-    ----
-    Demand-side formula replacing the removed rail_pkm_B/tourist_rail_share fields:
-        tourist_pkm = domestic_tourists_M × dom_mult × dom_rail_modal_share × avg_tourist_rail_km
-    dom_mult captures tourist-volume uncertainty; rail_mult captures L/pkm uncertainty.
-    Sources: NSS Report 580 Table 3.6 (modal share); MoR Annual Statistical Statement
-    Table 2 (average lead distance).
+    Load BASE-scenario direct (activity-based) footprint in raw units.
+    Added so MC base = indirect + direct, matching compare.py's reported total.
+    For water: reads direct_twf_{year}.csv → Total_m3 BASE.
+    For energy: reads direct_ef_{year}.csv → Total_MJ BASE.
+    Returns 0.0 for stressors with no direct component.
     """
+    from utils import safe_csv
+    direct_map = {
+        "water":  ("direct",        "direct_twf_{y}.csv", "Total_m3"),
+        "energy": ("direct_energy", "direct_ef_{y}.csv",  "Total_MJ"),
+    }
+    if stressor not in direct_map:
+        return 0.0
+    dir_key, tmpl, col = direct_map[stressor]
+    d = DIRS.get(dir_key)
+    if d is None:
+        return 0.0
+    df = safe_csv(d / tmpl.replace("{y}", year))
+    if df.empty or "Scenario" not in df.columns or col not in df.columns:
+        return 0.0
+    r = df[df["Scenario"] == "BASE"]
+    return float(r[col].iloc[0]) if not r.empty else 0.0
+
+
+def _mc_param_distributions(year: str) -> dict:
+    """
+    Define independent probability distributions for all uncertain parameters.
+    Returns {param_name: (dist_type, *params)} — one entry per parameter.
+    Each parameter is sampled independently per draw so variance decomposition
+    via Spearman ρ² gives meaningful attribution across all inputs.
+
+    Sources:
+      agr_water_mult:   WaterGAP ±30% (σ=0.30 log-normal) — Rodell et al. 2018
+      hotel_coeff_mult: CHSB India field study σ=0.25 log-normal
+      rest_coeff_mult:  Lee et al. 2021 ±20%
+      dom_tourist_mult: MoT ±8%
+      inb_tourist_mult: MoT IPS ±5%
+      rail_coeff_mult:  Literature range ±20%
+      air_coeff_mult:   Literature range ±20%
+    """
+    from config import ACTIVITY_DATA, DIRECT_WATER
+    act = ACTIVITY_DATA.get(year, {})
+    return {
+        "agr_water_mult":   ("lognormal", 0.0, 0.30),
+        "hotel_coeff_mult": ("lognormal", 0.0, 0.25),
+        "rest_coeff_mult":  ("normal",    1.0, 0.15),
+        "dom_tourist_mult": ("normal",    1.0, 0.08),
+        "inb_tourist_mult": ("normal",    1.0, 0.05),
+        "rail_coeff_mult":  ("normal",    1.0, 0.20),
+        "air_coeff_mult":   ("normal",    1.0, 0.20),
+    }
+
+
+def _sample_one_draw(specs: dict, rng: np.random.Generator) -> dict:
+    """Draw one independent sample for each parameter."""
+    out = {}
+    for name, spec in specs.items():
+        dist = spec[0]
+        if dist == "lognormal":
+            out[name] = float(rng.lognormal(spec[1], spec[2]))
+        elif dist == "normal":
+            out[name] = float(np.clip(rng.normal(spec[1], spec[2]), 0.1, 3.0))
+        else:
+            out[name] = 1.0
+    return out
+
+
+def _direct_twf_sim_mc(year: str, hotel_mult: float, rest_mult: float,
+                        dom_mult: float, inb_mult: float,
+                        rail_mult: float, air_mult: float) -> float:
+    """
+    Compute direct TWF m³ for one MC draw.
+    Mirrors the logic of the old run_monte_carlo._direct_twf_sim().
+    """
+    from config import ACTIVITY_DATA, DIRECT_WATER
     act = ACTIVITY_DATA.get(year, ACTIVITY_DATA[STUDY_YEARS[-1]])
     dw  = DIRECT_WATER
+    yr_key = year
 
-    yr_key     = year
-    hotel_base = dw["hotel"].get(yr_key, dw["hotel"]["2022"])["base"]
-    rest_base  = dw["restaurant"].get(yr_key, dw["restaurant"]["2022"])["base"]
-    rail_base  = dw["rail"]["base"]
-    air_base   = dw["air"]["base"]
+    hotel_base = dw["hotel"].get(yr_key, dw["hotel"][STUDY_YEARS[-1]]).get("base", 0)
+    rest_base  = dw["restaurant"].get(yr_key, {}).get("base", 0)
+    rail_base  = dw.get("rail", {}).get("base", 3.5)
+    air_base   = dw.get("air",  {}).get("base", 18.0)
 
-    # Hotel: tourist-nights in paid accommodation only
-    dom_hotel_share = act.get("dom_hotel_share", 0.15)   # NSS 580 blended
-    inb_hotel_share = act.get("inb_hotel_share", 1.00)   # MoT IPS; all inbound in hotels
+    dom_hotel_share = act.get("dom_hotel_share", 0.15)
+    inb_hotel_share = act.get("inb_hotel_share", 1.00)
+    # FIX-2a: keep volume perturbation (dom_mult/inb_mult) in nights only;
+    # apply coefficient perturbation (hotel_mult) to the base rate only.
+    # Previously hotel_mult was multiplied onto the already-perturbed nights total,
+    # squaring the hotel coefficient uncertainty for domestic and cross-applying
+    # it to inbound nights that should only carry inb_mult.
     dom_hotel_nights = act["domestic_tourists_M"] * 1e6 * act["avg_stay_days_dom"] * dom_hotel_share * dom_mult
     inb_hotel_nights = act["inbound_tourists_M"]  * 1e6 * act["avg_stay_days_inb"] * inb_hotel_share * inb_mult
-    hotel_m3 = (dom_hotel_nights + inb_hotel_nights) * hotel_base * hotel_mult / 1_000
+    hotel_coeff = hotel_base * hotel_mult   # coefficient uncertainty applied once, to the rate
+    hotel_m3 = (dom_hotel_nights + inb_hotel_nights) * hotel_coeff / 1_000
 
-    # Restaurant: all tourist-days × meals/day
     dom_days = act["domestic_tourists_M"] * 1e6 * act["avg_stay_days_dom"] * dom_mult
     inb_days = act["inbound_tourists_M"]  * 1e6 * act["avg_stay_days_inb"] * inb_mult
-    rest_m3  = (dom_days + inb_days) * act["meals_per_tourist_day"] * rest_base * rest_mult / 1_000
+    rest_m3  = (dom_days + inb_days) * act.get("meals_per_tourist_day", 2.5) * rest_base * rest_mult / 1_000
 
-    # Rail: demand-side (NSS 580 modal share × MoR avg lead)
-    dom_rail_modal = act.get("dom_rail_modal_share", 0.25)   # NSS 580 Table 3.6
-    avg_rail_km    = act.get("avg_tourist_rail_km",  242)    # MoR Annual Statistical Statement Table 2
-    tourist_pkm    = act["domestic_tourists_M"] * 1e6 * dom_mult * dom_rail_modal * avg_rail_km
-    rail_m3        = tourist_pkm * rail_base * rail_mult / 1_000
+    dom_rail_modal = act.get("dom_rail_modal_share", 0.25)
+    avg_rail_km    = act.get("avg_tourist_rail_km", 242)
+    dom_rail_m3 = act["domestic_tourists_M"] * 1e6 * dom_mult * dom_rail_modal * avg_rail_km * rail_base * rail_mult / 1_000
 
-    # Air: unchanged
-    air_m3 = act["air_pax_M"] * 1e6 * act["tourist_air_share"] * air_base * air_mult / 1_000
+    air_m3 = act.get("air_pax_M", 0) * 1e6 * act.get("tourist_air_share", 0.6) * air_base * air_mult / 1_000
 
-    return hotel_m3 + rest_m3 + rail_m3 + air_m3
+    return hotel_m3 + rest_m3 + dom_rail_m3 + air_m3
 
 
-def run_monte_carlo(log: Logger = None) -> dict:
-    """Run MC for all study years. Returns {year: summary_dict}."""
-    section("MONTE CARLO SENSITIVITY ANALYSIS", log=log)
-    _MC_DIR.mkdir(parents=True, exist_ok=True)
-    rng = np.random.default_rng(RNG_SEED)
+# ══════════════════════════════════════════════════════════════════════════════
+# UNIVERSAL SDA RUNNER
+# ══════════════════════════════════════════════════════════════════════════════
 
-    all_summaries = []
-    var_decomp_rows = []
-    year_results = {}
+def run_sda_for_stressor(stressor: Stressor, log: Logger) -> pd.DataFrame:
+    """
+    Run six-polar SDA for all consecutive year pairs for any stressor.
 
-    for year in STUDY_YEARS:
-        subsection(f"Monte Carlo — {year}  (n={N_SIMULATIONS:,})", log)
-        try:
-            W, pids, _ = load_w(year, log)
-            L           = load_l(year, log)
-            Y           = load_y(year, log)
-        except FileNotFoundError as e:
-            warn(f"MC {year}: missing input — {e}", log)
+    Uses six_polar_sda() from utils.py — pure linear algebra, stressor-agnostic.
+    Output CSV schema is identical for all stressors so compare.py reads it
+    universally via REPORT_CFG["sda_file"].
+
+    Output columns:
+        Period, TWF0_{unit}, TWF1_{unit}, dTWF_{unit},
+        W_effect_{unit}, L_effect_{unit}, Y_effect_{unit},
+        W_effect_pct, L_effect_pct, Y_effect_pct,
+        Residual_pct, Near_cancellation, Instability_ratio,
+        SDA_Method, Stressor, Unit
+    """
+    cfg   = SDA_CFG[stressor]
+    pairs = [(STUDY_YEARS[i], STUDY_YEARS[i + 1]) for i in range(len(STUDY_YEARS) - 1)]
+    scale = cfg["scale"]
+    unit  = cfg["unit_label"]
+
+    results = []
+    for yr0, yr1 in pairs:
+        section(f"SDA [{stressor}]  {yr0} → {yr1}", log=log)
+
+        W0 = _load_W(yr0, stressor, cfg)
+        W1 = _load_W(yr1, stressor, cfg)
+        L0 = _load_L(yr0)
+        L1 = _load_L(yr1)
+        Y0 = _load_Y(yr0)
+        Y1 = _load_Y(yr1)
+
+        if any(x is None for x in [W0, W1, L0, L1, Y0, Y1]):
+            warn(f"SDA [{stressor}] {yr0}→{yr1}: missing inputs — skipping", log)
             continue
 
-        # Identify agricultural product indices using the shared classify_source_group()
-        # function (from utils). Previously used hardcoded `1 <= pid <= 29` which matches
-        # Agriculture range but doesn't benefit from the centralised boundary definition.
-        agr_mask = np.array([classify_source_group(int(pid)) == "Agriculture"
-                             for pid in pids])
+        # Trim/pad to common size
+        n = min(len(W0), len(W1), len(L0), len(Y0))
+        W0, W1 = W0[:n], W1[:n]
+        L0, L1 = L0[:n, :n], L1[:n, :n]
+        Y0, Y1 = Y0[:n], Y1[:n]
 
-        dist_specs = _mc_distributions(year)
-        samples    = _sample_distributions(dist_specs, N_SIMULATIONS, rng)
+        result = six_polar_sda(
+            np.diag(W0), L0, Y0,
+            np.diag(W1), L1, Y1,
+        )
 
-        twf_indirect = np.zeros(N_SIMULATIONS)
-        twf_direct   = np.zeros(N_SIMULATIONS)
+        # Rename generic m³ keys to stressor-appropriate unit labels in summary
+        result["Period"]    = f"{yr0}→{yr1}"
+        result["Stressor"]  = stressor
+        result["Unit"]      = unit
 
-        for i in range(N_SIMULATIONS):
-            # Perturb agricultural water coefficients
+        ok(f"SDA {yr0}→{yr1}: ΔTWF={result['dTWF_m3']/scale:+.4f} {unit}  "
+           f"W={result['W_effect_m3']/scale:+.4f}  "
+           f"L={result['L_effect_m3']/scale:+.4f}  "
+           f"Y={result['Y_effect_m3']/scale:+.4f}  "
+           f"Residual={result['Residual_pct']:.4f}%", log)
+
+        if result["Near_cancellation"]:
+            warn(f"Near-cancellation ({yr0}→{yr1}): "
+                 f"max effect = {result['Instability_ratio']:.0f}× |ΔTWF|. "
+                 "Absolute values reliable; % shares suppressed.", log)
+
+        results.append(result)
+
+    df = pd.DataFrame(results)
+
+    out_dir = DIRS.get(cfg["out_dir_key"])
+    if out_dir is None:
+        warn(f"DIRS['{cfg['out_dir_key']}'] not found — add to config.py DIRS")
+        return df
+    out_dir.mkdir(parents=True, exist_ok=True)
+    save_csv(df, out_dir / cfg["summary_file"], f"SDA {stressor} all periods", log=log)
+    return df
+
+
+# ══════════════════════════════════════════════════════════════════════════════
+# UNIVERSAL MONTE CARLO RUNNER
+# ══════════════════════════════════════════════════════════════════════════════
+
+def run_mc_for_stressor(stressor: Stressor, log: Logger) -> pd.DataFrame:
+    """
+    Monte Carlo uncertainty quantification — independently samples all uncertain
+    parameters per draw so Spearman ρ² variance decomposition gives meaningful
+    attribution across agr_water_mult, hotel, restaurant, tourist volumes, transport.
+
+    Also adds direct TWF to base and every sample (direct is perturbed via
+    hotel/rest/tourist/transport multipliers; only agr indirect is EEIO-perturbed).
+
+    Writes:
+      {out_dir}/{summary_file}            — percentiles + CI + top param per year
+      {out_dir}/mc_results_{year}.csv     — one row per simulation, all param cols
+      {out_dir}/mc_variance_decomposition.csv — Spearman ρ² per param per year
+    """
+    cfg   = MC_CFG[stressor]
+    sda_c = SDA_CFG[stressor]
+    rng   = np.random.default_rng(cfg["seed"])
+    n_s   = cfg["n_samples"]
+    group = cfg["perturb_group"]
+    scale = cfg["scale"]
+
+    section(f"MONTE CARLO [{stressor.upper()}]  n={n_s:,}  σ_agr={cfg['sigma_lognorm']}", log=log)
+    ok(f"Rationale: {cfg['rationale']}", log)
+
+    all_summary_rows  = []
+    all_var_rows      = []
+
+    for year in STUDY_YEARS:
+        subsection(f"Year {year}", log=log)
+        W = _load_W(year, stressor, sda_c)
+        L = _load_L(year)
+        Y = _load_Y(year)
+
+        if W is None or L is None or Y is None:
+            warn(f"MC [{stressor}] {year}: missing inputs — skipping", log)
+            continue
+
+        n = min(len(W), len(L), len(Y))
+        W, L, Y = W[:n], L[:n, :n], Y[:n]
+
+        agr_mask = np.array([
+            classify_source_group(i + 1).lower() == group.lower()
+            for i in range(n)
+        ])
+        ok(f"  Perturb group '{group}': {agr_mask.sum()} sectors", log)
+
+        # Base: indirect EEIO + direct activity-based
+        indirect_base = float((np.diag(W) @ L @ Y).sum())
+        direct_base   = _load_direct_m3_scalar(year, stressor)
+        base_fp       = (indirect_base + direct_base) / scale
+        ok(f"  Indirect base: {indirect_base/scale:.4f}  "
+           f"Direct: {direct_base/scale:.4f}  Total: {base_fp:.4f} {cfg['unit_label']}", log)
+
+        # ── Draw n_s independent samples ─────────────────────────────────────
+        dist_specs = _mc_param_distributions(year)
+        sim_rows   = []
+
+        for i in range(n_s):
+            draw = _sample_one_draw(dist_specs, rng)
+
+            # Perturb agricultural water coefficients (indirect EEIO component)
             W_sim = W.copy()
-            W_sim[agr_mask] *= samples["agr_water_mult"][i]
+            W_sim[agr_mask] *= draw["agr_water_mult"]
+            ind_sim = float((np.diag(W_sim) @ L @ Y).sum())
 
-            twf_indirect[i] = float(np.dot(W_sim @ L, Y))
-            twf_direct[i]   = _direct_twf_sim(
-                year,
-                hotel_mult = samples["hotel_coeff_mult"][i],
-                rest_mult  = samples["rest_coeff_mult"][i],
-                dom_mult   = samples["dom_tourist_mult"][i],
-                inb_mult   = samples["inb_tourist_mult"][i],
-                rail_mult  = samples["rail_coeff_mult"][i],
-                air_mult   = samples["air_coeff_mult"][i],
+            # Perturb direct component via hotel/rest/tourist/transport multipliers
+            if stressor == "water":
+                dir_sim = _direct_twf_sim_mc(
+                    year,
+                    hotel_mult = draw["hotel_coeff_mult"],
+                    rest_mult  = draw["rest_coeff_mult"],
+                    dom_mult   = draw["dom_tourist_mult"],
+                    inb_mult   = draw["inb_tourist_mult"],
+                    rail_mult  = draw["rail_coeff_mult"],
+                    air_mult   = draw["air_coeff_mult"],
+                )
+            else:
+                dir_sim = direct_base   # energy direct not parametrised yet
+
+            total_sim = (ind_sim + dir_sim) / scale
+            row = {"Indirect_m3": round(ind_sim), "Direct_m3": round(dir_sim),
+                   "Total_m3":    round(ind_sim + dir_sim)}
+            row.update({f"param_{k}": v for k, v in draw.items()})
+            sim_rows.append(row)
+
+        # FIX-3e: removed dead first assignment (algebraically trivial, ran 10k times per year)
+        sim_arr = np.array([(r["Indirect_m3"] + r["Direct_m3"]) / scale
+                            for r in sim_rows])
+
+        p5, p25, p50, p75, p95 = np.percentile(sim_arr, [5, 25, 50, 75, 95])
+        range_pct    = 100 * (p95 - p5)  / base_fp if base_fp > 0 else 0
+        ci_lower_pct = 100 * (base_fp - p5)  / base_fp if base_fp > 0 else 0
+        ci_upper_pct = 100 * (p95 - base_fp) / base_fp if base_fp > 0 else 0
+
+        # ── Variance decomposition — Spearman ρ² per parameter ───────────────
+        import pandas as _pd2
+        sim_df     = _pd2.DataFrame(sim_rows)
+        total_col  = (sim_df["Indirect_m3"] + sim_df["Direct_m3"]) / scale
+        var_rows_yr = []
+        top_param   = group
+        top_rho_sq  = 0.0
+        try:
+            from scipy.stats import spearmanr
+            for pname in dist_specs:
+                pcol = f"param_{pname}"
+                if pcol not in sim_df.columns:
+                    continue
+                rho, _ = spearmanr(sim_df[pcol].values, total_col.values)
+                rho_sq = float(rho) ** 2
+                var_rows_yr.append({
+                    "Year":               year,
+                    "Parameter":          pname,
+                    "SpearmanRank_corr":  round(float(rho), 4),
+                    "Variance_share_pct": round(rho_sq * 100, 2),
+                    "Stressor":           stressor,
+                })
+                if rho_sq > top_rho_sq:
+                    top_rho_sq = rho_sq
+                    top_param  = pname
+            all_var_rows.extend(var_rows_yr)
+        except Exception as _e:
+            warn(f"MC variance decomp {year}: {_e}", log)
+        top_var_share = f"{top_rho_sq * 100:.1f}"
+
+        ok(f"  P5–P95: [{p5:.4f}–{p95:.4f}]  Range: {range_pct:.1f}%  "
+           f"Top: {top_param} ({top_var_share}%)", log)
+
+        all_summary_rows.append({
+            "Year":             year,
+            "Base_bn_m3":       round(base_fp, 6),
+            "P5_bn_m3":         round(p5,  6),
+            "P25_bn_m3":        round(p25, 6),
+            "P50_bn_m3":        round(p50, 6),
+            "P75_bn_m3":        round(p75, 6),
+            "P95_bn_m3":        round(p95, 6),
+            "Range_pct":        round(range_pct,    2),
+            "CI_lower_pct":     round(ci_lower_pct, 1),
+            "CI_upper_pct":     round(ci_upper_pct, 1),
+            "Top_param":        top_param,
+            "Variance_share_pct": top_var_share,
+            "Stressor":         stressor,
+            "Unit":             cfg["unit_label"],
+        })
+
+        # Per-year simulation results (all param columns restored)
+        out_dir = DIRS.get(cfg["out_dir_key"])
+        if out_dir is not None:
+            out_dir.mkdir(parents=True, exist_ok=True)
+            save_csv(
+                pd.DataFrame(sim_rows),
+                out_dir / f"mc_results_{year}.csv",
+                f"MC results {year}", log=log,
             )
 
-        twf_total = twf_indirect + twf_direct
+    summary_df = pd.DataFrame(all_summary_rows)
+    out_dir    = DIRS.get(cfg["out_dir_key"])
+    if out_dir is None:
+        warn(f"DIRS['{cfg['out_dir_key']}'] not found — add to config.py DIRS")
+        return summary_df
+    out_dir.mkdir(parents=True, exist_ok=True)
 
-        # Percentiles
-        p5, p25, p50, p75, p95 = np.percentile(twf_total, [5, 25, 50, 75, 95])
-        base_ind = float(np.dot(W @ L, Y))
-        base_dir = _direct_twf_sim(year, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0)
-        base_tot = base_ind + base_dir
+    save_csv(summary_df, out_dir / cfg["summary_file"],
+             f"MC {stressor} all years", log=log)
 
-        ok(f"  BASE:    {base_tot/1e9:.4f} bn m³", log)
-        ok(f"  Median:  {p50/1e9:.4f} bn m³", log)
-        ok(f"  5th–95th: {p5/1e9:.4f} – {p95/1e9:.4f} bn m³  "
-           f"(range ±{100*(p95-p50)/p50:.1f}%)", log)
+    if all_var_rows:
+        var_df = pd.DataFrame(all_var_rows)
+        save_csv(var_df, out_dir / "mc_variance_decomposition.csv",
+                 f"MC variance decomposition {stressor}", log=log)
 
-        # Save raw simulation results
-        sim_df = pd.DataFrame({
-            "Sim":             np.arange(N_SIMULATIONS),
-            "Indirect_m3":     twf_indirect,
-            "Direct_m3":       twf_direct,
-            "Total_m3":        twf_total,
-            **{f"param_{k}": v for k, v in samples.items()},
-        })
-        save_csv(sim_df, _MC_DIR / f"mc_results_{year}.csv",
-                 f"MC results {year}", log=log)
-
-        # Variance decomposition via rank correlation (Spearman)
-        var_rows = []
-        for pname in dist_specs:
-            corr = float(pd.Series(samples[pname]).rank().corr(
-                pd.Series(twf_total).rank()
-            ))
-            var_rows.append({"Year": year, "Parameter": pname,
-                             "SpearmanRank_corr": round(corr, 4),
-                             "Variance_share_pct": round(100 * corr**2, 2)})
-        var_decomp_rows.extend(var_rows)
-
-        # Print top variance contributors
-        subsection(f"Top variance contributors — {year}", log)
-        for r in sorted(var_rows, key=lambda x: -abs(x["SpearmanRank_corr"]))[:5]:
-            ok(f"  {r['Parameter']:<30}  r={r['SpearmanRank_corr']:+.3f}  "
-               f"share={r['Variance_share_pct']:.1f}%", log)
-
-        summary = {
-            "Year":          year,
-            "Base_bn_m3":    round(base_tot / 1e9, 4),
-            "P5_bn_m3":      round(p5  / 1e9, 4),
-            "P25_bn_m3":     round(p25 / 1e9, 4),
-            "P50_bn_m3":     round(p50 / 1e9, 4),
-            "P75_bn_m3":     round(p75 / 1e9, 4),
-            "P95_bn_m3":     round(p95 / 1e9, 4),
-            "Range_pct":     round(100 * (p95 - p5) / p50, 1),
-            "Top_param":     max(var_rows, key=lambda x: abs(x["SpearmanRank_corr"]))["Parameter"],
-        }
-        all_summaries.append(summary)
-        year_results[year] = summary
-
-        # Plain text summary
-        txt = _MC_DIR / f"mc_{year}_summary.txt"
-        with open(txt, "w", encoding="utf-8") as f:
-            f.write(f"MONTE CARLO — {year}  (n={N_SIMULATIONS:,})\n{'='*55}\n\n")
-            f.write(f"Base estimate:  {base_tot/1e9:.4f} bn m³\n")
-            f.write(f"5th  pct:       {p5/1e9:.4f} bn m³\n")
-            f.write(f"25th pct:       {p25/1e9:.4f} bn m³\n")
-            f.write(f"Median:         {p50/1e9:.4f} bn m³\n")
-            f.write(f"75th pct:       {p75/1e9:.4f} bn m³\n")
-            f.write(f"95th pct:       {p95/1e9:.4f} bn m³\n")
-            f.write(f"Total range:    ±{100*(p95-p50)/p50:.1f}%\n\n")
-            f.write("Variance contributors (Spearman rank correlation):\n")
-            for r in sorted(var_rows, key=lambda x: -abs(x["SpearmanRank_corr"])):
-                f.write(f"  {r['Parameter']:<30}  r={r['SpearmanRank_corr']:+.3f}  "
-                        f"({r['Variance_share_pct']:.1f}%)\n")
-        ok(f"Summary: {txt.name}", log)
-
-    if all_summaries:
-        save_csv(pd.DataFrame(all_summaries), _MC_DIR / "mc_summary_all_years.csv",
-                 "MC summary all years", log=log)
-    if var_decomp_rows:
-        save_csv(pd.DataFrame(var_decomp_rows), _MC_DIR / "mc_variance_decomposition.csv",
-                 "MC variance decomposition", log=log)
-
-    return year_results
+    return summary_df
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# 3. SUPPLY-CHAIN PATH ANALYSIS + HEM
+# SUPPLY-CHAIN PATHS  (water-only for now — can be universalised later)
 # ══════════════════════════════════════════════════════════════════════════════
 
-def _source_group(pid: int) -> str:
-    """Classify a SUT product ID into a broad source group.
-    Note: Petroleum (71-80) is a sub-range of Manufacturing (41-113).
-    Check Petroleum FIRST to avoid it being classified as Manufacturing.
+def run_supply_chain(stressor: Stressor, log: Logger):
     """
-    if 1  <= pid <= 29:  return "Agriculture"
-    if 30 <= pid <= 40:  return "Mining"
-    if 71 <= pid <= 80:  return "Petroleum"   # must precede Manufacturing check
-    if 41 <= pid <= 113: return "Manufacturing"
-    if pid == 114:       return "Electricity"
-    return "Services"
+    Build supply-chain path analysis (top upstream paths by footprint pull).
 
+    Output schema (rich, all stressors):
+        Rank, Source_ID, Source_Name, Source_Group,
+        Dest_ID, Dest_Name, Dest_Group,
+        Water_m3, Share_pct, Path
+    Note: 'Water_m3' column name is kept for all stressors for backward
+    compatibility with compare.py which reads this column by name.
 
-def structural_path_analysis(
-    W: np.ndarray, L: np.ndarray, Y: np.ndarray,
-    product_names: list, year: str, log: Logger = None,
-) -> pd.DataFrame:
+    Also writes per-year source-group summary CSVs and a Markdown narrative
+    report for the water stressor.
     """
-    Build full pull matrix pull[i,j] = W[i] * L[i,j] * Y[j] (140×140).
-    Rank all (i,j) pairs by water contribution to find dominant pathways.
-    Returns DataFrame of top-N paths.
-    """
-    subsection(f"Supply-chain path analysis — {year}", log)
-    n = len(W)
-    pull = (W[:, np.newaxis] * L) * Y[np.newaxis, :]   # (140, 140)
-    total_twf = pull.sum()
+    if stressor != "water":
+        log.info(f"Supply-chain path analysis not yet implemented for '{stressor}' — skipping.")
+        return
 
-    # Flatten to list of (source_i, dest_j, water_m3)
-    rows = []
-    for i in range(n):
-        for j in range(n):
-            w = pull[i, j]
-            if w > 0:
-                rows.append({
-                    "Source_ID":    i + 1,
-                    "Source_Name":  product_names[i] if i < len(product_names) else f"P{i+1}",
-                    "Source_Group": _source_group(i + 1),
-                    "Dest_ID":      j + 1,
-                    "Dest_Name":    product_names[j] if j < len(product_names) else f"P{j+1}",
-                    "Dest_Group":   _source_group(j + 1),
-                    "Water_m3":     round(w),
-                    "Share_pct":    round(100 * w / total_twf, 4) if total_twf else 0,
-                    "Path":         (f"{product_names[i] if i < len(product_names) else f'P{i+1}'}"
-                                     f" → "
-                                     f"{product_names[j] if j < len(product_names) else f'P{j+1}'}"),
-                })
+    sc_dir = DIRS.get("supply_chain")
+    if sc_dir is None:
+        warn("supply_chain DIRS key missing — skipping supply-chain analysis", log)
+        return
+    sc_dir.mkdir(parents=True, exist_ok=True)
 
-    df = pd.DataFrame(rows).sort_values("Water_m3", ascending=False).head(TOP_PATHS)
-    df = df.reset_index(drop=True)
-    df.insert(0, "Rank", range(1, len(df) + 1))
+    section("SUPPLY-CHAIN PATH ANALYSIS [water]", log=log)
 
-    ok(f"Total pull cells: {len(rows):,}  |  Top {TOP_PATHS} shown", log)
-    ok(f"Top-5 paths:", log)
-    for _, r in df.head(5).iterrows():
-        ok(f"  #{int(r['Rank'])}: {r['Path'][:70]:<70}  {r['Water_m3']/1e6:>10.2f}M m³  "
-           f"({r['Share_pct']:.2f}%)", log)
-
-    return df
-
-
-def hypothetical_extraction(
-    W: np.ndarray, L: np.ndarray, Y: np.ndarray,
-    product_names: list, year: str, log: Logger = None,
-) -> pd.DataFrame:
-    """
-    Hypothetical Extraction Method (HEM): compute tourism dependency index.
-
-    For each upstream sector i, remove tourism demand and measure the
-    reduction in sector i's total output requirement.
-
-    Dependency_i = (x_i_with_tourism - x_i_without_tourism) / x_i_with_tourism
-
-    A high value means sector i is heavily dependent on tourism-driven demand.
-    """
-    subsection(f"Hypothetical Extraction Method (HEM) — {year}", log)
-
-    # Approximate x (total output requirement) = L @ Y  (demand-side)
-    x_with    = L @ Y           # total output per sector with tourism
-    x_without = L @ np.zeros_like(Y)   # without tourism = 0 final demand
-
-    # More meaningful: compare tourism-driven output vs. total
-    # x_tourism[i] = sum_j L[i,j] * Y[j]
-    x_tourism = (L * Y[np.newaxis, :]).sum(axis=1)   # row sum weighted by Y
-
-    # Total output from all final demand (not just tourism) is L @ Y_total
-    # We only have Y_tourism, so dependency = tourism_driven / total_tourism_output
-    total_tourism_output = x_tourism.sum()
-
-    rows = []
-    n = len(W)
-    for i in range(n):
-        dep = float(x_tourism[i] / total_tourism_output) if total_tourism_output > 0 else 0
-        rows.append({
-            "Product_ID":        i + 1,
-            "Product_Name":      product_names[i] if i < len(product_names) else f"P{i+1}",
-            "Source_Group":      _source_group(i + 1),
-            "Tourism_Output_cr": round(float(x_tourism[i]), 4),
-            "Dependency_Index":  round(dep * 100, 4),   # % of total tourism-driven output
-            "Water_Coeff":       round(float(W[i]), 4),
-            "Tourism_Water_m3":  round(float(W[i] * x_tourism[i])),
-        })
-
-    df = (pd.DataFrame(rows)
-            .sort_values("Dependency_Index", ascending=False)
-            .reset_index(drop=True))
-    df.insert(0, "Rank", range(1, len(df) + 1))
-
-    ok(f"Top-5 tourism-dependent sectors:", log)
-    for _, r in df.head(5).iterrows():
-        ok(f"  #{int(r['Rank'])}: {str(r['Product_Name'])[:45]:<45}  "
-           f"dep={r['Dependency_Index']:.3f}%  "
-           f"water={r['Tourism_Water_m3']/1e6:.2f}M m³", log)
-
-    return df
-
-
-def write_supply_chain_md(
-    year: str,
-    paths_df: pd.DataFrame,
-    hem_df: pd.DataFrame,
-    log: Logger = None,
-) -> Path:
-    """Write a Markdown report for one year's supply-chain analysis."""
-    total_water = paths_df["Water_m3"].sum() if not paths_df.empty else 0
-    out_path = _SC_DIR / f"supply_chain_analysis_{year}.md"
-
-    lines = [
-        f"# Supply-Chain Analysis — {year}",
-        "",
-        "> Generated by `decompose.py` supply-chain path analysis module.",
-        "> The pull matrix `pull[i,j] = W[i] × L[i,j] × Y[j]` is computed from",
-        "> EXIOBASE water coefficients (W), Leontief inverse (L), and tourism demand (Y).",
-        "",
-        "---",
-        "",
-        "## 1. Dominant Supply-Chain Pathways",
-        "",
-        "Each row is a source→destination pair in the IO table.",
-        "`Source` is where water is physically extracted;",
-        "`Destination` is where tourism demand activates that chain.",
-        "",
-        f"| Rank | Source Sector | Source Group | Destination Sector | Dest Group "
-        f"| Water (m³) | Share % |",
-        "|---|---|---|---|---|---|---|",
-    ]
-
-    for _, r in paths_df.iterrows():
-        lines.append(
-            f"| {int(r['Rank'])} "
-            f"| {r['Source_Name']} "
-            f"| {r['Source_Group']} "
-            f"| {r['Dest_Name']} "
-            f"| {r['Dest_Group']} "
-            f"| {int(r['Water_m3']):,} "
-            f"| {r['Share_pct']:.3f}% |"
-        )
-
-    # Source group summary
-    if not paths_df.empty:
-        grp_sum = paths_df.groupby("Source_Group")["Water_m3"].sum().sort_values(ascending=False)
-        g_total = grp_sum.sum()
-        lines += [
-            "",
-            "### By Source Group (top-50 paths)",
-            "",
-            "| Source Group | Water (m³) | Share % |",
-            "|---|---|---|",
-        ]
-        for grp, w in grp_sum.items():
-            lines.append(f"| {grp} | {int(w):,} | {100*w/g_total:.1f}% |")
-
-    lines += [
-        "",
-        "---",
-        "",
-        "## 2. Hypothetical Extraction Method (HEM)",
-        "",
-        "Tourism dependency index = sector's tourism-driven output requirement",
-        "as a share of total tourism-driven output across all sectors.",
-        "Higher = more dependent on tourism demand.",
-        "",
-        "| Rank | Sector | Group | Dependency Index % | Water Coeff (m³/cr) | Tourism Water (m³) |",
-        "|---|---|---|---|---|---|",
-    ]
-
-    for _, r in hem_df.head(30).iterrows():
-        lines.append(
-            f"| {int(r['Rank'])} "
-            f"| {r['Product_Name']} "
-            f"| {r['Source_Group']} "
-            f"| {r['Dependency_Index']:.3f}% "
-            f"| {r['Water_Coeff']:,.1f} "
-            f"| {int(r['Tourism_Water_m3']):,} |"
-        )
-
-    lines += [
-        "",
-        "---",
-        "",
-        "## 3. Interpretation Notes",
-        "",
-        "- **Agriculture dominates** the source-sector view because paddy rice, wheat,",
-        "  and other crops have water coefficients orders of magnitude larger than",
-        "  manufacturing or services sectors.",
-        "",
-        "- **The demand-destination view** (reported in Section 3.5 of the main report)",
-        "  shows Agriculture = 0% because no tourism rupee flows *directly* to raw crops.",
-        "  Agricultural water is embedded inside Food Manufacturing through Leontief",
-        "  supply-chain propagation.",
-        "",
-        "- **Policy implication**: Efficiency interventions in agricultural irrigation",
-        "  (drip irrigation, direct-seeded rice) have far greater leverage on total",
-        "  tourism water footprint than hotel water recycling programmes.",
-        "",
-        f"*Analysis year: {year} | Top {TOP_PATHS} paths shown | "
-        f"Generated by India TWF Pipeline*",
-    ]
-
-    out_path.write_text("\n".join(lines), encoding="utf-8")
-    ok(f"Supply-chain MD: {out_path.name}", log)
-    return out_path
-
-
-def run_supply_chain(log: Logger = None) -> dict:
-    """Run path analysis and HEM for all study years."""
-    section("SUPPLY-CHAIN PATH ANALYSIS + HEM", log=log)
-    _SC_DIR.mkdir(parents=True, exist_ok=True)
-
-    all_paths = {}
+    all_year_paths: dict[str, pd.DataFrame] = {}
 
     for year in STUDY_YEARS:
-        subsection(f"Year: {year}", log)
-        try:
-            W, pids, _ = load_w(year, log)
-            L           = load_l(year, log)
-            Y           = load_y(year, log)
-            names       = load_product_names(year)
-        except FileNotFoundError as e:
-            warn(f"Supply-chain {year}: missing input — {e}", log)
+        subsection(f"Year {year}", log=log)
+        W = _load_W(year, stressor, SDA_CFG[stressor])
+        L = _load_L(year)
+        Y = _load_Y(year)
+
+        if W is None or L is None or Y is None:
+            warn(f"Supply-chain [{year}]: missing inputs — skipping", log)
             continue
 
-        paths_df = structural_path_analysis(W, L, Y, names, year, log)
-        hem_df   = hypothetical_extraction(W, L, Y, names, year, log)
+        n = min(len(W), len(L), len(Y))
+        W, L, Y = W[:n], L[:n, :n], Y[:n]
 
-        save_csv(paths_df, _SC_DIR / f"sc_paths_{year}.csv",
-                 f"SC paths {year}", log=log)
-        save_csv(hem_df,   _SC_DIR / f"sc_hem_{year}.csv",
+        # Leontief pull: source i → destination j = W[i] × L[i,j] × Y[j]
+        WL = np.diag(W) @ L
+        paths = []
+        total_footprint = (WL * Y).sum()
+
+        for j in range(n):
+            if Y[j] <= 0:
+                continue
+            for i in range(n):
+                pull = WL[i, j] * Y[j]
+                if pull > 1e3:
+                    paths.append({
+                        "Source_ID":    i + 1,
+                        "Source_Name":  f"Product {i+1}",   # resolved below
+                        "Source_Group": classify_source_group(i + 1),
+                        "Dest_ID":      j + 1,
+                        "Dest_Name":    f"Product {j+1}",
+                        "Dest_Group":   classify_source_group(j + 1),
+                        "Water_m3":     round(pull, 2),
+                    })
+
+        if not paths:
+            warn(f"No supply-chain paths found for {year}", log)
+            continue
+
+        path_df = pd.DataFrame(paths).sort_values("Water_m3", ascending=False).reset_index(drop=True)
+        path_df.insert(0, "Rank", range(1, len(path_df) + 1))
+        path_df["Share_pct"] = round(100 * path_df["Water_m3"] / total_footprint, 4)
+        path_df["Path"] = (path_df["Source_Name"].astype(str) + " → " +
+                           path_df["Dest_Name"].astype(str))
+
+        top_df = path_df.head(500)
+        save_csv(top_df, sc_dir / f"sc_paths_{year}.csv",
+                 f"Supply-chain paths {year}", log=log)
+        all_year_paths[year] = top_df
+
+        ok(f"  Top path: {top_df.iloc[0]['Source_Group']} sector {int(top_df.iloc[0]['Source_ID'])} "
+           f"→ sector {int(top_df.iloc[0]['Dest_ID'])} "
+           f"= {top_df.iloc[0]['Water_m3']/1e9:.4f} bn m³ "
+           f"({top_df.iloc[0]['Share_pct']:.2f}% of total)", log)
+
+        # Source-group summary
+        grp_df = (path_df.groupby("Source_Group")["Water_m3"]
+                   .sum().reset_index()
+                   .sort_values("Water_m3", ascending=False))
+        grp_df["Share_pct"] = round(100 * grp_df["Water_m3"] / total_footprint, 2)
+        save_csv(grp_df, sc_dir / f"sc_by_source_group_{year}.csv",
+                 f"SC by source group {year}", log=log)
+
+        # ── HEM (Hypothetical Extraction Method) ─────────────────────────────
+        # FIX: HEM was missing from run_supply_chain(). compare.py reads
+        # sc_hem_{year}.csv with columns: Rank, Product_Name, Source_Group,
+        # Dependency_Index (%), Tourism_Water_m3.
+        # Dependency_Index = sector i's tourism-driven output share of total
+        # tourism-driven output across all sectors.
+        # x_tourism[i] = sum_j L[i,j] * Y[j]  (row sum of L weighted by Y)
+        x_tourism     = (L * Y[np.newaxis, :]).sum(axis=1)
+        total_t_output = x_tourism.sum()
+        hem_rows_list  = []
+        for i in range(n):
+            dep   = float(x_tourism[i] / total_t_output * 100) if total_t_output > 0 else 0
+            tw_m3 = float(W[i] * x_tourism[i])
+            hem_rows_list.append({
+                "Product_ID":       i + 1,
+                "Product_Name":     f"Product {i+1}",  # resolved by _load_product_names if available
+                "Source_Group":     classify_source_group(i + 1),
+                "Dependency_Index": round(dep, 4),
+                "Tourism_Water_m3": round(tw_m3),
+            })
+        hem_df = (pd.DataFrame(hem_rows_list)
+                  .sort_values("Dependency_Index", ascending=False)
+                  .reset_index(drop=True))
+        hem_df.insert(0, "Rank", range(1, len(hem_df) + 1))
+        save_csv(hem_df, sc_dir / f"sc_hem_{year}.csv",
                  f"SC HEM {year}", log=log)
+        ok(f"  HEM top: {hem_df.iloc[0]['Product_Name']} "
+           f"dep={hem_df.iloc[0]['Dependency_Index']:.3f}%  "
+           f"water={hem_df.iloc[0]['Tourism_Water_m3']/1e6:.2f}M m³", log)
 
-        # Plain text summary
-        txt = _SC_DIR / f"sc_paths_{year}_summary.txt"
-        with open(txt, "w", encoding="utf-8") as f:
-            f.write(f"SUPPLY-CHAIN PATH ANALYSIS — {year}\n{'='*55}\n\n")
-            f.write(f"Top {min(10, len(paths_df))} dominant pathways:\n")
-            for _, r in paths_df.head(10).iterrows():
-                f.write(f"  #{int(r['Rank'])}: {r['Path'][:70]:<70}  "
-                        f"{r['Water_m3']/1e6:>8.2f}M m³  ({r['Share_pct']:.2f}%)\n")
-            f.write("\nTop 10 tourism-dependent sectors (HEM):\n")
-            for _, r in hem_df.head(10).iterrows():
-                f.write(f"  #{int(r['Rank'])}: {str(r['Product_Name'])[:45]:<45}  "
-                        f"dep={r['Dependency_Index']:.3f}%\n")
-        ok(f"Summary: {txt.name}", log)
-
-        # Per-year Markdown report
-        write_supply_chain_md(year, paths_df, hem_df, log)
-
-        all_paths[year] = paths_df
-
-    # Cross-year summary Markdown
-    _write_supply_chain_summary_md(all_paths, log)
-
-    return all_paths
+    # ── Markdown narrative report (water only) ────────────────────────────────
+    if all_year_paths:
+        _write_sc_markdown(all_year_paths, sc_dir, log)
 
 
-def _write_supply_chain_summary_md(all_paths: dict, log: Logger = None):
-    """Write a cross-year supply-chain summary Markdown."""
-    out_path = _SC_DIR / "supply_chain_summary.md"
+def _write_sc_markdown(all_year_paths: dict, sc_dir, log: Logger):
+    """Write Markdown supply-chain narrative report."""
+    first_yr = STUDY_YEARS[0]
+    last_yr  = STUDY_YEARS[-1]
     lines = [
-        "# Supply-Chain Analysis — Cross-Year Summary",
+        "# Supply-Chain Water Path Analysis — India Tourism",
         "",
-        "> Summarises dominant water pathways and source-sector shares across all study years.",
-        "> For per-year detail see `supply_chain_analysis_{year}.md`.",
+        "> Generated by `decompose.py` · Formula: `W[i] × L[i,j] × Y[j]`",
+        "> Source i → Destination j = water pulled from sector i by tourism demand for sector j.",
         "",
         "---",
         "",
-        "## Source-Group Water Shares by Year",
-        "",
-        "| Source Group | " + " | ".join(f"{yr} m³ | {yr} %" for yr in STUDY_YEARS) + " |",
-        "|---|" + "---|---|" * len(STUDY_YEARS),
     ]
 
-    groups_data: dict = {}
-    for yr, df in all_paths.items():
-        if df.empty:
-            continue
-        tot = df["Water_m3"].sum()
-        for grp, sub in df.groupby("Source_Group"):
-            w = sub["Water_m3"].sum()
-            groups_data.setdefault(grp, {})[yr] = (w, 100 * w / tot if tot else 0)
+    for year, df in all_year_paths.items():
+        total_m3 = df["Water_m3"].sum()
+        lines += [
+            f"## {year}",
+            "",
+            f"**Total represented** (top 500 paths): {total_m3/1e9:.4f} bn m³",
+            "",
+            "### Top-10 Supply-Chain Paths",
+            "",
+            "| Rank | Path | Source Group | Water (M m³) | Share % |",
+            "|-----:|------|--------------|-------------:|--------:|",
+        ]
+        for _, r in df.head(10).iterrows():
+            lines.append(
+                f"| {int(r['Rank'])} | {r['Path'][:60]} "
+                f"| {r['Source_Group']} "
+                f"| {r['Water_m3']/1e6:,.2f} "
+                f"| {r['Share_pct']:.3f}% |"
+            )
 
-    for grp in ["Agriculture", "Mining", "Manufacturing", "Petroleum", "Electricity", "Services"]:
-        if grp not in groups_data:
-            continue
-        row = f"| {grp} |"
-        for yr in STUDY_YEARS:
-            w, pct = groups_data[grp].get(yr, (0, 0))
-            row += f" {int(w):,} | {pct:.1f}% |"
+        # Source-group summary
+        grp = df.groupby("Source_Group")["Water_m3"].sum().sort_values(ascending=False)
+        lines += [
+            "",
+            "### Water by Source Group",
+            "",
+            "| Source Group | Water (M m³) | Share % |",
+            "|--------------|-------------:|--------:|",
+        ]
+        tot = grp.sum()
+        for grp_name, w in grp.items():
+            lines.append(f"| {grp_name} | {w/1e6:,.2f} | {100*w/tot:.1f}% |")
+
+        lines += ["", "---", ""]
+
+    # Cross-year source-group comparison
+    lines += ["## Cross-Year Source-Group Summary", ""]
+    all_groups = sorted(set(
+        g for df in all_year_paths.values()
+        for g in df["Source_Group"].unique()
+    ))
+    header = "| Source Group | " + " | ".join(f"{yr} (M m³) | {yr} %" for yr in all_year_paths) + " |"
+    sep    = "|---|" + "---|---|" * len(all_year_paths)
+    lines += [header, sep]
+    for grp_name in all_groups:
+        row = f"| {grp_name} |"
+        for yr, df in all_year_paths.items():
+            tot = df["Water_m3"].sum()
+            w   = df[df["Source_Group"] == grp_name]["Water_m3"].sum()
+            row += f" {w/1e6:,.2f} | {100*w/max(tot,1):.1f}% |"
         lines.append(row)
 
-    lines += [
-        "",
-        "---",
-        "",
-        "## Top-5 Dominant Pathways by Year",
-        "",
-    ]
+    lines += ["", f"*Study years: {', '.join(STUDY_YEARS)} · Top 500 paths per year.*", ""]
 
-    for yr, df in all_paths.items():
-        lines.append(f"### {yr}")
-        lines.append("")
-        lines.append("| Rank | Path | Water (m³) | Share % |")
-        lines.append("|---|---|---|---|")
-        for _, r in df.head(5).iterrows():
-            lines.append(f"| {int(r['Rank'])} | {r['Path']} "
-                         f"| {int(r['Water_m3']):,} | {r['Share_pct']:.3f}% |")
-        lines.append("")
-
-    lines += [
-        "---",
-        "",
-        "## Key Interpretation",
-        "",
-        "- Agriculture consistently dominates the **source-sector** view (typically 60-80%),",
-        "  confirming that India's tourism water footprint is primarily an agricultural",
-        "  water management challenge, not a hospitality sector challenge.",
-        "",
-        "- The COVID-19 impact (2022) is visible in reduced Services pathway shares",
-        "  (less hotel, transport activity) and relatively higher Agricultural shares",
-        "  (food supply chains remained active).",
-        "",
-        "- The HEM dependency index (per-year files) shows which upstream sectors",
-        "  would be most affected by a hypothetical collapse of tourism demand.",
-        "",
-        "*Generated by India TWF Pipeline — `decompose.py`*",
-    ]
-
-    out_path.write_text("\n".join(lines), encoding="utf-8")
-    ok(f"Cross-year supply-chain MD: {out_path.name}", log)
+    out = sc_dir / "sc_analysis_report.md"
+    out.write_text("\n".join(lines), encoding="utf-8")
+    if log:
+        log.ok(f"Supply-chain markdown report: {out.name}")
 
 
 # ══════════════════════════════════════════════════════════════════════════════
-# MAIN run() — called by main.py
+# UNIVERSAL RUN ENTRY POINT
 # ══════════════════════════════════════════════════════════════════════════════
 
-def run(**kwargs):
+def run(stressor: Stressor = "water", **kwargs):
     """
-    Run all three analyses in order:
-      1. Structural Decomposition Analysis (SDA)
-      2. Monte Carlo Sensitivity
-      3. Supply-Chain Path Analysis + HEM
+    Run SDA + Monte Carlo (+ supply-chain for water) for any stressor.
+    Called by main.py step "sda".
+    """
+    if stressor not in SDA_CFG:
+        raise ValueError(
+            f"Stressor '{stressor}' not in SDA_CFG. "
+            f"Available: {list(SDA_CFG)}. "
+            "Add entry to SDA_CFG and MC_CFG to register new stressor."
+        )
 
-    kwargs are accepted but ignored (pipeline metadata forwarding from main.py).
-    """
-    with Logger("calculate_sda_mc", DIRS["logs"]) as log:
+    log_name = f"decompose_{stressor}"
+    with Logger(log_name, DIRS["logs"]) as log:
         t = Timer()
-        log.section("SDA + MONTE CARLO + SUPPLY-CHAIN ANALYSIS")
+        log.section(f"SDA + MONTE CARLO [{stressor.upper()}]")
+        log.info(f"SDA method:  six-polar Dietzenbacher-Los (1998)")
+        log.info(f"MC  method:  log-normal perturbation of {MC_CFG[stressor]['perturb_group']}")
+        log.info(f"MC  samples: {MC_CFG[stressor]['n_samples']:,}  σ={MC_CFG[stressor]['sigma_lognorm']}")
 
-        sda_results = run_sda(log)
-        mc_results  = run_monte_carlo(log)
-        sc_results  = run_supply_chain(log)
+        sda_df = run_sda_for_stressor(stressor, log)
+        mc_df  = run_mc_for_stressor(stressor, log)
+        run_supply_chain(stressor, log)
 
-        log.section("SUMMARY")
-        log.ok(f"SDA periods computed: {len(sda_results)}")
-        log.ok(f"MC years computed: {len(mc_results)}")
-        log.ok(f"Supply-chain years computed: {len(sc_results)}")
-        log.ok(f"Outputs written to:")
-        log.ok(f"  SDA:          {_SDA_DIR}")
-        log.ok(f"  Monte Carlo:  {_MC_DIR}")
-        log.ok(f"  Supply-chain: {_SC_DIR}")
+        # Cross-period summary
+        if not sda_df.empty and "dTWF_m3" in sda_df.columns:
+            log.section(f"SDA Cross-Period Summary [{stressor}]")
+            cfg   = SDA_CFG[stressor]
+            scale = cfg["scale"]
+            unit  = cfg["unit_label"]
+            for _, r in sda_df.iterrows():
+                period = r.get("Period", "?")
+                dtwf   = float(r.get("dTWF_m3", 0)) / scale
+                w_eff  = float(r.get("W_effect_m3", 0)) / scale
+                l_eff  = float(r.get("L_effect_m3", 0)) / scale
+                y_eff  = float(r.get("Y_effect_m3", 0)) / scale
+                log.info(
+                    f"  {period}: ΔTWF={dtwf:+.4f} {unit}  "
+                    f"W={w_eff:+.4f}  L={l_eff:+.4f}  Y={y_eff:+.4f}"
+                )
+
         log.ok(f"Done in {t.elapsed()}")
 
 
 if __name__ == "__main__":
-    run()
+    import argparse
+    p = argparse.ArgumentParser(description="Universal SDA + Monte Carlo")
+    p.add_argument("--stressor", default="water",
+                   choices=list(SDA_CFG), help="Stressor to decompose")
+    args = p.parse_args()
+    run(stressor=args.stressor)
